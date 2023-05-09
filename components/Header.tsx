@@ -7,7 +7,7 @@ const Header = () => {
     <>
       <header className="flex flex-row items-center justify-between mb-8 px-2 pr-2">
         <h1 className="p-4 text-slate-700 font-bold text-2xl font-mono flex items-center gap-3 dark:text-slate-200">
-          <Image src={'/logo.png'} width="32" height="32" alt="MagickPen logo" /> BDFZ AI
+          <Image src={'/logo.png'} width="32" height="32" alt="MagickPen logo" /> bdfz.app
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-opacity-10 bg-scale-200 text-scale-1100 border border-scale-700">
             <svg
               xmlns="http://www.w3.org/2000/svg"

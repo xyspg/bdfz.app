@@ -60,9 +60,9 @@ sequenceDiagram
     end
 ```
 
-相关文件 [`SearchDialog`](./components/SearchDialog.tsx)组件和[`vector-search`](./pages/api/vector-search.ts)
+相关文件 [`SearchDialog`](./components/SearchDialog.tsx) 组件和 [`vector-search`](./pages/api/vector-search.ts)
 
-数据库的初始化，包括 `pgvector` 扩展的设置存储在 [`supabase/migrations`文件夹](./supabase/migrations/)中，并在运行 `supabase start` 时自动应用于本地 PostgreSQL 实例
+数据库的初始化，包括 `pgvector` 扩展的设置存储在 [`supabase/migrations`文件夹](./supabase/migrations/) 中，并在运行 `supabase start` 时自动应用于本地 PostgreSQL 实例
 
 ## 本地开发
 
