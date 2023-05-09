@@ -349,9 +349,9 @@ export function SearchDialog() {
               "
                     >
                       <div
-                        className={`p-1.5 bg-white dark:bg-neutral-800  rounded-md ${
+                        className={`p-1.5 rounded-md ${
                           feedback !== '' ? `cursor-default` : `cursor-pointer dark:hover:bg-neutral-700 hover:bg-neutral-200`
-                        } ${feedback === 'positive' && `bg-neutral-200 dark:bg-neutral-700`}`}
+                        } ${feedback === 'positive' ? `bg-neutral-200 dark:bg-neutral-700`:`bg-white dark:bg-neutral-800`}`}
                         onClick={() => {
                           sendFeedback('positive')
                         }}
@@ -372,9 +372,9 @@ export function SearchDialog() {
                         </svg>
                       </div>
                       <div
-                        className={`p-1.5 bg-white dark:bg-neutral-800  rounded-md ${
+                        className={`p-1.5 rounded-md ${
                           feedback !== '' ? `cursor-default` : `cursor-pointer dark:hover:bg-neutral-700 hover:bg-neutral-200`
-                        } ${feedback === 'negative' && `bg-neutral-200 dark:bg-neutral-700`}`}
+                        } ${feedback === 'negative' ? `bg-neutral-200 dark:bg-neutral-700`:`bg-white dark:bg-neutral-800`}`}
                         onClick={() => {
                           sendFeedback('negative')
                         }}
