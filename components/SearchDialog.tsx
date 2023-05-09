@@ -424,9 +424,9 @@ export function SearchDialog() {
                   data-umami-event={'ask: ' + q}
                   className="px-1.5 py-3 md:py-0.5 md:px-1.5 md:w-fit h-full
                     md:h-auto
-                  bg-slate-50 dark:bg-gray-500 text-sm md:text-xs
+                  bg-slate-50 dark:bg-neutral-700 text-sm md:text-xs
                   hover:bg-slate-100 dark:hover:bg-gray-600
-                  rounded-md border border-slate-200 dark:border-slate-600
+                  rounded-md border border-slate-200 dark:border-neutral-600
                   transition-colors"
                   onClick={(_) => setSearch(q)}
                 >
