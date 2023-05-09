@@ -1,0 +1,39 @@
+.reactMarkDown a {
+    cursor: pointer;
+    color: #0070f3;
+    text-decoration: none;
+    margin: 0 0.1rem;
+}
+
+.reactMarkDown table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0;
+    border-radius: 30px;
+    border: 1px solid #ccc;
+}
+
+
+.reactMarkDown thead {
+    background-color: #464242;
+}
+
+.reactMarkDown th {
+    text-align: left;
+    padding: 8px;
+}
+
+.reactMarkDown td {
+    text-align: left;
+    padding: 8px;
+}
+
+.reactMarkDown tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.reactMarkDown th {
+    font-weight: bold;
+    color: black;
+    background-color: #f2f2f2;
+}
