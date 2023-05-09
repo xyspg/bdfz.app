@@ -29,6 +29,8 @@
 
 .reactMarkDown tr:nth-child(even) {
   background-color: #f2f2f2;
+  color: #334155;
+
 }
 
 .reactMarkDown th {
