@@ -296,9 +296,9 @@ export function SearchDialog() {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 className="text-scale-900"
               >
                 <path d="M6 18h8"></path>

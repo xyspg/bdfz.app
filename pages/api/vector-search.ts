@@ -126,7 +126,7 @@ export default async function handler(req: NextRequest) {
        try to answer the question using that information. Give the document name and section.
        If you are uncertain or the answer is not explicitly written in the documentation, 
        please respond with "I'm sorry, I cannot assist with this."
-       Your output must be in Chinese except for course names. 
+       Your output should stay consistent with the input language, mostly Chinese and English. 
       `}
 
       Context sections:
