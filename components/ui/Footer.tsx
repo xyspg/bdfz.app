@@ -9,7 +9,10 @@ const Footer = () => {
           <div className="flex flex-col items-center justify-center mt-4 md:m-0">
             <div className="opacity-75 transition hover:opacity-100 cursor-pointer">
               <Link
-                href="https://github.com/lvwzhen/law-cn-ai"
+                href="https://github.com/xyspg/bdfz.app"
+                data-umami-event="Visit GitHub"
+                target='_blank'
+                rel='noopener'
                 className="flex items-center justify-center fill-neutral-600 dark:fill-neutral-200 "
               >
                 <svg

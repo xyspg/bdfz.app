@@ -273,6 +273,7 @@ export function SearchDialog() {
                 <button
                   key={q}
                   type="button"
+                  data-umami-event={'ask: ' + q}
                   className="px-1.5 py-3 md:py-0.5 md:px-1.5 md:w-fit h-full
                     md:h-auto
                   bg-slate-50 dark:bg-gray-500 text-sm md:text-xs
@@ -332,6 +333,7 @@ export function SearchDialog() {
             <Button
               //@ts-ignore
               onClick={isGenerating ? stopGenerating : handleSubmit}
+              data-umami-event={isGenerating ? 'Click stop' : 'Click ask'}
               className="md:w-20 w-full bg-red-900 block shadow-md hover:bg-red-800 dark:bg-red-900 dark:hover:bg-red-800"
             >
               {isGenerating ? 'Stop' : 'Ask'}
