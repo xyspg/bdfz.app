@@ -5,6 +5,7 @@ import GPT3Tokenizer from 'gpt3-tokenizer'
 import { CreateChatCompletionRequest } from 'openai'
 import { ApplicationError, UserError } from '@/lib/errors'
 
+
 // OpenAIApi does currently not work in Vercel Edge Functions as it uses Axios under the hood.
 export const config = {
   runtime: 'edge',
@@ -126,7 +127,8 @@ export default async function handler(req: NextRequest) {
        try to answer the question using that information. Give the document name and section.
        If you are uncertain or the answer is not explicitly written in the documentation, 
        please respond with "I'm sorry, I cannot assist with this."
-       Your output should stay consistent with the input language, mostly Chinese and English. 
+       Your output should be the same with the prompt language. If the prompt is Chinese,
+       your output must be in Chinese except for course names and other proper nouns.
       `}
 
       Context sections:
@@ -142,7 +144,7 @@ export default async function handler(req: NextRequest) {
     const completionOptions: CreateChatCompletionRequest = {
       model: 'gpt-3.5-turbo',
       messages: [{ role: 'user', content: prompt }],
-      max_tokens: 1028,
+      max_tokens: 1024,
       temperature: 0,
       stream: true,
     }
