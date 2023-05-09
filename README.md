@@ -1,13 +1,15 @@
-# 北大附中AI 助手
+# 北大附中 AI 助手
 
 ## 介绍
-这个项目从 `pages` 目录中获取所有的 `.mdx` 文件，并使用 OpenAI Embeddings 计算文本矢量，以在[OpenAI ChatGPT API](https://platform.openai.com/docs/guides/completion) prompt 中使用。 
+
+这个项目从 `pages` 目录中获取所有的 `.mdx` 文件，并使用 OpenAI Embeddings 计算文本矢量，以在[OpenAI ChatGPT API](https://platform.openai.com/docs/guides/completion) prompt 中使用。
 目前包括的文件：
- - 北大附中学生手册
- - 北大附中文凭方案
- - 北大附中社团运行和管理方案
- - 国际部选课说明
- - 国际部学生毕业要求
+
+- 北大附中学生手册
+- 北大附中文凭方案
+- 北大附中社团运行和管理方案
+- 国际部选课说明
+- 国际部学生毕业要求
 
 ## 技术细节
 
@@ -67,11 +69,14 @@ sequenceDiagram
 ## 本地开发
 
 ### 配置开发环境
+
 1. 安装 [Node.js](https://nodejs.org/en/download/) (LTS)
 2. ```bash
    npm install -g pnpm
    ```
+
 ### 配置
+
 - `cd 项目文件夹`
 - `pnpm install`
 - `cp .env.example .env`

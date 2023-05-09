@@ -3,11 +3,11 @@ import Script from 'next/script'
 
 export default function Document() {
   return (
-    <Html lang='zh'>
+    <Html lang="zh">
       <Head />
-      <body className='bg-white dark:bg-neutral-800'>
-      <Main />
-      <NextScript />
+      <body className="bg-white dark:bg-neutral-800">
+        <Main />
+        <NextScript />
       </body>
     </Html>
   )

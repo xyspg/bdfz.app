@@ -11,8 +11,8 @@ const Footer = () => {
               <Link
                 href="https://github.com/xyspg/bdfz.app"
                 data-umami-event="Visit GitHub"
-                target='_blank'
-                rel='noopener'
+                target="_blank"
+                rel="noopener"
                 className="flex items-center justify-center fill-neutral-600 dark:fill-neutral-200 "
               >
                 <svg

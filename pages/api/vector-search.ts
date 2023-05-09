@@ -5,7 +5,6 @@ import GPT3Tokenizer from 'gpt3-tokenizer'
 import { CreateChatCompletionRequest } from 'openai'
 import { ApplicationError, UserError } from '@/lib/errors'
 
-
 // OpenAIApi does currently not work in Vercel Edge Functions as it uses Axios under the hood.
 export const config = {
   runtime: 'edge',
