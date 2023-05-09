@@ -16,6 +16,8 @@ const fpPromise = FingerprintJS.load()
   const fp = await fpPromise
   const result = await fp.get()
   console.log(result.visitorId)
+  console.log(result)
+
 })()
 
 function promptDataReducer(
@@ -127,6 +129,7 @@ export function SearchDialog() {
               return x + 1
             })
             setIsGenerating(false)
+            sendStatistics();
             return
           }
 
@@ -163,6 +166,41 @@ export function SearchDialog() {
     e.preventDefault()
     handleConfirm(search)
   }
+
+  const sendStatistics = async () => {
+    const fp = await fpPromise;
+    const result = await fp.get();
+    const visitorId = result.visitorId;
+
+    // Extract device information from the FingerprintJS result
+    const deviceInfo = {
+      platform: result.components.platform.value,
+      osCpu: result.components.osCpu.value,
+      browserVendor: result.components.vendor.value,
+      screenResolution: result.components.screenResolution.value,
+    };
+
+    const timestamp = new Date().toISOString(); // Current timestamp in ISO format
+
+    const response = await fetch("/api/statistics", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        visitorId,
+        question,
+        answer,
+        timestamp,
+        deviceInfo,
+        hasFlaggedContent, // Include the hasFlaggedContent state variable
+      }),
+    });
+
+    const data = await response.json();
+    console.log(data);
+  };
+
 
   const stopGenerating = () => {
     if (eventSourceRef.current) {

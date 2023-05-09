@@ -3,6 +3,7 @@ import { SearchDialog } from '@/components/SearchDialog'
 import Header from '@/components/Header'
 import Footer from '@/components/ui/Footer'
 
+
 export default function Home() {
   return (
     <>
