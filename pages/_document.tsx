@@ -5,7 +5,7 @@ export default function Document() {
   return (
     <Html lang='zh'>
       <Head>
-        <Script src='https://analytics.umami.is/script.js' data-website-id='2c84a5e3-0df4-41ba-bcc6-72028bae3279' />
+        <script async src='https://analytics.umami.is/script.js' data-website-id='2c84a5e3-0df4-41ba-bcc6-72028bae3279' />
       </Head>
       <body className='bg-white dark:bg-neutral-800'>
       <Main />
