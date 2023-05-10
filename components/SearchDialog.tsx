@@ -476,7 +476,7 @@ export function SearchDialog() {
             />
           </div>
           <div className="text-xs text-gray-500 flex flex-col md:flex-row flex-grow space-y-2 md:space-y-0 gap-2 dark:text-gray-100 items-center">
-            <div className="w-20">Or try:</div>
+            <div className="mx-auto md:w-20">Or try:</div>
             <div className="mt-1 flex gap-3 md:gap-x-2.5 md:gap-y-1 flex-col md:flex-row w-full md:w-auto md:flex-wrap">
               {sampleQuestion.map((q) => (
                 <button
