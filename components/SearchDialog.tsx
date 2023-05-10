@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import style from '@/styles/markdown-styles.module.css'
 import { SSE } from 'sse.js'
 import { Frown, User } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
@@ -73,12 +73,15 @@ export function SearchDialog() {
   const [promptIndex, setPromptIndex] = React.useState(0)
   const [promptData, dispatchPromptData] = React.useReducer(promptDataReducer, [])
   const [feedback, setFeedback] = React.useState('')
+  const [notificationShown, setNotificationShown] = React.useState(false)
 
   const sampleQuestion = [
     '我在升旗仪式迟到了16分钟会发生什么?',
     '列出预科部的日程',
     '我如何申请荣誉文凭?',
-    '我在国际部选课只选一年的CLA可以毕业吗?',
+    '我在 Dalton 对 Neuroscience 感兴趣',
+    '我在 Dalton 应该上 Statistics 还是 Calculus',
+    '介绍 Dalton 的 Physical Chemistry 课程',
     '我在新民书活吃一次零食会扣多少学时？',
   ]
 
@@ -98,6 +101,15 @@ export function SearchDialog() {
       sendStatistics()
     }
   }, [answer, isGenerating])
+
+  React.useEffect(()=>{
+    if (question.includes('道尔顿') || question.includes('国际部')) {
+      setNotificationShown(true)
+      setInterval(() => {
+        setNotificationShown(false)
+      }, 7000)
+    }
+  },[question])
 
   const handleConfirm = React.useCallback(
     async (query: string) => {
@@ -143,6 +155,7 @@ export function SearchDialog() {
               return x + 1
             })
             setIsGenerating(false)
+
             return
           }
 
@@ -213,7 +226,7 @@ export function SearchDialog() {
   }
 
   const sendFeedback = async (f: string) => {
-    if(feedback !== '') return;
+    if (feedback !== '') return
     setFeedback(f)
     const fp = await fpPromise
     const result = await fp.get()
@@ -315,7 +328,7 @@ export function SearchDialog() {
 
           {answer && !hasError ? (
             <>
-              <div className="flex justify-start gap-4 dark:text-white max-w-3xl ml-0.5 my-1">
+              <div className="flex justify-start gap-4 dark:text-white max-w-xs sm:max-w-screen-sm md:max-w-3xl ml-0.5 my-1">
                 <div className="w-7 min-w-[28px] ml-0.5 h-7 bg-gradient-to-r from-red-900 to-red-800 ring-red-600 ring-1 rounded-md border border-brand-400 flex items-center justify-center shadow-sm ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -332,13 +345,15 @@ export function SearchDialog() {
                     ></path>
                   </svg>
                 </div>
-                <ReactMarkdown
-                  linkTarget="_blank"
-                  className={style.reactMarkDown}
-                  remarkPlugins={[remarkGfm]}
-                >
-                  {answer}
-                </ReactMarkdown>
+                <div className="w-full overflow-x-auto">
+                  <ReactMarkdown
+                    linkTarget="_blank"
+                    className={style.reactMarkDown}
+                    remarkPlugins={[remarkGfm]}
+                  >
+                    {answer}
+                  </ReactMarkdown>
+                </div>
               </div>
               <div>
                 {/*  Feedback Button*/}
@@ -350,8 +365,14 @@ export function SearchDialog() {
                     >
                       <div
                         className={`p-1.5 rounded-md ${
-                          feedback !== '' ? `cursor-default` : `cursor-pointer dark:hover:bg-neutral-700 hover:bg-neutral-200`
-                        } ${feedback === 'positive' ? `bg-neutral-200 dark:bg-neutral-700`:`bg-white dark:bg-neutral-800`}`}
+                          feedback !== ''
+                            ? `cursor-default`
+                            : `cursor-pointer dark:hover:bg-neutral-700 hover:bg-neutral-200`
+                        } ${
+                          feedback === 'positive'
+                            ? `bg-neutral-200 dark:bg-neutral-700`
+                            : `bg-white dark:bg-neutral-800`
+                        }`}
                         onClick={() => {
                           sendFeedback('positive')
                         }}
@@ -373,8 +394,14 @@ export function SearchDialog() {
                       </div>
                       <div
                         className={`p-1.5 rounded-md ${
-                          feedback !== '' ? `cursor-default` : `cursor-pointer dark:hover:bg-neutral-700 hover:bg-neutral-200`
-                        } ${feedback === 'negative' ? `bg-neutral-200 dark:bg-neutral-700`:`bg-white dark:bg-neutral-800`}`}
+                          feedback !== ''
+                            ? `cursor-default`
+                            : `cursor-pointer dark:hover:bg-neutral-700 hover:bg-neutral-200`
+                        } ${
+                          feedback === 'negative'
+                            ? `bg-neutral-200 dark:bg-neutral-700`
+                            : `bg-white dark:bg-neutral-800`
+                        }`}
                         onClick={() => {
                           sendFeedback('negative')
                         }}
@@ -397,11 +424,22 @@ export function SearchDialog() {
                     </div>
                   </>
                 )}
-
               </div>
             </>
           ) : null}
-
+          <AnimatePresence>
+            {notificationShown && (
+              <motion.div
+                initial={{ opacity: 0, y: 50, scale: 0.3 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
+                className='bg-neutral-200 rounded-xl w-2/3 md:w-1/3 fixed bottom-5 right-5 flex flex-col justify-center items-center text-sm font-mono p-4 shadow-xl'
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              >
+                When asking questions specific to Dalton, using English will yield better results.
+              </motion.div>
+            )}
+          </AnimatePresence>
           <div className="relative">
             <Input
               ref={inputRef}
@@ -415,7 +453,7 @@ export function SearchDialog() {
             />
           </div>
           <div className="text-xs text-gray-500 flex flex-col md:flex-row flex-grow space-y-2 md:space-y-0 gap-2 dark:text-gray-100 items-center">
-            <div className="w-14">Or try:</div>
+            <div className="w-20">Or try:</div>
             <div className="mt-1 flex gap-3 md:gap-x-2.5 md:gap-y-1 flex-col md:flex-row w-full md:w-auto md:flex-wrap">
               {sampleQuestion.map((q) => (
                 <button

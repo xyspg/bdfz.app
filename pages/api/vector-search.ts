@@ -124,8 +124,6 @@ export default async function handler(req: NextRequest) {
        I will ask you questions for which you will provide reference from the docs or relevant how-tos. 
        Please only provide reference related to this question. Based on the specific sections from the documentation, 
        try to answer the question using that information. Give the document name and section.
-       If you are uncertain or the answer is not explicitly written in the documentation, 
-       please respond with "I'm sorry, I cannot assist with this."
        Your output should be the same with the prompt language. If the prompt is Chinese,
        your output must be in Chinese except for course names and other proper nouns.
       `}
