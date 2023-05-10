@@ -328,7 +328,7 @@ export function SearchDialog() {
 
           {answer && !hasError ? (
             <>
-              <div className="flex justify-start gap-4 dark:text-white max-w-xs sm:max-w-screen-sm md:max-w-3xl ml-0.5 my-1">
+              <div className="flex justify-start gap-4 dark:text-white max-w-xs sm:max-w-screen-sm md:max-w-3xl my-1">
                 <div className="w-7 min-w-[28px] ml-0.5 h-7 bg-gradient-to-r from-red-900 to-red-800 ring-red-600 ring-1 rounded-md border border-brand-400 flex items-center justify-center shadow-sm ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
