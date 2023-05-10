@@ -66,24 +66,23 @@ export default async function handler(req: NextRequest) {
       });
     }
 
-    for (let i = 0; i < politicalWords.length; i++){
-      if (query.includes(politicalWords[i])) {
-        throw new UserError('Flagged content politics', {
-          flagged: true,
-          categories: results.categories,
-        });
-      }
+    const politicalRegex = new RegExp(`\\b(${politicalWords.join('|')})\\b`, 'i');
+    const pornRegex = new RegExp(`\\b(${pornWords.join('|')})\\b`, 'i');
+
+    if (politicalRegex.test(query)) {
+      throw new UserError('Flagged content politics', {
+        flagged: true,
+        categories: results.categories,
+      });
     }
 
-
-    for (let i = 0; i < pornWords.length; i++){
-      if (query.includes(pornWords[i])) {
-        throw new UserError('Flagged content', {
-          flagged: true,
-          categories: results.categories,
-        });
-      }
+    if (pornRegex.test(query)) {
+      throw new UserError('Flagged content', {
+        flagged: true,
+        categories: results.categories,
+      });
     }
+
 
     if (results.flagged) {
       throw new UserError('Flagged content', {

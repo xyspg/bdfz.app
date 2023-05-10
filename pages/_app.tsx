@@ -8,6 +8,7 @@ import { useRouter } from 'next/router'
 
 import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
+
 if (typeof window !== 'undefined') {
   let process = require('process')
   posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
@@ -15,7 +16,7 @@ if (typeof window !== 'undefined') {
     // Enable debug mode in development
     loaded: (posthog) => {
       if (process.env.NODE_ENV === 'development') posthog.debug()
-    }
+    },
   })
 }
 export default function App({ Component, pageProps }: AppProps) {
@@ -32,11 +33,11 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [])
   return (
     <>
-      <PostHogProvider client={posthog}>
       <ThemeProvider attribute="class">
-        <Component {...pageProps} />
+        <PostHogProvider client={posthog}>
+          <Component {...pageProps} />
+        </PostHogProvider>
       </ThemeProvider>
-      </PostHogProvider>
       <Script
         async
         src="https://analytics.umami.is/script.js"
