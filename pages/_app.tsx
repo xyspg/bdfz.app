@@ -32,9 +32,11 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [])
   return (
     <>
+      <PostHogProvider client={posthog}>
       <ThemeProvider attribute="class">
         <Component {...pageProps} />
       </ThemeProvider>
+      </PostHogProvider>
       <Script
         async
         src="https://analytics.umami.is/script.js"
