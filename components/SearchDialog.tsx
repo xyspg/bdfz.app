@@ -82,7 +82,7 @@ export function SearchDialog() {
     '我在 Dalton 对 Neuroscience 感兴趣',
     '我在 Dalton 应该上 Statistics 还是 Calculus',
     '介绍 Dalton 的 Physical Chemistry 课程',
-    '我在新民书活吃一次零食会扣多少学时？',
+    'BBS 制度是什么？',
   ]
 
   React.useEffect(() => {
@@ -510,7 +510,7 @@ export function SearchDialog() {
                       >
                         北大附中学生手册
                       </a>
-                      &nbsp;为准
+                      &nbsp;等文件为准
                     </p>
                   </div>
                 </div>
