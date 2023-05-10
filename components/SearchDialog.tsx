@@ -11,6 +11,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
 
+
 const fpPromise = FingerprintJS.load()
 ;(async () => {
   // Get the visitor identifier when you need it.
@@ -74,6 +75,7 @@ export function SearchDialog() {
   const [promptData, dispatchPromptData] = React.useReducer(promptDataReducer, [])
   const [feedback, setFeedback] = React.useState('')
   const [notificationShown, setNotificationShown] = React.useState(false)
+  const [politicalSensitive, setPoliticalSensitive] = React.useState(false)
 
   const sampleQuestion = [
     '我在升旗仪式迟到了16分钟会发生什么?',
@@ -96,20 +98,29 @@ export function SearchDialog() {
     return () => document.removeEventListener('keydown', down)
   }, [])
 
+  const handleNotification = () => {
+    setNotificationShown(true)
+    setInterval(() => {
+      setNotificationShown(false)
+    }, 7000)
+  }
+
   React.useEffect(() => {
-    if (!isGenerating && answer) {
+    if ((!isGenerating && answer) || politicalSensitive) {
       sendStatistics()
     }
-  }, [answer, isGenerating])
+  }, [answer, isGenerating, politicalSensitive])
 
   React.useEffect(()=>{
     if (question.includes('道尔顿') || question.includes('国际部')) {
-      setNotificationShown(true)
-      setInterval(() => {
-        setNotificationShown(false)
-      }, 7000)
+      handleNotification()
     }
   },[question])
+
+
+
+
+
 
   const handleConfirm = React.useCallback(
     async (query: string) => {
@@ -121,6 +132,8 @@ export function SearchDialog() {
       setIsLoading(true)
       setIsGenerating(true)
       setFeedback('')
+      setHasFlaggedContent(false)
+      setPoliticalSensitive(false)
 
       const eventSource = new SSE(`api/vector-search`, {
         headers: {
@@ -137,14 +150,22 @@ export function SearchDialog() {
         const errorData = JSON.parse((err as any).data)
         const errorMessage = errorData.error
         console.error(errorMessage)
+        // if the error is flagged content, we show `6` as the answer
         if (errorMessage === 'Flagged content') {
           setHasFlaggedContent(true)
           setIsGenerating(false)
           setAnswer('6')
         } else {
+          // handle regular error, show `server busy`
           setHasError(true)
+          // if the error is political sensitive content, we show `server busy`
+          if(errorMessage === 'Flagged content politics'){
+            setHasFlaggedContent(true)
+            setPoliticalSensitive(true)
+          }
         }
       }
+
 
       eventSource.addEventListener('error', handleError)
       eventSource.addEventListener('message', (e: any) => {
@@ -265,7 +286,8 @@ export function SearchDialog() {
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !isGenerating) {
+    if (e.keyCode === 13 && !isGenerating) {
+      e.preventDefault()
       handleConfirm(search)
     }
   }
@@ -433,10 +455,10 @@ export function SearchDialog() {
                 initial={{ opacity: 0, y: 50, scale: 0.3 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
-                className='bg-neutral-200 rounded-xl w-2/3 md:w-1/3 fixed bottom-5 right-5 flex flex-col justify-center items-center text-sm font-mono p-4 shadow-xl'
+                className={`bg-neutral-200 rounded-xl w-2/3 md:w-1/3 fixed bottom-5 right-5 flex flex-col justify-center items-center text-sm font-mono p-4 shadow-xl`}
                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               >
-                When asking questions specific to Dalton, using English will yield better results.
+                {`When asking questions specific to Dalton, using English will yield better results.`}
               </motion.div>
             )}
           </AnimatePresence>
@@ -446,6 +468,7 @@ export function SearchDialog() {
               placeholder="输入问题..."
               name="search"
               value={search}
+              maxLength={4000}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={handleKeyDown}
               className="col-span-3"

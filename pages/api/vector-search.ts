@@ -4,6 +4,7 @@ import { codeBlock, oneLine } from 'common-tags'
 import GPT3Tokenizer from 'gpt3-tokenizer'
 import { CreateChatCompletionRequest } from 'openai'
 import { ApplicationError, UserError } from '@/lib/errors'
+import { politicalWords, pornWords } from '@/pages/api/sensitiveWords'
 
 // OpenAIApi does currently not work in Vercel Edge Functions as it uses Axios under the hood.
 export const config = {
@@ -57,6 +58,32 @@ export default async function handler(req: NextRequest) {
     }).then((res) => res.json())
 
     const [results] = moderationResponse.results
+
+    if (/\bdeveloper mode\b/i.test(query)) {
+      throw new UserError('Flagged content', {
+        flagged: true,
+        categories: results.categories,
+      });
+    }
+
+    for (let i = 0; i < politicalWords.length; i++){
+      if (query.includes(politicalWords[i])) {
+        throw new UserError('Flagged content politics', {
+          flagged: true,
+          categories: results.categories,
+        });
+      }
+    }
+
+
+    for (let i = 0; i < pornWords.length; i++){
+      if (query.includes(pornWords[i])) {
+        throw new UserError('Flagged content', {
+          flagged: true,
+          categories: results.categories,
+        });
+      }
+    }
 
     if (results.flagged) {
       throw new UserError('Flagged content', {

@@ -85,6 +85,9 @@ dependencies:
   openai:
     specifier: ^3.2.1
     version: 3.2.1
+  pangu:
+    specifier: ^4.0.7
+    version: 4.0.7
   posthog-js:
     specifier: ^1.56.0
     version: 1.56.0
@@ -129,6 +132,9 @@ devDependencies:
   '@types/mdast':
     specifier: ^3.0.11
     version: 3.0.11
+  '@types/pangu':
+    specifier: ^4.0.0
+    version: 4.0.0
   autoprefixer:
     specifier: ^10.4.14
     version: 10.4.14(postcss@8.4.21)
@@ -1029,6 +1035,10 @@ packages:
   /@types/node@18.15.10:
     resolution: {integrity: sha512-9avDaQJczATcXgfmMAW3MIWArOO7A+m90vuCFLr8AotWf8igO/mRoYukrk2cqZVtv38tHs33retzHEilM7FpeQ==}
     dev: false
+
+  /@types/pangu@4.0.0:
+    resolution: {integrity: sha512-da3b6P7QDH41VdfF2xRE8/KgL06nX3RawfiIMAvJ/sYzLWQCQtxc+B3qWVtrIlrNlSgV/e1oG2SZYUpN6gvmhQ==}
+    dev: true
 
   /@types/phoenix@1.5.5:
     resolution: {integrity: sha512-1eWWT19k0L4ZiTvdXjAvJ9KvW0B8SdiVftQmFPJGTEx78Q4PCSIQDpz+EfkFVR1N4U9gREjlW4JXL8YCIlY0bw==}
@@ -3586,6 +3596,11 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       p-limit: 3.1.0
+    dev: false
+
+  /pangu@4.0.7:
+    resolution: {integrity: sha512-weZKJIwwy5gjt4STGVUH9bix3BGk7wZ2ahtIypwe3e/mllsrIZIvtfLx1dPX56GcpZFOCFKmeqI1qVuB9enRzA==}
+    hasBin: true
     dev: false
 
   /parent-module@1.0.1:
