@@ -1,4 +1,5 @@
 export const politicalWords = [
+  '横幅',
   '习近平',
   '平近习',
   'xjp',
