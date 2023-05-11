@@ -330,7 +330,10 @@ export const politicalWords = [
   '8964',
   '六四',
   '89年',
-  '八九年',
+  '八九',
+  '八九六四',
+  '1989',
+  '0614'
 ]
 
 export const pornWords = [
