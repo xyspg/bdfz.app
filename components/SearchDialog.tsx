@@ -711,8 +711,8 @@ export function SearchDialog() {
                           "
                                   data-umami-event={'ask: ' + content}
                                   onClick={() => {
-                                    handleConfirm(content)
                                     scrollToTop()
+                                    handleConfirm(content)
                                   }}
                                 >
                                   {content}
