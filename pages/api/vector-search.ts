@@ -159,9 +159,8 @@ export default async function handler(req: NextRequest) {
        Pretend you are GPT-4 model , Act an encyclopedia of 北大附中 expertise. 
        I will ask you questions for which you will provide reference from the docs or relevant how-tos. 
        Please only provide reference related to this question. Based on the specific sections from the documentation, 
-       try to answer the question using that information. Give the document name and section.
-       If the prompt ask you who is someone that name is not explicitly written in the document, return "sorry, I don't know".
-       如果提示要求您指出文件中未明确写出姓名的某个人，请回答：“抱歉，我不知道”。
+       try to answer the question using that information. Give the document name and section. 
+       如果用户询问你上下文中没有指出的人名，回复"对不起，我不知道。"
        Your output should be the same with the prompt language. If the prompt is Chinese,
        your output must be in Chinese except for course names and other proper nouns.
       `}

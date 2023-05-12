@@ -10,6 +10,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
 
 const fpPromise = FingerprintJS.load()
 ;(async () => {
@@ -112,7 +114,16 @@ export function SearchDialog() {
 
   React.useEffect(() => {
     if (question.includes('道尔顿') || question.includes('国际部')) {
-      handleNotification()
+      toast('🤔️ When asking questions specific to Dalton, using English will yield better results.', {
+        position: "top-right",
+        autoClose: 8000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
   }, [question])
 
@@ -299,6 +310,7 @@ export function SearchDialog() {
     <>
       <div>
         <div className="grid gap-4 text-slate-700 w-screen px-6 pb-4 max-w-3xl">
+          <ToastContainer />
           {question && (
             <div className="flex gap-4">
               <span className="bg-slate-100 dark:bg-slate-300 p-2 w-8 h-8 rounded-full text-center flex items-center justify-center">
@@ -447,6 +459,7 @@ export function SearchDialog() {
               </div>
             </>
           ) : null}
+          {/*
           <AnimatePresence>
             {notificationShown && (
               <motion.div
@@ -460,6 +473,7 @@ export function SearchDialog() {
               </motion.div>
             )}
           </AnimatePresence>
+          */}
           <div className="relative">
             <Input
               ref={inputRef}
