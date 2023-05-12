@@ -1,17 +1,19 @@
 'use client'
 
 import * as React from 'react'
+import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import style from '@/styles/markdown-styles.module.css'
 import { SSE } from 'sse.js'
 import { Frown, User } from 'lucide-react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useAnimationControls, useScroll, Variants } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
 import { toast, ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css';
+import 'react-toastify/dist/ReactToastify.css'
+import { ArrowUpIcon } from '@radix-ui/react-icons'
 
 const fpPromise = FingerprintJS.load()
 ;(async () => {
@@ -78,14 +80,52 @@ export function SearchDialog() {
   const [notificationShown, setNotificationShown] = React.useState(false)
   const [politicalSensitive, setPoliticalSensitive] = React.useState(false)
   const [errorMessage, setErrorMessage] = React.useState('')
+  const [showMore, setShowMore] = React.useState(false)
+  const [lastRequestTime, setLastRequestTime] = React.useState(0)
+  const delay = 5000 // ms
 
   const sampleQuestion = [
     '我在升旗仪式迟到了16分钟会发生什么?',
     '列出预科部的日程',
     '我如何申请荣誉文凭?',
-    '我在 Dalton 对 Neuroscience 感兴趣',
     '我在 Dalton 应该上 Statistics 还是 Calculus',
-    'BBS 制度是什么？',
+  ]
+
+  const showMoreList = [
+    {
+      category: '校规校纪',
+      content: ['北大附中的培养目标是什么？', '处分的撤销程序是什么样的？'],
+    },
+    {
+      category: '学校事务',
+      content: [
+        '如何申请荣誉文凭',
+        '如何请假',
+        '如何更换六选三选科',
+        '医务室在哪里',
+        '心理咨询预约的邮箱是什么',
+        '如何申请创建社团',
+        '如何申请社团经费',
+        '老师记错考勤了怎么办？',
+        '学考合格考缺考或不合格对个人是否有影响',
+        '平板电脑如何申请领取',
+      ],
+    },
+    {
+      category: '本部课程',
+      content: ['Track Team 是什么', '数学荣誉课程的内容是什么', 'BIY1101-N是什么课'],
+    },
+    {
+      category: '国际部课程',
+      content: [
+        'What are CLA courses?',
+        "I'm interested in neuroscience at Dalton.",
+        "Could you introduce Dalton's economics courses?",
+        "Please provide information on Dalton's Global Studies courses.",
+        'Do I have to take IRP3 to graduate?',
+        'What are the prerequisites for studying calculus?',
+      ],
+    },
   ]
 
   React.useEffect(() => {
@@ -114,21 +154,83 @@ export function SearchDialog() {
 
   React.useEffect(() => {
     if (question.includes('道尔顿') || question.includes('国际部')) {
-      toast('🤔️ When asking questions specific to Dalton, using English will yield better results.', {
-        position: "top-right",
-        autoClose: 8000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      toast(
+        '🤔️ When asking questions specific to Dalton, using English will yield better results.',
+        {
+          position: 'top-right',
+          autoClose: 8000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'light',
+        }
+      )
     }
   }, [question])
 
+  const isBrowser = () => typeof window !== 'undefined'
+
+  function scrollToTop() {
+    if (!isBrowser()) return
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const ScrollToTopContainerVariants: Variants = {
+    hide: { opacity: 0, y: 100 },
+    show: { opacity: 1, y: 0 },
+  }
+
+  function ScrollToTopButton() {
+    const { scrollYProgress } = useScroll()
+    const controls = useAnimationControls()
+
+    useEffect(() => {
+      return scrollYProgress.on('change', (latestValue) => {
+        if (latestValue > 0.5) {
+          controls.start('show')
+        } else {
+          controls.start('hide')
+        }
+      })
+    })
+
+    return (
+      <motion.button
+        className="fixed bottom-0 right-0 p-10"
+        variants={ScrollToTopContainerVariants}
+        initial="hide"
+        animate={controls}
+        onClick={scrollToTop}
+      >
+        <ArrowUpIcon />
+      </motion.button>
+    )
+  }
+
   const handleConfirm = React.useCallback(
     async (query: string) => {
+      const currentTime = new Date().getTime()
+      const delayInSec = (delay - (currentTime - lastRequestTime)) / 1000
+      if (currentTime - lastRequestTime < delay) {
+        // If the time since the last request is less than the delay, prevent request and show error
+        toast.error(`请求过于频繁，请${delayInSec}秒后再试`, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        return
+      } else {
+        setLastRequestTime(currentTime) // Update lastRequestTime
+      }
+
+      if(isGenerating) stopGenerating();
       setAnswer(undefined)
       setQuestion(query)
       setSearch('')
@@ -170,7 +272,6 @@ export function SearchDialog() {
           setHasError(true)
           setErrorMessage(errorMessage)
           // if the error is political sensitive content, we show `server busy`
-
         }
       }
 
@@ -187,8 +288,6 @@ export function SearchDialog() {
             return
           }
 
-          // 应该在代码顶部放置断言，以确保 `e.data` 符合 `string` 类型
-          // 另外，请注意，使用类型断言会带来运行时错误的风险，因此对于不确定类型的值，请确保进行有效的类型验证
           const completionResponse = JSON.parse(e.data)
           const text = completionResponse.choices[0].delta?.content || ''
 
@@ -213,7 +312,7 @@ export function SearchDialog() {
 
       setIsLoading(true)
     },
-    [promptIndex, promptData]
+    [promptIndex, promptData,lastRequestTime]
   )
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
@@ -459,6 +558,7 @@ export function SearchDialog() {
               </div>
             </>
           ) : null}
+
           {/*
           <AnimatePresence>
             {notificationShown && (
@@ -486,27 +586,6 @@ export function SearchDialog() {
               className="col-span-3"
               autoFocus={true}
             />
-          </div>
-          <div className="text-xs text-gray-500 flex flex-col md:flex-row flex-grow space-y-2 md:space-y-0 gap-2 dark:text-gray-100 items-center">
-            <div className="mx-auto md:w-20">Or try:</div>
-            <div className="mt-1 flex gap-3 md:gap-x-2.5 md:gap-y-1 flex-col md:flex-row w-full md:w-auto md:flex-wrap">
-              {sampleQuestion.map((q) => (
-                <button
-                  key={q}
-                  type="button"
-                  data-umami-event={'ask: ' + q}
-                  className="px-1.5 py-3 md:py-0.5 md:px-1.5 md:w-fit h-full
-                    md:h-auto
-                  bg-slate-50 dark:bg-neutral-700 text-sm md:text-xs
-                  hover:bg-slate-100 dark:hover:bg-gray-600
-                  rounded-md border border-slate-200 dark:border-neutral-600
-                  transition-colors"
-                  onClick={(_) => setSearch(q)}
-                >
-                  {q}
-                </button>
-              ))}
-            </div>
           </div>
           <div className="rounded-md border px-1.5 py-3 md:p-6 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 justify-between items-center bg-scale-400 border-scale-500 dark:bg-scale-100 dark:border-scale-300 mb-3 w-full gap-2">
             <div className="text-scale-1200 dark:text-neutral-200 flex flex-row items-start gap-2 justify-center">
@@ -560,8 +639,99 @@ export function SearchDialog() {
               {isGenerating ? 'Stop' : 'Ask'}
             </Button>
           </div>
+            <div className="text-xs text-gray-500 flex flex-col md:flex-row flex-grow space-y-2 md:space-y-0 gap-2 dark:text-gray-100 items-stretch md:items-start">
+              <div className="pt-1.5 mx-auto md:w-20">Or try:</div>
+              <div className='flex flex-col gap-4'>
+                <div className="mt-1 flex gap-3 md:gap-x-2.5 md:gap-y-1 flex-col md:flex-row w-full md:w-auto md:flex-wrap">
+                  {sampleQuestion.map((q) => (
+                    <button
+                      key={q}
+                      type="button"
+                      data-umami-event={'ask: ' + q}
+                      className="px-1.5 py-3 md:py-0.5 md:px-1.5 md:w-fit h-full
+                    md:h-auto cursor-pointer
+                  bg-slate-50 dark:bg-neutral-700 text-sm md:text-xs
+                  hover:bg-slate-100 dark:hover:bg-gray-600
+                  rounded-md border border-slate-200 dark:border-neutral-600
+                  transition-colors"
+                      onClick={(_) => {
+                        setSearch(q)
+                        scrollToTop()
+                      }}
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+                <div
+                  className="md:w-fit h-full
+                  md:h-auto cursor-pointer
+                  flex justify-center
+                  bg-white dark:bg-neutral-800
+                  dark:text-white text-[15px]
+                  rounded-md underline-offset-4 underline
+                  transition-colors"
+                  onClick={() => {
+                    setShowMore(!showMore)
+                  }}
+                >
+                  {showMore ? '收起列表' : '查看更多...'}
+                </div>
+              </div>
+
+          </div>
+          <AnimatePresence>
+            {showMore ? (
+              <>
+                <hr />
+                <motion.div
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -20, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className=" flex flex-col justify-start gap-4">
+                    {showMoreList.map((category) => (
+                      <>
+                        <div className="flex flex-col  md:flex-row items-center gap-4 md:gap-12">
+                          <h1 className="text-xl font-bold dark:text-white md:w-1/4">
+                            {category.category}
+                          </h1>
+                          <div className="flex flex-wrap gap-4 md:w-3/4 justify-start">
+                            {category.content.map((content) => (
+                              <>
+                                <div
+                                  className="
+                          text-sm text-neutral-700 dark:text-neutral-200
+                          px-2.5 py-1.5 md:px-3 md:py-1.5
+                          border-2 border-neutral-200 dark:border-neutral-600
+                          rounded-xl cursor-pointer
+                          bg-slate-50 hover:bg-slate-100
+                          dark:bg-neutral-700  dark:hover:bg-gray-600
+                          "
+                                  data-umami-event={'ask: ' + content}
+                                  onClick={() => {
+                                    scrollToTop()
+                                    handleConfirm(content)
+                                  }}
+                                >
+                                  {content}
+                                </div>
+                              </>
+                            ))}
+                          </div>
+                        </div>
+                        <hr />
+                      </>
+                    ))}
+                  </div>
+                </motion.div>
+              </>
+            ) : null}
+          </AnimatePresence>
         </div>
       </div>
+      <ScrollToTopButton />
     </>
   )
 }
