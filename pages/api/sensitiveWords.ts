@@ -1,5 +1,7 @@
 export const politicalWords = [
   '横幅',
+  '白纸运动',
+  '坦克',
   '习近平',
   '平近习',
   'xjp',
@@ -337,7 +339,7 @@ export const politicalWords = [
   '天安门',
   '八九六四',
   '1989',
-  '0614'
+  '0614',
 ]
 
 export const pornWords = [

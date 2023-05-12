@@ -63,28 +63,26 @@ export default async function handler(req: NextRequest) {
       throw new UserError('Flagged content', {
         flagged: true,
         categories: results.categories,
-      });
+      })
     }
 
-    for (let i = 0; i < politicalWords.length; i++){
+    for (let i = 0; i < politicalWords.length; i++) {
       if (query.includes(politicalWords[i])) {
         throw new UserError('Flagged content politics', {
           flagged: true,
           categories: results.categories,
-        });
+        })
       }
     }
 
-
-    for (let i = 0; i < pornWords.length; i++){
+    for (let i = 0; i < pornWords.length; i++) {
       if (query.includes(pornWords[i])) {
         throw new UserError('Flagged content', {
           flagged: true,
           categories: results.categories,
-        });
+        })
       }
     }
-
 
     if (results.flagged) {
       throw new UserError('Flagged content', {
@@ -114,14 +112,14 @@ export default async function handler(req: NextRequest) {
       data: [{ embedding }],
     } = await embeddingResponse.json()
 
-    const DaltonKeywords = ['Dalton','道尔顿','dalton','国际部']
+    const DaltonKeywords = ['Dalton', '道尔顿', 'dalton', '国际部']
     const MainSchoolKeywords = ['本部']
     let department = null
     // Determine department based on keywords in sanitized query
-    if (DaltonKeywords.some(keyword => sanitizedQuery.includes(keyword))) {
-      department = 'Dalton';
-    } else if (MainSchoolKeywords.some(keyword => sanitizedQuery.includes(keyword))) {
-      department = 'MainSchool';
+    if (DaltonKeywords.some((keyword) => sanitizedQuery.includes(keyword))) {
+      department = 'Dalton'
+    } else if (MainSchoolKeywords.some((keyword) => sanitizedQuery.includes(keyword))) {
+      department = 'MainSchool'
     }
 
     const { error: matchError, data: pageSections } = await supabaseClient.rpc(
@@ -131,13 +129,13 @@ export default async function handler(req: NextRequest) {
         match_threshold: 0.78,
         match_count: 10,
         min_content_length: 50,
-        department
+        department,
       }
     )
     if (matchError) {
       throw new ApplicationError('Failed to match page sections', matchError)
     }
-    console.log('pageSections received', pageSections);
+    console.log('pageSections received', pageSections)
 
     const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
     let tokenCount = 0
@@ -149,21 +147,21 @@ export default async function handler(req: NextRequest) {
       const encoded = tokenizer.encode(content)
       tokenCount += encoded.text.length
 
-      if (tokenCount >= 5000) {
+      if (tokenCount >= 4096) {
         break
       }
 
       contextText += `${content.trim()}\n---\n`
     }
-// If the prompt ask you who is someone that name is not explicitly written in the document, return "sorry, I don't know".
-//        如果提示要求您指出文件中未明确写出姓名的某个人，请回答：“抱歉，我不知道”。
+
     const prompt = codeBlock`
       ${oneLine`
        Pretend you are GPT-4 model , Act an encyclopedia of 北大附中 expertise. 
        I will ask you questions for which you will provide reference from the docs or relevant how-tos. 
        Please only provide reference related to this question. Based on the specific sections from the documentation, 
        try to answer the question using that information. Give the document name and section.
-       
+       If the prompt ask you who is someone that name is not explicitly written in the document, return "sorry, I don't know".
+       如果提示要求您指出文件中未明确写出姓名的某个人，请回答：“抱歉，我不知道”。
        Your output should be the same with the prompt language. If the prompt is Chinese,
        your output must be in Chinese except for course names and other proper nouns.
       `}
