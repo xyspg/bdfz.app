@@ -81,6 +81,8 @@ export function SearchDialog() {
   const [politicalSensitive, setPoliticalSensitive] = React.useState(false)
   const [errorMessage, setErrorMessage] = React.useState('')
   const [showMore, setShowMore] = React.useState(false)
+  const [lastRequestTime, setLastRequestTime] = React.useState(0)
+  const delay = 5000 // ms
 
   const sampleQuestion = [
     '我在升旗仪式迟到了16分钟会发生什么?',
@@ -209,6 +211,26 @@ export function SearchDialog() {
 
   const handleConfirm = React.useCallback(
     async (query: string) => {
+      const currentTime = new Date().getTime()
+      const delayInSec = (delay - (currentTime - lastRequestTime)) / 1000
+      if (currentTime - lastRequestTime < delay) {
+        // If the time since the last request is less than the delay, prevent request and show error
+        toast.error(`请求过于频繁，请${delayInSec}秒后再试`, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        return
+      } else {
+        setLastRequestTime(currentTime) // Update lastRequestTime
+      }
+
+      if(isGenerating) stopGenerating();
       setAnswer(undefined)
       setQuestion(query)
       setSearch('')
@@ -266,8 +288,6 @@ export function SearchDialog() {
             return
           }
 
-          // 应该在代码顶部放置断言，以确保 `e.data` 符合 `string` 类型
-          // 另外，请注意，使用类型断言会带来运行时错误的风险，因此对于不确定类型的值，请确保进行有效的类型验证
           const completionResponse = JSON.parse(e.data)
           const text = completionResponse.choices[0].delta?.content || ''
 
@@ -292,7 +312,7 @@ export function SearchDialog() {
 
       setIsLoading(true)
     },
-    [promptIndex, promptData]
+    [promptIndex, promptData,lastRequestTime]
   )
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
@@ -691,7 +711,6 @@ export function SearchDialog() {
                           "
                                   data-umami-event={'ask: ' + content}
                                   onClick={() => {
-                                    setSearch(content)
                                     handleConfirm(content)
                                     scrollToTop()
                                   }}
