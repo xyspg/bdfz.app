@@ -614,48 +614,51 @@ export function SearchDialog() {
               //@ts-ignore
               onClick={isGenerating ? stopGenerating : handleSubmit}
               data-umami-event={isGenerating ? 'Click stop' : 'Click ask'}
-              className='md:w-20 w-full bg-red-900 block shadow-md hover:bg-red-800 dark:bg-red-900 dark:hover:bg-red-800'
+              className="md:w-20 w-full bg-red-900 block shadow-md hover:bg-red-800 dark:bg-red-900 dark:hover:bg-red-800"
             >
               {isGenerating ? 'Stop' : 'Ask'}
             </Button>
           </div>
-
-          <div
-            className='text-xs text-gray-500 flex flex-col md:flex-row flex-grow space-y-2 md:space-y-0 gap-2 dark:text-gray-100 items-center'>
-            <div className='mx-auto md:w-20'>Or try:</div>
-            <div className='mt-1 flex gap-3 md:gap-x-2.5 md:gap-y-1 flex-col md:flex-row w-full md:w-auto md:flex-wrap'>
-              {sampleQuestion.map((q) => (
-                <button
-                  key={q}
-                  type='button'
-                  data-umami-event={'ask: ' + q}
-                  className='px-1.5 py-3 md:py-0.5 md:px-1.5 md:w-fit h-full
-                    md:h-auto
+            <div className="text-xs text-gray-500 flex flex-col md:flex-row flex-grow space-y-2 md:space-y-0 gap-2 dark:text-gray-100 items-stretch md:items-start">
+              <div className="pt-1.5 mx-auto md:w-20">Or try:</div>
+              <div className='flex flex-col gap-4'>
+                <div className="mt-1 flex gap-3 md:gap-x-2.5 md:gap-y-1 flex-col md:flex-row w-full md:w-auto md:flex-wrap">
+                  {sampleQuestion.map((q) => (
+                    <button
+                      key={q}
+                      type="button"
+                      data-umami-event={'ask: ' + q}
+                      className="px-1.5 py-3 md:py-0.5 md:px-1.5 md:w-fit h-full
+                    md:h-auto cursor-pointer
                   bg-slate-50 dark:bg-neutral-700 text-sm md:text-xs
                   hover:bg-slate-100 dark:hover:bg-gray-600
                   rounded-md border border-slate-200 dark:border-neutral-600
-                  transition-colors'
-                  onClick={(_) => {
-                    setSearch(q)
-                    scrollToTop()
+                  transition-colors"
+                      onClick={(_) => {
+                        setSearch(q)
+                        scrollToTop()
+                      }}
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+                <div
+                  className="md:w-fit h-full
+                  md:h-auto cursor-pointer
+                  flex justify-center
+                  bg-white dark:bg-neutral-800
+                  dark:text-white text-[15px]
+                  rounded-md underline-offset-4 underline
+                  transition-colors"
+                  onClick={() => {
+                    setShowMore(!showMore)
                   }}
                 >
-                  {q}
-                </button>
-              ))}
-              <div
-                className='px-1.5 py-3 md:py-0.5 md:px-1.5 md:w-fit h-full
-                    md:h-auto cursor-pointer
-                  bg-white dark:bg-black dark:text-white text-sm md:text-xs
-                  rounded-md underline-offset-2 underline
-                  transition-colors'
-                onClick={() => {
-                  setShowMore(!showMore)
-                }}
-              >
-                {showMore ? '收起列表' : '查看更多...'}
+                  {showMore ? '收起列表' : '查看更多...'}
+                </div>
               </div>
-            </div>
+
           </div>
           <AnimatePresence>
             {showMore ? (
@@ -667,23 +670,25 @@ export function SearchDialog() {
                   exit={{ y: -20, opacity: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <div className=' flex flex-col justify-start gap-4'>
+                  <div className=" flex flex-col justify-start gap-4">
                     {showMoreList.map((category) => (
                       <>
-                        <div className='flex flex-col  md:flex-row items-center gap-4 md:gap-12'>
-                          <h1 className='text-xl font-bold dark:text-white md:w-1/4'>{category.category}</h1>
-                          <div className='flex flex-wrap gap-4 md:w-3/4 justify-start'>
+                        <div className="flex flex-col  md:flex-row items-center gap-4 md:gap-12">
+                          <h1 className="text-xl font-bold dark:text-white md:w-1/4">
+                            {category.category}
+                          </h1>
+                          <div className="flex flex-wrap gap-4 md:w-3/4 justify-start">
                             {category.content.map((content) => (
                               <>
                                 <div
-                                  className='
+                                  className="
                           text-sm text-neutral-700 dark:text-neutral-200
                           px-2.5 py-1.5 md:px-3 md:py-1.5
-                          border-2 border-neutral-200 dark:border-neutral-500
+                          border-2 border-neutral-200 dark:border-neutral-600
                           rounded-xl cursor-pointer
                           bg-slate-50 hover:bg-slate-100
-                          dark:bg-slate-700 dark:hover:bg-slate-300
-                          '
+                          dark:bg-neutral-700  dark:hover:bg-gray-600
+                          "
                                   data-umami-event={'ask: ' + content}
                                   onClick={() => {
                                     setSearch(content)
