@@ -39,7 +39,7 @@ export default async function handler(req: NextRequest) {
     const { query } = requestData
 
     if (!query) {
-      throw new UserError('Missing query in request data')
+      throw new UserError('请输入查询内容')
     }
 
     const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
@@ -66,21 +66,23 @@ export default async function handler(req: NextRequest) {
       });
     }
 
-    const politicalRegex = new RegExp(`\\b(${politicalWords.join('|')})\\b`, 'i');
-    const pornRegex = new RegExp(`\\b(${pornWords.join('|')})\\b`, 'i');
-
-    if (politicalRegex.test(query)) {
-      throw new UserError('Flagged content politics', {
-        flagged: true,
-        categories: results.categories,
-      });
+    for (let i = 0; i < politicalWords.length; i++){
+      if (query.includes(politicalWords[i])) {
+        throw new UserError('Flagged content politics', {
+          flagged: true,
+          categories: results.categories,
+        });
+      }
     }
 
-    if (pornRegex.test(query)) {
-      throw new UserError('Flagged content', {
-        flagged: true,
-        categories: results.categories,
-      });
+
+    for (let i = 0; i < pornWords.length; i++){
+      if (query.includes(pornWords[i])) {
+        throw new UserError('Flagged content', {
+          flagged: true,
+          categories: results.categories,
+        });
+      }
     }
 
 
@@ -112,6 +114,16 @@ export default async function handler(req: NextRequest) {
       data: [{ embedding }],
     } = await embeddingResponse.json()
 
+    const DaltonKeywords = ['Dalton','道尔顿','dalton','国际部']
+    const MainSchoolKeywords = ['本部']
+    let department = null
+    // Determine department based on keywords in sanitized query
+    if (DaltonKeywords.some(keyword => sanitizedQuery.includes(keyword))) {
+      department = 'Dalton';
+    } else if (MainSchoolKeywords.some(keyword => sanitizedQuery.includes(keyword))) {
+      department = 'MainSchool';
+    }
+
     const { error: matchError, data: pageSections } = await supabaseClient.rpc(
       'match_page_sections',
       {
@@ -119,12 +131,13 @@ export default async function handler(req: NextRequest) {
         match_threshold: 0.78,
         match_count: 10,
         min_content_length: 50,
+        department
       }
     )
-
     if (matchError) {
       throw new ApplicationError('Failed to match page sections', matchError)
     }
+    console.log('pageSections received', pageSections);
 
     const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
     let tokenCount = 0

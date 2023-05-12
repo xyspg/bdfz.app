@@ -41,8 +41,115 @@
 确保已安装并在本地运行 Docker。然后运行
 
 ```bash
+supabase init
+```
+
+```bash
+supabase migration new init
+```
+```bash
+-- Enable pgvector extension
+create extension if not exists vector with schema public;
+```
+创建数据库表
+```bash
+-- Stores the checksum of our pages.
+-- This ensures that we only regenerate embeddings
+-- when the page content has changed.
+create table "public"."nods_page" (
+  id bigserial primary key,
+  parent_page_id bigint references public.nods_page,
+  path text not null unique,
+  department text,
+  checksum text,
+  meta jsonb,
+  type text,
+  source text
+);
+alter table "public"."nods_page"
+  enable row level security;
+
+-- Stores the actual embeddings with some metadata
+create table "public"."nods_page_section" (
+  id bigserial primary key,
+  page_id bigint not null references public.nods_page on delete cascade,
+  content text,
+  token_count int,
+  embedding vector(1536),
+  slug text,
+  heading text
+);
+alter table "public"."nods_page_section"
+  enable row level security;
+```
+```bash
+-- Create embedding similarity search functions
+create or replace function match_page_sections(
+    embedding vector(1536),
+    match_threshold float,
+    match_count int,
+    min_content_length int,
+    department text
+)
+returns table (
+    id bigint,
+    page_id bigint,
+    slug text,
+    heading text,
+    content text,
+    similarity float
+)
+language plpgsql
+as $$
+#variable_conflict use_variable
+begin
+  return query
+  select
+    nods_page_section.id,
+    nods_page_section.page_id,
+    nods_page_section.slug,
+    nods_page_section.heading,
+    nods_page_section.content,
+    (nods_page_section.embedding <#> embedding) * -1 as similarity
+  from nods_page_section
+  join nods_page
+  on nods_page_section.page_id = nods_page.id
+  -- We only care about sections that have a useful amount of content
+  where length(nods_page_section.content) >= min_content_length
+  
+  -- The dot product is negative because of a Postgres limitation, so we negate it
+  and (nods_page_section.embedding <#> embedding) * -1 > match_threshold
+  
+  -- Filter the department based on the input
+  and (
+      (department is null)
+      or (department = 'Dalton' and nods_page.department != 'MainSchool')
+      or (department = 'MainSchool' and nods_page.department != 'Dalton')
+      or (department = 'Both')
+  )
+    
+  -- OpenAI embeddings are normalized to length 1, so
+  -- cosine similarity and dot product will produce the same results.
+  -- Using dot product which can be computed slightly faster.
+  --
+  -- For the different syntaxes, see https://github.com/pgvector/pgvector
+  order by nods_page_section.embedding <#> embedding
+  limit match_count;
+end;
+$$;
+```
+
+```bash
 npx supabase start
 ```
+
+本地开发完成后，推送到远程数据库
+```bash
+supabase link --project-ref=your-project-ref
+
+supabase db push
+```
+
 
 ### 启动 Next.js 应用程序
 

@@ -11,7 +11,6 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
 
-
 const fpPromise = FingerprintJS.load()
 ;(async () => {
   // Get the visitor identifier when you need it.
@@ -76,6 +75,7 @@ export function SearchDialog() {
   const [feedback, setFeedback] = React.useState('')
   const [notificationShown, setNotificationShown] = React.useState(false)
   const [politicalSensitive, setPoliticalSensitive] = React.useState(false)
+  const [errorMessage, setErrorMessage] = React.useState('')
 
   const sampleQuestion = [
     '我在升旗仪式迟到了16分钟会发生什么?',
@@ -83,7 +83,6 @@ export function SearchDialog() {
     '我如何申请荣誉文凭?',
     '我在 Dalton 对 Neuroscience 感兴趣',
     '我在 Dalton 应该上 Statistics 还是 Calculus',
-    '介绍 Dalton 的 Physical Chemistry 课程',
     'BBS 制度是什么？',
   ]
 
@@ -111,16 +110,11 @@ export function SearchDialog() {
     }
   }, [answer, isGenerating, politicalSensitive])
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
     if (question.includes('道尔顿') || question.includes('国际部')) {
       handleNotification()
     }
-  },[question])
-
-
-
-
-
+  }, [question])
 
   const handleConfirm = React.useCallback(
     async (query: string) => {
@@ -134,6 +128,7 @@ export function SearchDialog() {
       setFeedback('')
       setHasFlaggedContent(false)
       setPoliticalSensitive(false)
+      setErrorMessage('')
 
       const eventSource = new SSE(`api/vector-search`, {
         headers: {
@@ -155,17 +150,18 @@ export function SearchDialog() {
           setHasFlaggedContent(true)
           setIsGenerating(false)
           setAnswer('6')
+        } else if (errorMessage === 'Flagged content politics') {
+          setHasError(true)
+          setHasFlaggedContent(true)
+          setPoliticalSensitive(true)
         } else {
           // handle regular error, show `server busy`
           setHasError(true)
+          setErrorMessage(errorMessage)
           // if the error is political sensitive content, we show `server busy`
-          if(errorMessage === 'Flagged content politics'){
-            setHasFlaggedContent(true)
-            setPoliticalSensitive(true)
-          }
+
         }
       }
-
 
       eventSource.addEventListener('error', handleError)
       eventSource.addEventListener('message', (e: any) => {
@@ -344,13 +340,15 @@ export function SearchDialog() {
               <span className="bg-red-100 p-2 w-8 h-8 rounded-full text-center flex items-center justify-center">
                 <Frown width={18} />
               </span>
-              <span className="text-slate-700 dark:text-slate-100">服务器繁忙，请稍后再试</span>
+              <span className="text-slate-700 dark:text-slate-100">
+                {errorMessage ? errorMessage : '服务器繁忙，请稍后再试'}
+              </span>
             </div>
           )}
 
           {answer && !hasError ? (
             <>
-              <div className="flex justify-start gap-4 dark:text-white max-w-xs sm:max-w-screen-sm md:max-w-3xl my-1">
+              <div className="flex gap-4 my-1 dark:text-white max-w-[85vw]">
                 <div className="w-7 min-w-[28px] ml-0.5 h-7 bg-gradient-to-r from-red-900 to-red-800 ring-red-600 ring-1 rounded-md border border-brand-400 flex items-center justify-center shadow-sm ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
