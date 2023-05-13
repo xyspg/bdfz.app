@@ -118,11 +118,7 @@ const Profile = () => {
                 />
                 {password !== '' && (
                   <>
-                    <PasswordStrengthBar
-                      shortScoreWord={'太短了'}
-                      scoreWords={['太短了', '弱', '还行吧', '一般', '强']}
-                      password={password}
-                    />
+
                   </>
                 )}
               </div>
