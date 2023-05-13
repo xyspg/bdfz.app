@@ -14,8 +14,8 @@ const Chat = () => {
       <Header />
       {session && (
         <>
-          <div className="flex justify-center">
-            <h1>Under Developement...</h1>
+          <div className="flex justify-center font-mono">
+            <h1>Under Development...</h1>
           </div>
         </>
       )}
