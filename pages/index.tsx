@@ -1,9 +1,11 @@
 import Head from 'next/head'
 import { SearchDialog } from '@/components/SearchDialog'
 import Header from '@/components/Header'
-import Footer from '@/components/ui/Footer'
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 export default function Home() {
+  const session = useSession()
+  const supabase = useSupabaseClient()
   return (
     <>
       <Head>
@@ -24,13 +26,11 @@ export default function Home() {
         <meta property="og:url" content="https://bdfz.app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
-      <div className="flex flex-col min-h-screen justify-center items-center ">
-        <div className="flex-grow p-8 md:p-18 lg:p-24 xl:p-28 2xl:p-32">
-          <Header />
+      <div className="">
+        <Header />
+        <div className="flex justify-center">
           <SearchDialog />
         </div>
-        <Footer />
       </div>
     </>
   )

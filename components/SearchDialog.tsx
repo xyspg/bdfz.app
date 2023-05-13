@@ -14,6 +14,7 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { ArrowUpIcon } from '@radix-ui/react-icons'
+import { useUser } from '@supabase/auth-helpers-react'
 
 const fpPromise = FingerprintJS.load()
 ;(async () => {
@@ -83,6 +84,9 @@ export function SearchDialog() {
   const [showMore, setShowMore] = React.useState(false)
   const [lastRequestTime, setLastRequestTime] = React.useState(0)
   const delay = 5000 // ms
+
+  const user = useUser()
+  const userId = user?.id
 
   const sampleQuestion = [
     '我在升旗仪式迟到了16分钟会发生什么?',
@@ -216,21 +220,21 @@ export function SearchDialog() {
       if (currentTime - lastRequestTime < delay) {
         // If the time since the last request is less than the delay, prevent request and show error
         toast.error(`请求过于频繁，请${delayInSec}秒后再试`, {
-          position: "top-right",
+          position: 'top-right',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: "light",
-        });
+          theme: 'light',
+        })
         return
       } else {
         setLastRequestTime(currentTime) // Update lastRequestTime
       }
 
-      if(isGenerating) stopGenerating();
+      if (isGenerating) stopGenerating()
       setAnswer(undefined)
       setQuestion(query)
       setSearch('')
@@ -312,7 +316,7 @@ export function SearchDialog() {
 
       setIsLoading(true)
     },
-    [promptIndex, promptData,lastRequestTime]
+    [promptIndex, promptData, lastRequestTime]
   )
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
@@ -343,6 +347,7 @@ export function SearchDialog() {
       },
       body: JSON.stringify({
         visitorId,
+        userId,
         question,
         answer,
         timestamp,
@@ -375,6 +380,7 @@ export function SearchDialog() {
       },
       body: JSON.stringify({
         visitorId,
+        userId,
         question,
         answer,
         f,
@@ -639,46 +645,45 @@ export function SearchDialog() {
               {isGenerating ? 'Stop' : 'Ask'}
             </Button>
           </div>
-            <div className="text-xs text-gray-500 flex flex-col md:flex-row flex-grow space-y-2 md:space-y-0 gap-2 dark:text-gray-100 items-stretch md:items-start">
-              <div className="pt-1.5 mx-auto md:w-20">Or try:</div>
-              <div className='flex flex-col gap-4'>
-                <div className="mt-1 flex gap-3 md:gap-x-2.5 md:gap-y-1 flex-col md:flex-row w-full md:w-auto md:flex-wrap">
-                  {sampleQuestion.map((q) => (
-                    <button
-                      key={q}
-                      type="button"
-                      data-umami-event={'ask: ' + q}
-                      className="px-1.5 py-3 md:py-0.5 md:px-1.5 md:w-fit h-full
+          <div className="text-xs text-gray-500 flex flex-col md:flex-row flex-grow space-y-2 md:space-y-0 gap-2 dark:text-gray-100 items-stretch md:items-start">
+            <div className="pt-1.5 mx-auto md:w-20">Or try:</div>
+            <div className="flex flex-col gap-4">
+              <div className="mt-1 flex gap-3 md:gap-x-2.5 md:gap-y-1 flex-col md:flex-row w-full md:w-auto md:flex-wrap">
+                {sampleQuestion.map((q) => (
+                  <button
+                    key={q}
+                    type="button"
+                    data-umami-event={'ask: ' + q}
+                    className="px-1.5 py-3 md:py-0.5 md:px-1.5 md:w-fit h-full
                     md:h-auto cursor-pointer
                   bg-slate-50 dark:bg-neutral-700 text-sm md:text-xs
                   hover:bg-slate-100 dark:hover:bg-gray-600
                   rounded-md border border-slate-200 dark:border-neutral-600
                   transition-colors"
-                      onClick={(_) => {
-                        setSearch(q)
-                        scrollToTop()
-                      }}
-                    >
-                      {q}
-                    </button>
-                  ))}
-                </div>
-                <div
-                  className="md:w-fit h-full
+                    onClick={(_) => {
+                      setSearch(q)
+                      scrollToTop()
+                    }}
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
+              <div
+                className="md:w-fit h-full
                   md:h-auto cursor-pointer
                   flex justify-center
                   bg-white dark:bg-neutral-800
                   dark:text-white text-[15px]
                   rounded-md underline-offset-4 underline
                   transition-colors"
-                  onClick={() => {
-                    setShowMore(!showMore)
-                  }}
-                >
-                  {showMore ? '收起列表' : '查看更多...'}
-                </div>
+                onClick={() => {
+                  setShowMore(!showMore)
+                }}
+              >
+                {showMore ? '收起列表' : '查看更多...'}
               </div>
-
+            </div>
           </div>
           <AnimatePresence>
             {showMore ? (

@@ -5,7 +5,7 @@ export default function Document() {
   return (
     <Html lang="zh">
       <Head />
-      <body className="bg-white dark:bg-neutral-800">
+      <body>
         <Main />
         <NextScript />
       </body>
