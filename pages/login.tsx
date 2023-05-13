@@ -42,9 +42,10 @@ const LoginPage = () => {
     if (loginOrSignup === 'login') {
       handleLogin(email, password)
     } else if (loginOrSignup === 'signup') {
-      checkPassword(password, passwordConfirm)
-      if (passwordError) {
-        alert(passwordError)
+      const error = checkPassword(password, passwordConfirm)
+      if (error) {
+        setPasswordError(error)
+        alert(error)
         return
       }
       handleSignUp(email, password)
@@ -69,7 +70,6 @@ const LoginPage = () => {
           theme: 'light',
         })
       } else {
-        // Handle other types of errors
         toast.error(`${error.message}`, {
           position: 'top-right',
           autoClose: 3000,
@@ -137,6 +137,18 @@ const LoginPage = () => {
         progress: undefined,
         theme: 'light',
       })
+    } else {
+      toast.success('请检查收件箱', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      })
+      setLoginOrSignup('login')
     }
   }
 
