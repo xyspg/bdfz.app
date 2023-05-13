@@ -416,7 +416,7 @@ async function generateEmbeddings() {
 
         try {
           const configuration = new Configuration({
-            apiKey: process.env.OPENAI_KEY,
+            apiKey: process.env.OPENAI_KEY_OFFICIAL ? process.env.OPENAI_KEY_OFFICIAL : process.env.OPENAI_KEY,
           })
           const openai = new OpenAIApi(configuration)
 

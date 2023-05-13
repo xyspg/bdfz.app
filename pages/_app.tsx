@@ -3,41 +3,27 @@ import type { AppProps } from 'next/app'
 import { ThemeProvider } from 'next-themes'
 import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/react'
-import { useEffect } from 'react'
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { SessionContextProvider, Session } from '@supabase/auth-helpers-react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import Layout from '@/components/Layout'
 
-import posthog from 'posthog-js'
-import { PostHogProvider } from 'posthog-js/react'
+export default function App({ Component, pageProps }: AppProps<{ initialSession: Session }>) {
+  const [supabaseClient] = useState(() => createBrowserSupabaseClient())
 
-if (typeof window !== 'undefined') {
-  let process = require('process')
-  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
-    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://app.posthog.com',
-    // Enable debug mode in development
-    loaded: (posthog) => {
-      if (process.env.NODE_ENV === 'development') posthog.debug()
-    },
-  })
-}
-export default function App({ Component, pageProps }: AppProps) {
-  const router = useRouter()
-
-  useEffect(() => {
-    // Track page views
-    const handleRouteChange = () => posthog?.capture('$pageview')
-    router.events.on('routeChangeComplete', handleRouteChange)
-    posthog.capture('my event', { property: 'value' })
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-    }
-  }, [])
   return (
     <>
-      <ThemeProvider attribute="class">
-        <PostHogProvider client={posthog}>
-          <Component {...pageProps} />
-        </PostHogProvider>
-      </ThemeProvider>
+      <SessionContextProvider
+        supabaseClient={supabaseClient}
+        initialSession={pageProps.initialSession}
+      >
+        <ThemeProvider attribute="class">
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </ThemeProvider>
+      </SessionContextProvider>
       <Script
         async
         src="https://analytics.umami.is/script.js"

@@ -9,12 +9,14 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { visitorId, question, answer, timestamp, deviceInfo, hasFlaggedContent } = req.body
+    const { visitorId, userId, question, answer, timestamp, deviceInfo, hasFlaggedContent } =
+      req.body
 
     try {
       const { error } = await supabase.from('statistics').insert([
         {
           visitor_id: visitorId,
+          user_id: userId,
           question,
           answer,
           timestamp,
