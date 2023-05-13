@@ -19,15 +19,28 @@ const LoginPage = () => {
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
   const [passwordError, setPasswordError] = useState<string | null>(null)
-  const [loginOrSignup, setLoginOrSignup] = useState<'login' | 'signup'>('login')
+  const [loginOrSignup, setLoginOrSignup] = useState<'login' | 'signup' | 'reset'>('login')
   const [authError, setAuthError] = useState<string | null>(null)
   const [typingTimeout, setTypingTimeout] = useState<number | undefined>(undefined)
+  const [showPasswordResetScreen, setShowPasswordResetScreen] = useState(false)
   const { query } = useRouter()
 
   useEffect(() => {
     setAuthError(null)
     setPasswordError(null)
   }, [loginOrSignup])
+
+  const getURL = () => {
+    let url =
+      process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
+      process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
+      'http://localhost:3000/'
+    // Make sure to include `https://` when not localhost.
+    url = url.includes('http') ? url : `https://${url}`
+    // Make sure to including trailing `/`.
+    url = url.charAt(url.length - 1) === '/' ? url : `${url}/`
+    return url
+  }
 
   const checkPassword = (password: string, passwordConfirm: string) => {
     if (password.length < 6) return '密码长度至少为 6 位'
@@ -37,7 +50,7 @@ const LoginPage = () => {
 
   const handleClick = (email: string, password: string) => {
     if (!email) return setAuthError('邮箱不能为空')
-    if (!password) return setAuthError('密码不能为空')
+    if (!password && loginOrSignup !== 'reset') return setAuthError('密码不能为空')
 
     if (loginOrSignup === 'login') {
       handleLogin(email, password)
@@ -84,6 +97,90 @@ const LoginPage = () => {
     }
   }
 
+  const handleReset = async (email: string) => {
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: `${getURL()}/login`,
+    })
+    if (error) {
+      toast.error(`${error.message}`, {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      })
+    } else {
+      toast.success(`重置密码邮件已发送至 ${email}，请查收`, {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      })
+      // setRequestedRecovery(true)
+    }
+  }
+
+  useEffect(() => {
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      if (event == 'PASSWORD_RECOVERY') {
+        setShowPasswordResetScreen(true)
+      }
+    })
+  }, [])
+
+  const handleFinallyUserCanResetTheirActualPassword = async (password: string) => {
+    if (passwordConfirm && password !== passwordConfirm) {
+      toast.error('密码不一致', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      })
+      return
+    }
+    const { data, error } = await supabaseClient.auth.updateUser({ password: password })
+    if (error) {
+      let errorMessage = ''
+      if (error.message === 'Password should be at least 6 characters') {
+        errorMessage = '密码长度至少为 6 位'
+      } else {
+        errorMessage = error.message
+      }
+      toast.error(`${errorMessage}`, {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      })
+    } else {
+      toast.success('密码重置成功', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      })
+      router.push('/')
+    }
+  }
   const handleSignUp = async (email: string, password: string) => {
     const allowedDomains = ['i.pkuschool.edu.cn']
     const emailDomain = email.split('@')[1]
@@ -154,7 +251,13 @@ const LoginPage = () => {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      handleClick(email, password)
+      if (loginOrSignup === 'reset') {
+        handleReset(email)
+      } else if (showPasswordResetScreen) {
+        handleFinallyUserCanResetTheirActualPassword(password)
+      } else {
+        handleClick(email, password)
+      }
     }
   }
 
@@ -170,27 +273,38 @@ const LoginPage = () => {
                 <Label>Email</Label>
                 <Input
                   type="email"
-                  placeholder="请使用 @i.pkuschool.edu.cn 邮箱"
+                  placeholder={
+                    loginOrSignup === 'login' || loginOrSignup === 'reset'
+                      ? '请输入邮箱'
+                      : '请使用 @i.pkuschool.edu.cn 邮箱'
+                  }
                   onChange={(e) => setEmail(e.target.value)}
                   onKeyDown={handleKeyDown}
                 />
               </div>
-              <div className="flex flex-col gap-2">
-                <Label>密码</Label>
-                <Input
-                  type="password"
-                  onChange={(e) => {
-                    setPassword(e.target.value)
-                  }}
-                  onKeyDown={handleKeyDown}
-                />
-              </div>
+              {loginOrSignup !== 'reset' && (
+                <>
+                  <div className="flex flex-col gap-2">
+                    <Label>密码</Label>
+                    <Input
+                      type="password"
+                      placeholder="请输入密码"
+                      onChange={(e) => {
+                        setPassword(e.target.value)
+                      }}
+                      onKeyDown={handleKeyDown}
+                    />
+                  </div>
+                </>
+              )}
+
               {loginOrSignup === 'signup' && (
                 <>
                   <div className="flex flex-col gap-2">
                     <Label>确认密码</Label>
                     <Input
                       type="password"
+                      placeholder="请再次输入密码"
                       className="invalid:border-pink-500 invalid:text-pink-600 focus:invalid:border-pink-500 focus:invalid:ring-pink-500"
                       onChange={(e) => {
                         setPasswordConfirm(e.target.value)
@@ -231,35 +345,100 @@ const LoginPage = () => {
                 <div className="text-red-500 text-sm text-center font-medium">{passwordError}</div>
               )}
               <Button
-                data-umami-event={loginOrSignup === 'login' ? 'login' : 'signup'}
+                data-umami-event={
+                  loginOrSignup === 'login'
+                    ? 'login'
+                    : loginOrSignup === 'reset'
+                    ? 'reset pwd'
+                    : 'signup'
+                }
                 className="w-full bg-red-900 block shadow-md hover:bg-red-800 dark:bg-red-900 dark:hover:bg-red-800"
                 onClick={() => {
-                  handleClick(email, password)
+                  loginOrSignup !== 'reset' ? handleClick(email, password) : handleReset(email)
                 }}
               >
-                {loginOrSignup === 'login' ? '登录' : '注册'}
+                {loginOrSignup === 'login'
+                  ? '登录'
+                  : loginOrSignup === 'reset'
+                  ? '重置密码'
+                  : '注册'}
               </Button>
               <div className="flex flex-row justify-around">
+                {loginOrSignup !== 'reset' && (
+                  <p
+                    className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
+                    onClick={() => {
+                      loginOrSignup === 'login'
+                        ? setLoginOrSignup('signup')
+                        : setLoginOrSignup('login')
+                    }}
+                  >
+                    {loginOrSignup === 'login' ? '还没有账户？点击注册' : '已有账户？点击登录'}
+                  </p>
+                )}
                 <p
                   className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
                   onClick={() => {
-                    loginOrSignup === 'login'
-                      ? setLoginOrSignup('signup')
-                      : setLoginOrSignup('login')
+                    loginOrSignup === 'reset'
+                      ? setLoginOrSignup('login')
+                      : setLoginOrSignup('reset')
                   }}
                 >
-                  {loginOrSignup === 'login' ? '还没有账户？点击注册' : '已有账户？点击登录'}
+                  {loginOrSignup === 'reset' ? '返回登录' : '忘记密码'}
                 </p>
-                <p className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">忘记密码</p>
               </div>
             </div>
           </div>
         </div>
       </>
     )
-  if (query.redirect) {
+  if (showPasswordResetScreen) {
+    return (
+      <>
+        <Header />
+        <ToastContainer />
+        <div className="p-8 flex justify-center items-center">
+          <div className="flex flex-col gap-2 w-full max-w-xl">
+            <div>
+              <h1 className="text-xl font-bold mb-2 ">更改密码</h1>
+              <Input
+                type="password"
+                placeholder="输入新密码"
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  const passwordError = checkPassword(e.target.value, passwordConfirm)
+                  setPasswordError(passwordError)
+                }}
+                onKeyDown={handleKeyDown}
+              />
+            </div>
+            <div className="flex flex-col gap-2 mt-2">
+              <Input
+                type="password"
+                className="invalid:border-pink-500 invalid:text-pink-600 focus:invalid:border-pink-500 focus:invalid:ring-pink-500"
+                placeholder="确认密码"
+                onChange={(e) => {
+                  setPasswordConfirm(e.target.value)
+                  const passwordError = checkPassword(password, e.target.value)
+                  setPasswordError(passwordError)
+                }}
+                onKeyDown={handleKeyDown}
+              />
+            </div>
+            <Button
+              data-umami-event="change password"
+              className="w-full bg-red-900 block shadow-md hover:bg-red-800 dark:bg-red-900 dark:hover:bg-red-800"
+              onClick={() => handleFinallyUserCanResetTheirActualPassword(password)}
+            >
+              修改密码
+            </Button>
+          </div>
+        </div>
+      </>
+    )
+  } else if (query.redirect) {
     router.push(decodeURIComponent(query.redirect as string))
-  } else {
+  } else if (!showPasswordResetScreen) {
     router.push('/')
   }
 }
