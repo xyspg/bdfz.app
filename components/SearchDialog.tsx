@@ -662,6 +662,7 @@ export function SearchDialog() {
                   transition-colors"
                     onClick={(_) => {
                       setSearch(q)
+                      handleConfirm(q)
                       scrollToTop()
                     }}
                   >

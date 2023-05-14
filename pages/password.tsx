@@ -19,9 +19,6 @@ const Password = () => {
 
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
-  const [passwordError, setPasswordError] = useState<string | null>(null)
-  const [authError, setAuthError] = useState<string | null>(null)
-  const [typingTimeout, setTypingTimeout] = useState<number | undefined>(undefined)
 
   const handleSetNewPassword = async (password: string) => {
     if (passwordConfirm && password !== passwordConfirm) {
@@ -76,12 +73,11 @@ const Password = () => {
     }
   }
 
-  useEffect(()=>{
-    if(!session){
+  useEffect(() => {
+    if (!user) {
       router.push('/login')
     }
   })
-
 
   return (
     <>
@@ -115,8 +111,10 @@ const Password = () => {
               onKeyDown={handleKeyDown}
             />
           </div>
-          <PasswordStrengthBar password={password} shortScoreWord={'密码至少要6位哦～'}
-                               scoreWords={['太简单了', '弱诶', '一般', '还行', '强♡']}
+          <PasswordStrengthBar
+            password={password}
+            shortScoreWord={'密码至少要6位哦～'}
+            scoreWords={['太简单了', '弱诶', '一般', '还行', '强♡']}
           />
           <Button
             data-umami-event="change password"
