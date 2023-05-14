@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import PasswordStrengthBar from 'react-password-strength-bar'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/router'
+import Head from 'next/head'
 
 const Profile = () => {
   const user = useUser()
@@ -81,6 +82,10 @@ const Profile = () => {
 
   return (
     <>
+      <Head>
+        <title>个人资料 - bdfz.app</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1" />
+      </Head>
       <ToastContainer />
       <Header />
       {session && (

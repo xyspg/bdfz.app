@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '@/components/Header'
 import { toast, ToastContainer } from 'react-toastify'
 import { Input } from '@/components/ui/input'
@@ -6,13 +6,15 @@ import { Button } from '@/components/ui/button'
 import PasswordStrengthBar from 'react-password-strength-bar'
 import 'react-toastify/dist/ReactToastify.css'
 
-import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
+import { useSupabaseClient, useUser, useSession } from '@supabase/auth-helpers-react'
 import { useRouter } from 'next/router'
+import Head from 'next/head'
 
 
 const Password = () => {
   const supabaseClient = useSupabaseClient()
   const user = useUser()
+  const session = useSession()
   const router = useRouter()
 
   const [password, setPassword] = useState('')
@@ -74,9 +76,19 @@ const Password = () => {
     }
   }
 
+  useEffect(()=>{
+    if(!session){
+      router.push('/login')
+    }
+  })
+
 
   return (
     <>
+      <Head>
+        <title>设置密码 - bdfz.app</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1" />
+      </Head>
       <Header />
       <ToastContainer />
       <div className="p-8 flex justify-center items-center">

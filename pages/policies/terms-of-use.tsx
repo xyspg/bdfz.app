@@ -1,10 +1,15 @@
 import React from 'react'
 import styles from './policies.module.css'
 import Header from '@/components/Header'
+import Head from 'next/head'
 
 const TermsOfUse = () => {
   return (
     <>
+      <Head>
+        <title>使用条款 - bdfz.app</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1" />
+      </Head>
       <Header />
       <div className="p-4 leading-8 text-neutral-700 dark:text-neutral-200">
         <h1 className="text-center text-2xl font-medium mb-2">使用条款</h1>

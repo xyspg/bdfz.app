@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import Header from '@/components/Header'
 import { useSession } from '@supabase/auth-helpers-react'
 import { useRouter } from 'next/router'
+import Head from 'next/head'
 
 const Chat = () => {
   const session = useSession()
@@ -11,6 +12,10 @@ const Chat = () => {
   }, [router, session])
   return (
     <>
+      <Head>
+        <title>Chat - bdfz.app</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1" />
+      </Head>
       <Header />
       {session && (
         <>

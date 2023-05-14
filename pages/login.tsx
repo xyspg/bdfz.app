@@ -9,6 +9,7 @@ import PasswordStrengthBar from 'react-password-strength-bar'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useRouter } from 'next/router'
+import Head from 'next/head'
 
 const LoginPage = () => {
   const router = useRouter()
@@ -240,6 +241,10 @@ const LoginPage = () => {
   if (!user)
     return (
       <>
+        <Head>
+          <title>登录 - bdfz.app</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1" />
+        </Head>
         <ToastContainer />
         <div className="">
           <Header />
