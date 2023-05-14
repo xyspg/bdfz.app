@@ -145,6 +145,9 @@ dependencies:
   unist-util-filter:
     specifier: ^4.0.1
     version: 4.0.1
+  words-count:
+    specifier: ^2.0.2
+    version: 2.0.2
 
 devDependencies:
   '@types/common-tags':
@@ -5063,6 +5066,10 @@ packages:
   /word-wrap@1.2.3:
     resolution: {integrity: sha512-Hz/mrNwitNRh/HUAtM/VT/5VH+ygD6DV7mYKZAtHOrbs8U7lvPS6xf7EJKMF0uW1KJCl0H701g3ZGus+muE5vQ==}
     engines: {node: '>=0.10.0'}
+    dev: false
+
+  /words-count@2.0.2:
+    resolution: {integrity: sha512-u0LFfJPhnR0xXu/5WoqWIkgdGJst5GahS4lYy4G5TIX4JAQgeNKD33HpmMoxveVBWNS6W6YZV2OQjVIVLL4K7Q==}
     dev: false
 
   /wrappy@1.0.2:

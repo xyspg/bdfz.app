@@ -9,7 +9,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { visitorId, userId, question, answer, timestamp, deviceInfo, hasFlaggedContent } =
+    const { visitorId, userId, question, answer, timestamp,words, deviceInfo, hasFlaggedContent } =
       req.body
 
     try {
@@ -20,6 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           question,
           answer,
           timestamp,
+          word_count: words,
           platform: deviceInfo.platform,
           os_cpu: deviceInfo.osCpu,
           browser_vendor: deviceInfo.browserVendor,

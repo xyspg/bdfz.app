@@ -15,6 +15,8 @@ import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { ArrowUpIcon } from '@radix-ui/react-icons'
 import { useUser } from '@supabase/auth-helpers-react'
+import wordsCount from 'words-count';
+
 
 const fpPromise = FingerprintJS.load()
 ;(async () => {
@@ -83,6 +85,7 @@ export function SearchDialog() {
   const [errorMessage, setErrorMessage] = React.useState('')
   const [showMore, setShowMore] = React.useState(false)
   const [lastRequestTime, setLastRequestTime] = React.useState(0)
+  const [totalTokens, setTotalTokens] = React.useState<number | null>(0)
   const delay = 5000 // ms
 
   const user = useUser()
@@ -280,6 +283,7 @@ export function SearchDialog() {
       }
 
       eventSource.addEventListener('error', handleError)
+
       eventSource.addEventListener('message', (e: any) => {
         try {
           setIsLoading(false)
@@ -291,7 +295,6 @@ export function SearchDialog() {
 
             return
           }
-
           const completionResponse = JSON.parse(e.data)
           const text = completionResponse.choices[0].delta?.content || ''
 
@@ -309,7 +312,6 @@ export function SearchDialog() {
           handleError(err)
         }
       })
-
       eventSource.stream()
 
       eventSourceRef.current = eventSource
@@ -331,6 +333,8 @@ export function SearchDialog() {
     const result = await fp.get()
     const visitorId = result.visitorId
 
+    const words = answer && wordsCount(answer)
+    console.log(`word count: ${words}`)
     const deviceInfo = {
       platform: result.components.platform.value,
       osCpu: result.components.osCpu.value,
@@ -350,6 +354,7 @@ export function SearchDialog() {
         userId,
         question,
         answer,
+        words,
         timestamp,
         deviceInfo,
         hasFlaggedContent,
