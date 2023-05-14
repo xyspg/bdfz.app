@@ -16,19 +16,15 @@
 
   <div style='text-align: center; flex-grow: 1; padding: 0 5px 0 5px; '>
 
-    <p><p>您已受邀在{{ .SiteURL }} 上创建用户。<br>
+    <p><p>重置密码<br>
     </p>
-    <p style='text-align: left;'>
-    bdfz.app 采用了 OpenAI Embeddings 技术，能快速搜索并获取学校条例、学生手册、课程设置、请假流程等各种信息🔍<br>
-    轻松解决学校生活难题🚀<br />
-    </p>
-    <p style='text-align: center'><br>点击以下链接接受邀请：</p>
+    <p style='text-align: center'><br>点击以下链接重置您的用户密码：</p>
     <p style='text-align: center; margin: 20px 0;'>
-      <a href='{{ .ConfirmationURL }}/password'
-         style='background-color: #811010; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>接受邀请</a>
+      <a href='{{ .ConfirmationURL }}'
+         style='background-color: #811010; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>重置密码</a>
     </p>
     <br>
-    <p>请确保您在点击按钮后直接跳转至网站，如跳转失败，可复制<br> {{ .ConfirmationURL }}/password  <br> 至浏览器手动打开 </p>
+    <p>请确保您在点击按钮后直接跳转至网站，如跳转失败，可复制<br> {{ .ConfirmationURL }} <br> 至浏览器手动打开 </p>
   </div>
 
   <div style='text-align: center; margin-top: 25px; font-size: 10px; color: #888;'>

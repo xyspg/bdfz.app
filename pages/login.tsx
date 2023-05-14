@@ -99,7 +99,7 @@ const LoginPage = () => {
   }
 
   const handleReset = async (email: string) => {
-    toast.info('请稍后', {
+    toast.info('请稍候', {
       position: "top-right",
       autoClose: 5000,
       hideProgressBar: false,
@@ -187,7 +187,7 @@ const LoginPage = () => {
       })
       return
     }
-    toast.info('请稍后', {
+    toast.info('请稍候', {
       position: "top-right",
       autoClose: 5000,
       hideProgressBar: false,
