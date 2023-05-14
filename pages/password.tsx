@@ -73,12 +73,6 @@ const Password = () => {
     }
   }
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/login')
-    }
-  })
-
   return (
     <>
       <Head>
