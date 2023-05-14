@@ -85,10 +85,10 @@ const Profile = () => {
       <Header />
       {session && (
         <div className="flex justify-center">
-          <div className="p-8 flex justify-center flex-col gap-2 w-full md:w-1/2">
+          <div className="p-8 flex justify-center flex-col gap-8 w-full md:w-1/2">
             <div className="flex flex-col gap-2">
-              <h1 className="text-xl  font-bold">邮箱</h1>
-              <h2 className="text-sm  font-mono md:text-md">{user?.email}</h2>
+              <h1 className="text-xl font-bold">邮箱</h1>
+              <h2 className="text-sm md:text-md font-semibold font-mono">{user?.email}</h2>
             </div>
             <div className="flex flex-col gap-2 w-full max-w-3xl">
               <div>

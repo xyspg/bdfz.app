@@ -2,10 +2,13 @@ import Head from 'next/head'
 import { SearchDialog } from '@/components/SearchDialog'
 import Header from '@/components/Header'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
 
 export default function Home() {
   const session = useSession()
   const supabase = useSupabaseClient()
+
   return (
     <>
       <Head>

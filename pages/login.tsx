@@ -98,8 +98,18 @@ const LoginPage = () => {
   }
 
   const handleReset = async (email: string) => {
+    toast.info('请稍后', {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
     const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-      redirectTo: `${getURL()}/login`,
+      redirectTo: `${getURL()}password`,
     })
     if (error) {
       toast.error(`${error.message}`, {
@@ -131,55 +141,13 @@ const LoginPage = () => {
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       if (event == 'PASSWORD_RECOVERY') {
         setShowPasswordResetScreen(true)
+        handleSetNewPwd()
       }
     })
   }, [])
 
-  const handleFinallyUserCanResetTheirActualPassword = async (password: string) => {
-    if (passwordConfirm && password !== passwordConfirm) {
-      toast.error('密码不一致', {
-        position: 'top-right',
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      })
-      return
-    }
-    const { data, error } = await supabaseClient.auth.updateUser({ password: password })
-    if (error) {
-      let errorMessage = ''
-      if (error.message === 'Password should be at least 6 characters') {
-        errorMessage = '密码长度至少为 6 位'
-      } else {
-        errorMessage = error.message
-      }
-      toast.error(`${errorMessage}`, {
-        position: 'top-right',
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      })
-    } else {
-      toast.success('密码重置成功', {
-        position: 'top-right',
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      })
-      router.push('/')
-    }
+  const handleSetNewPwd = () => {
+    router.push('/password')
   }
   const handleSignUp = async (email: string, password: string) => {
     const allowedDomains = ['i.pkuschool.edu.cn']
@@ -218,6 +186,16 @@ const LoginPage = () => {
       })
       return
     }
+    toast.info('请稍后', {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
 
     const { error } = await supabaseClient.auth.signUp({
       email,
@@ -253,8 +231,6 @@ const LoginPage = () => {
     if (e.key === 'Enter') {
       if (loginOrSignup === 'reset') {
         handleReset(email)
-      } else if (showPasswordResetScreen) {
-        handleFinallyUserCanResetTheirActualPassword(password)
       } else {
         handleClick(email, password)
       }
@@ -331,8 +307,8 @@ const LoginPage = () => {
                           //   '啊～',
                           //   '不行了♡',
                           // ]}
-                          shortScoreWord={'太短了'}
-                          scoreWords={['太短了', '弱', '还行吧', '一般', '强']}
+                          shortScoreWord={'密码至少要6位哦～'}
+                          scoreWords={['太简单了', '弱诶', '一般', '还行', '强♡']}
                           password={password}
                         />
                       </>
@@ -392,51 +368,8 @@ const LoginPage = () => {
         </div>
       </>
     )
-  if (showPasswordResetScreen) {
-    return (
-      <>
-        <Header />
-        <ToastContainer />
-        <div className="p-8 flex justify-center items-center">
-          <div className="flex flex-col gap-2 w-full max-w-xl">
-            <div>
-              <h1 className="text-xl font-bold mb-2 ">更改密码</h1>
-              <Input
-                type="password"
-                placeholder="输入新密码"
-                onChange={(e) => {
-                  setPassword(e.target.value)
-                  const passwordError = checkPassword(e.target.value, passwordConfirm)
-                  setPasswordError(passwordError)
-                }}
-                onKeyDown={handleKeyDown}
-              />
-            </div>
-            <div className="flex flex-col gap-2 mt-2">
-              <Input
-                type="password"
-                className="invalid:border-pink-500 invalid:text-pink-600 focus:invalid:border-pink-500 focus:invalid:ring-pink-500"
-                placeholder="确认密码"
-                onChange={(e) => {
-                  setPasswordConfirm(e.target.value)
-                  const passwordError = checkPassword(password, e.target.value)
-                  setPasswordError(passwordError)
-                }}
-                onKeyDown={handleKeyDown}
-              />
-            </div>
-            <Button
-              data-umami-event="change password"
-              className="w-full bg-red-900 block shadow-md hover:bg-red-800 dark:bg-red-900 dark:hover:bg-red-800"
-              onClick={() => handleFinallyUserCanResetTheirActualPassword(password)}
-            >
-              修改密码
-            </Button>
-          </div>
-        </div>
-      </>
-    )
-  } else if (query.redirect) {
+
+  if (query.redirect) {
     router.push(decodeURIComponent(query.redirect as string))
   } else if (!showPasswordResetScreen) {
     router.push('/')

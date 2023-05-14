@@ -21,6 +21,7 @@ import {
   LaptopIcon,
   MoonIcon,
   SunIcon,
+  EnvelopeClosedIcon
 } from '@radix-ui/react-icons'
 import { AnimatePresence, motion } from 'framer-motion'
 
@@ -59,7 +60,7 @@ const DropDownNotLogin = () => {
               <DropdownMenuLabel>BDFZ AI</DropdownMenuLabel>
             </Link>
           ) : (
-            <DropdownMenuLabel className="text-xs">{user?.email}</DropdownMenuLabel>
+            <DropdownMenuLabel className="text-xs text-neutral-500 dark:text-neutral-300">{user?.email}</DropdownMenuLabel>
           )}
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
@@ -72,10 +73,10 @@ const DropDownNotLogin = () => {
               </Link>
             ) : (
               <>
-                <Link href="/chat">
+                <Link href="/">
                   <DropdownMenuItem>
                     <ChatBubbleIcon className="mr-2 h-4 w-4" />
-                    <span>BFDZ Chat</span>
+                    <span>BFDZ AI</span>
                   </DropdownMenuItem>
                 </Link>
                 <Link href="/profile">
@@ -112,13 +113,12 @@ const DropDownNotLogin = () => {
             </DropdownMenuSub>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          {!session && (
-            <DropdownMenuItem disabled>
-              <ChatBubbleIcon className="mr-2 h-4 w-4" />
-              <span>BFDZ Chat</span>
+          <a href="mailto:support@bdfz.app">
+            <DropdownMenuItem>
+              <EnvelopeClosedIcon className="mr-2 h-4 w-4" />
+              <span>寻求帮助</span>
             </DropdownMenuItem>
-          )}
-          <DropdownMenuSeparator />
+          </a>
           <Link href="https://github.com/xyspg/bdfz.app" rel="noopener noreferrer" target="_blank">
             <DropdownMenuItem>
               <Github className="mr-2 h-4 w-4" />
