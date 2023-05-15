@@ -50,8 +50,8 @@ const DropDownNotLogin = () => {
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <HamburgerMenuIcon className="cursor-pointer" />
+        <DropdownMenuTrigger asChild className='inline-block w-12 h-12 cursor-pointer'>
+          <HamburgerMenuIcon className="w-5 h-5 m-2" />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="mt-0.5 pt-2 w-56 bg-white min-w-min">
           {!session ? (
@@ -147,7 +147,7 @@ const Header = () => {
       <header className="flex flex-row items-center justify-between mb-8 px-4 py-6 md:px-12 ">
         <h1 className=" text-slate-700 font-bold text-2xl font-mono flex flex-row items-center gap-3 dark:text-slate-200 ">
           <div className="flex flex-row gap-1.5 relative">
-            <Image src={'/icon.png'} width="32" height="32" alt="logo" /> <span>bdfz.app</span>{' '}
+            <Image src={'/icon.png'} width="32" height="32" alt="logo" /> <span>bdfz.app</span>
             <Link href="/" className="absolute inset-0" />
           </div>
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-opacity-10 bg-scale-200 text-scale-1100 border border-scale-700">
