@@ -10,6 +10,7 @@ import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
+import Image from 'next/image'
 
 const LoginPage = () => {
   const router = useRouter()
@@ -100,15 +101,15 @@ const LoginPage = () => {
 
   const handleReset = async (email: string) => {
     toast.info('请稍候', {
-      position: "top-right",
+      position: 'top-right',
       autoClose: 5000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,
       progress: undefined,
-      theme: "light",
-    });
+      theme: 'light',
+    })
     const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
       redirectTo: `${getURL()}password`,
     })
@@ -188,15 +189,15 @@ const LoginPage = () => {
       return
     }
     toast.info('请稍候', {
-      position: "top-right",
+      position: 'top-right',
       autoClose: 5000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,
       progress: undefined,
-      theme: "light",
-    });
+      theme: 'light',
+    })
 
     const { error } = await supabaseClient.auth.signUp({
       email,
@@ -226,6 +227,15 @@ const LoginPage = () => {
       })
       setLoginOrSignup('login')
     }
+  }
+
+  async function signInWithAzure() {
+    const { data, error } = await supabaseClient.auth.signInWithOAuth({
+      provider: 'azure',
+      options: {
+        scopes: 'email',
+      },
+    })
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -344,6 +354,18 @@ const LoginPage = () => {
                   ? '重置密码'
                   : '注册'}
               </Button>
+              {loginOrSignup !== 'reset' && (
+              <Button className="w-full shadow-md bg-white hover:bg-slate-100 text-neutral-700 flex flex-row justify-center gap-2" onClick={signInWithAzure}>
+                <Image
+                  className=""
+                  src="/Microsoft_logo.svg"
+                  alt="ms logo"
+                  height={20}
+                  width={20}
+                />
+                <p> 使用 Microsoft 登录</p>
+              </Button>
+                )}
               <div className="flex flex-row justify-around">
                 {loginOrSignup !== 'reset' && (
                   <p
