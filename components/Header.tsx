@@ -145,7 +145,7 @@ const Header = () => {
   const supabase = useSupabaseClient()
   return (
     <>
-      <header className="flex flex-row items-center justify-between mb-8 px-8 py-4 ">
+      <header className="flex flex-row items-center justify-between mb-8 px-4 py-6 md:px-12 ">
         <h1 className=" text-slate-700 font-bold text-2xl font-mono flex flex-row items-center gap-3 dark:text-slate-200 ">
           <div className="flex flex-row gap-1.5 relative">
             <Image src={'/icon.png'} width="32" height="32" alt="logo" /> <span>bdfz.app</span>{' '}
