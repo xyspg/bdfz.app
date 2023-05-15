@@ -56,7 +56,6 @@ const DropDownNotLogin = () => {
         <DropdownMenuContent className="mt-0.5 pt-2 w-56 bg-white min-w-min">
           {!session ? (
             <Link href="/">
-              {' '}
               <DropdownMenuLabel>BDFZ AI</DropdownMenuLabel>
             </Link>
           ) : (
