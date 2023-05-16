@@ -150,7 +150,7 @@ const LoginPage = () => {
         handleSetNewPwd()
 
       } else if (event == 'SIGNED_IN'){
-        router.push('/redirect')
+        router.push('/')
       }
     })
   }, [])
