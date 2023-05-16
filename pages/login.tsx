@@ -149,11 +149,8 @@ const LoginPage = () => {
         setShowPasswordResetScreen(true)
         handleSetNewPwd()
 
-      } else if (event == 'SIGNED_IN'){
-        const timer = setTimeout(() => {
-          router.push('/')
-          // @ts-ignore
-        }, 3000);
+      } else if (event == 'SIGNED_IN') {
+        window.location.href = '/'
       }
     })
   }, [])
