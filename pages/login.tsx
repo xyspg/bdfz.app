@@ -96,6 +96,8 @@ const LoginPage = () => {
           theme: 'light',
         })
       }
+    } else {
+      router.push('/')
     }
   }
 
