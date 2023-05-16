@@ -281,11 +281,16 @@ const LoginPage = () => {
           <title>登录 - bdfz.app</title>
           <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1" />
         </Head>
+        <Header />
         <ToastContainer />
-        <div className="">
-          <Header />
-          <div className="flex flex-col items-center justify-center p-8">
+        <div>
+          <div className="flex flex-col items-center justify-center p-2">
             <div className="w-full md:w-1/2 max-w-md flex flex-col gap-6">
+              {/*
+              I don't know why adding a gap-6 here will
+              cause the layout to shift when opening dropdown menu
+              therefore I replaced  the gap-6 with a mb-6 or mt-6 on the children of the flex container
+              */}
               <div className="flex flex-col gap-2">
                 <Label>Email</Label>
                 <Input
@@ -434,8 +439,8 @@ const LoginPage = () => {
                 </p>
               </div>
             </div>
+            </div>
           </div>
-        </div>
       </>
     )
     else router.push(decodeURIComponent(query.redirectedFrom as string) || '/')
