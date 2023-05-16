@@ -1,4 +1,4 @@
-import { useSupabaseClient, useUser, useSession } from '@supabase/auth-helpers-react'
+import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 import * as React from 'react'
 import { useEffect, useState } from 'react'
 import Header from '@/components/Header'
@@ -14,7 +14,6 @@ import { GitHubLogoIcon} from '@radix-ui/react-icons'
 
 const LoginPage = () => {
   const router = useRouter()
-  const session = useSession()
   const supabaseClient = useSupabaseClient()
   const user = useUser()
   const [data, setData] = useState()
@@ -25,14 +24,13 @@ const LoginPage = () => {
   const [loginOrSignup, setLoginOrSignup] = useState<'login' | 'signup' | 'reset'>('login')
   const [authError, setAuthError] = useState<string | null>(null)
   const [typingTimeout, setTypingTimeout] = useState<number | undefined>(undefined)
+  const [showPasswordResetScreen, setShowPasswordResetScreen] = useState(false)
   const { query } = useRouter()
 
   useEffect(() => {
     setAuthError(null)
     setPasswordError(null)
   }, [loginOrSignup])
-
-
 
   const getURL = () => {
     let url =
@@ -52,13 +50,12 @@ const LoginPage = () => {
     return null
   }
 
-  const handleClick = async (email: string, password: string) => {
+  const handleClick = (email: string, password: string) => {
     if (!email) return setAuthError('邮箱不能为空')
     if (!password && loginOrSignup !== 'reset') return setAuthError('密码不能为空')
 
     if (loginOrSignup === 'login') {
-      await handleLogin(email, password)
-       router.push('/')
+      handleLogin(email, password)
     } else if (loginOrSignup === 'signup') {
       const error = checkPassword(password, passwordConfirm)
       if (error) {
@@ -66,7 +63,7 @@ const LoginPage = () => {
         alert(error)
         return
       }
-      await handleSignUp(email, password)
+      handleSignUp(email, password)
     }
   }
 
@@ -114,7 +111,7 @@ const LoginPage = () => {
       theme: 'light',
     })
     const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-      redirectTo: `${getURL()}`,
+      redirectTo: `${getURL()}password`,
     })
     if (error) {
       toast.error(`${error.message}`, {
@@ -143,21 +140,17 @@ const LoginPage = () => {
   }
 
   useEffect(() => {
-    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN') {
-          router.push('/')
-        } else if (event === 'PASSWORD_RECOVERY') {
-          router.push('/password')
-        }
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      if (event == 'PASSWORD_RECOVERY') {
+        setShowPasswordResetScreen(true)
+        handleSetNewPwd()
       }
-    );
-    return () => {
-      subscription?.unsubscribe();
-    };
+    })
   }, [])
 
-
+  const handleSetNewPwd = () => {
+    router.push('/password')
+  }
   const handleSignUp = async (email: string, password: string) => {
     const allowedDomains = ['i.pkuschool.edu.cn']
     const emailDomain = email.split('@')[1]
@@ -284,23 +277,19 @@ const LoginPage = () => {
       }
     }
   }
-  if (!user) {
+
+  if (!user)
     return (
       <>
         <Head>
           <title>登录 - bdfz.app</title>
           <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1" />
         </Head>
-        <Header />
         <ToastContainer />
-        <div>
+        <div className="">
+          <Header />
           <div className="flex flex-col items-center justify-center p-8">
             <div className="w-full md:w-1/2 max-w-md flex flex-col gap-6">
-              {/*
-              I don't know why adding a gap-6 here will
-              cause the layout to shift when opening dropdown menu
-              therefore I replaced  the gap-6 with a mb-6 or mt-6 on the children of the flex container
-              */}
               <div className="flex flex-col gap-2">
                 <Label>Email</Label>
                 <Input
@@ -453,6 +442,11 @@ const LoginPage = () => {
         </div>
       </>
     )
+
+  if (query.redirect) {
+    router.push(decodeURIComponent(query.redirect as string))
+  } else if (!showPasswordResetScreen) {
+    router.push('/')
   }
 }
 
