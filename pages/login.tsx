@@ -286,7 +286,8 @@ const LoginPage = () => {
 
   setInterval(()=>{
     if (redirecting){
-      router.replace('/')
+      router.push('/')
+      console.log('redirecting')
     }
   },500);
 
