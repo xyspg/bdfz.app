@@ -274,7 +274,9 @@ const LoginPage = () => {
     }
   }
 
-  if (!user)
+
+
+  if (!user) {
     return (
       <>
         <Head>
@@ -371,8 +373,8 @@ const LoginPage = () => {
                   loginOrSignup === 'login'
                     ? 'login'
                     : loginOrSignup === 'reset'
-                    ? 'reset pwd'
-                    : 'signup'
+                      ? 'reset pwd'
+                      : 'signup'
                 }
                 className="w-full bg-red-900 block shadow-md hover:bg-red-800 dark:bg-red-900 dark:hover:bg-red-800"
                 onClick={() => {
@@ -382,8 +384,8 @@ const LoginPage = () => {
                 {loginOrSignup === 'login'
                   ? '登录'
                   : loginOrSignup === 'reset'
-                  ? '重置密码'
-                  : '注册'}
+                    ? '重置密码'
+                    : '注册'}
               </Button>
               {loginOrSignup !== 'reset' && (
                 <div className='flex flex-col gap-4'>
@@ -409,7 +411,7 @@ const LoginPage = () => {
                     className="w-full shadow-md bg-white hover:bg-slate-100 text-neutral-700 flex flex-row justify-center gap-2"
                     onClick={signInWithGitHub}
                   >
-                   <GitHubLogoIcon width='20' height='20' />
+                    <GitHubLogoIcon width='20' height='20' />
                     <p> 使用 GitHub 登录</p>
                   </Button>
                 </div>
@@ -439,12 +441,13 @@ const LoginPage = () => {
                 </p>
               </div>
             </div>
-            </div>
           </div>
+        </div>
       </>
     )
-    else router.push(decodeURIComponent(query.redirectedFrom as string) || '/')
-
+  } else {
+    router.push(decodeURIComponent(query.redirectedFrom as string) || '/')
+  }
 }
 
 export default LoginPage
