@@ -37,6 +37,7 @@ const DropDownNotLogin = () => {
     try {
       await supabaseClient.auth.signOut()
       router.push('/')
+      router.reload()
     } catch (error: any) {
       console.error('Error signing out:', error.message)
     }
