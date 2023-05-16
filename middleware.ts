@@ -25,5 +25,5 @@ export async function middleware(req: NextRequest) {
   return NextResponse.redirect(redirectUrl)
 }
 export const config = {
-  matcher: ['/api','/profile','/password','/'],
+  matcher: ['/api','/profile','/'],
 };

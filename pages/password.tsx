@@ -63,7 +63,7 @@ const Password = () => {
         progress: undefined,
         theme: 'light',
       })
-      router.push('/')
+      window.location.href = '/'
     }
   }
 
