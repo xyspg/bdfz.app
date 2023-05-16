@@ -145,15 +145,21 @@ const LoginPage = () => {
         setShowPasswordResetScreen(true)
         handleSetNewPwd()
       }
-      if (event == 'SIGNED_IN') {
+    })
+  }, [])
+
+  useEffect(() => {
+    if (user) {
+      setTimeout(() => {
         if (query.redirect) {
           router.push(decodeURIComponent(query.redirect as string))
         } else if (!showPasswordResetScreen) {
           router.push('/')
         }
-      }
-    })
-  }, [])
+      }, 1000); // Adjust this delay time as needed
+    }
+  }, [user]);
+
 
   const handleSetNewPwd = () => {
     router.push('/password')
