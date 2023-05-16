@@ -1,22 +1,23 @@
-import { createClient } from '@supabase/supabase-js'
-import { NextApiRequest, NextApiResponse } from 'next'
+import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+export default async (req: NextApiRequest, res: NextApiResponse) => {
+  const supabaseServerClient = createServerSupabaseClient({
+    req,
+    res,
+  })
+  const {
+    data: { user },
+  } = await supabaseServerClient.auth.getUser()
 
-//@ts-ignore
-const supabase = createClient(supabaseUrl, supabaseKey)
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { visitorId, userId, question, answer, timestamp,words, deviceInfo, hasFlaggedContent } =
+    const { question, answer, timestamp, words, deviceInfo, hasFlaggedContent } =
       req.body
-
     try {
-      const { error } = await supabase.from('statistics').insert([
+      const { error } = await supabaseServerClient.from('statistics').insert([
         {
-          visitor_id: visitorId,
-          user_id: userId,
+          user_id: user?.id,
           question,
           answer,
           timestamp,
@@ -28,7 +29,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           has_flagged_content: hasFlaggedContent,
         },
       ])
-
       if (error) {
         res.status(400).json({ error: error.message })
       } else {

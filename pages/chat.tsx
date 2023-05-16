@@ -7,9 +7,7 @@ import Head from 'next/head'
 const Chat = () => {
   const session = useSession()
   const router = useRouter()
-  useEffect(() => {
-    if (!session) router.push(`/login?redirect=${encodeURIComponent(router.asPath)}`)
-  }, [router, session])
+
   return (
     <>
       <Head>

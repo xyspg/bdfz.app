@@ -24,13 +24,13 @@ const LoginPage = () => {
   const [loginOrSignup, setLoginOrSignup] = useState<'login' | 'signup' | 'reset'>('login')
   const [authError, setAuthError] = useState<string | null>(null)
   const [typingTimeout, setTypingTimeout] = useState<number | undefined>(undefined)
-  const [showPasswordResetScreen, setShowPasswordResetScreen] = useState(false)
   const { query } = useRouter()
 
   useEffect(() => {
     setAuthError(null)
     setPasswordError(null)
   }, [loginOrSignup])
+
 
   const getURL = () => {
     let url =
@@ -111,7 +111,7 @@ const LoginPage = () => {
       theme: 'light',
     })
     const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-      redirectTo: `${getURL()}password`,
+      redirectTo: `${getURL()}`,
     })
     if (error) {
       toast.error(`${error.message}`, {
@@ -142,15 +142,11 @@ const LoginPage = () => {
   useEffect(() => {
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       if (event == 'PASSWORD_RECOVERY') {
-        setShowPasswordResetScreen(true)
-        handleSetNewPwd()
+        router.push('/password')
       }
     })
   }, [])
 
-  const handleSetNewPwd = () => {
-    router.push('/password')
-  }
   const handleSignUp = async (email: string, password: string) => {
     const allowedDomains = ['i.pkuschool.edu.cn']
     const emailDomain = email.split('@')[1]
@@ -285,11 +281,16 @@ const LoginPage = () => {
           <title>登录 - bdfz.app</title>
           <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1" />
         </Head>
+        <Header />
         <ToastContainer />
-        <div className="">
-          <Header />
-          <div className="flex flex-col items-center justify-center p-8">
+        <div>
+          <div className="flex flex-col items-center justify-center p-2">
             <div className="w-full md:w-1/2 max-w-md flex flex-col gap-6">
+              {/*
+              I don't know why adding a gap-6 here will
+              cause the layout to shift when opening dropdown menu
+              therefore I replaced  the gap-6 with a mb-6 or mt-6 on the children of the flex container
+              */}
               <div className="flex flex-col gap-2">
                 <Label>Email</Label>
                 <Input
@@ -438,16 +439,12 @@ const LoginPage = () => {
                 </p>
               </div>
             </div>
+            </div>
           </div>
-        </div>
       </>
     )
+    else router.push(decodeURIComponent(query.redirectedFrom as string) || '/')
 
-  if (query.redirect) {
-    router.push(decodeURIComponent(query.redirect as string))
-  } else if (!showPasswordResetScreen) {
-    router.push('/')
-  }
 }
 
 export default LoginPage

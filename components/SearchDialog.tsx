@@ -252,8 +252,6 @@ export function SearchDialog() {
 
       const eventSource = new SSE(`api/vector-search`, {
         headers: {
-          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
           'Content-Type': 'application/json',
         },
         payload: JSON.stringify({ query }),
@@ -331,7 +329,6 @@ export function SearchDialog() {
 
     const fp = await fpPromise
     const result = await fp.get()
-    const visitorId = result.visitorId
 
     const words = answer && wordsCount(answer)
     console.log(`word count: ${words}`)
@@ -350,8 +347,6 @@ export function SearchDialog() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        visitorId,
-        userId,
         question,
         answer,
         words,
@@ -363,11 +358,11 @@ export function SearchDialog() {
   }
 
   const sendFeedback = async (f: string) => {
+    // If feedback is empty, do not send
     if (feedback !== '') return
     setFeedback(f)
     const fp = await fpPromise
     const result = await fp.get()
-    const visitorId = result.visitorId
 
     const deviceInfo = {
       platform: result.components.platform.value,
@@ -384,8 +379,6 @@ export function SearchDialog() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        visitorId,
-        userId,
         question,
         answer,
         f,
