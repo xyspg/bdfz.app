@@ -25,7 +25,5 @@ export async function middleware(req: NextRequest) {
   return NextResponse.redirect(redirectUrl)
 }
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|login|favicon.ico|icon.png|meta.png).*)',
-  ],
+  matcher: ['/api','/profile','/password','/'],
 };

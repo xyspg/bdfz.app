@@ -26,6 +26,7 @@ const LoginPage = () => {
   const [authError, setAuthError] = useState<string | null>(null)
   const [typingTimeout, setTypingTimeout] = useState<number | undefined>(undefined)
   const [showPasswordResetScreen, setShowPasswordResetScreen] = useState(false)
+  const [redirecting, setRedirecting] = useState(false)
   const { query } = useRouter()
 
   const { setUser } = useContext(UserContext);
@@ -101,6 +102,7 @@ const LoginPage = () => {
         })
       }
     }
+    setRedirecting(true);
   }
 
   const handleReset = async (email: string) => {
@@ -144,20 +146,24 @@ const LoginPage = () => {
   }
 
   useEffect(() => {
+    let intervalId: any;
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       if (event == 'PASSWORD_RECOVERY') {
         setShowPasswordResetScreen(true)
         handleSetNewPwd()
       }
-      if (event == 'SIGNED_IN') {
-        const { data: {user} } = await supabaseClient.auth.getUser();
-        if (user) {
-          setUser(user);
-          console.log(user)
-          router.replace('/')
-        }
+      if (event == 'SIGNED_IN'){
+        intervalId = setInterval(() => {
+          // Your router code here
+          router.push("/");
+        }, 1000);
       }
     })
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    }
   }, [])
 
   const handleSetNewPwd = () => {
@@ -454,6 +460,13 @@ const LoginPage = () => {
         </div>
       </>
     )
+  if (redirecting){
+    return (
+      <div className='flex justify-center items-center h-48'>
+        <p className='text-gray-700 dark:text-gray-200 text-md'>登录成功，正在重定向...</p>
+      </div>
+    )
+  }
 }
 
 export default LoginPage

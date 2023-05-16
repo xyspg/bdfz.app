@@ -1,14 +1,12 @@
 import Head from 'next/head'
 import { SearchDialog } from '@/components/SearchDialog'
 import Header from '@/components/Header'
-import { useSession, useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 
-
 export default function Home() {
   const session = useSession()
-  const user = useUser()
   const router = useRouter()
   const supabase = useSupabaseClient()
 
@@ -18,7 +16,7 @@ export default function Home() {
         router.push('/password')
       }
     })
-  }, [router, supabase.auth, user])
+  }, [router, supabase.auth])
 
 
   return (
