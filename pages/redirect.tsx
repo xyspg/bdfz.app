@@ -6,8 +6,8 @@ const Redirect = () => {
   const router = useRouter()
   useEffect(() => {
     const redirectTimer = setTimeout(() => {
-      router.push('/'); // Replace with your desired redirect path
-    }, 1000); // Delay of 5 seconds (5000 milliseconds)
+      router.push('/');
+    }, 2000);
 
     return () => {
       clearTimeout(redirectTimer);
