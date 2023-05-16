@@ -11,7 +11,6 @@ import 'react-toastify/dist/ReactToastify.css'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import { GitHubLogoIcon} from '@radix-ui/react-icons'
-import { UserContext } from '@/context/UserContext'
 
 const LoginPage = () => {
   const router = useRouter()
@@ -26,9 +25,8 @@ const LoginPage = () => {
   const [authError, setAuthError] = useState<string | null>(null)
   const [typingTimeout, setTypingTimeout] = useState<number | undefined>(undefined)
   const [showPasswordResetScreen, setShowPasswordResetScreen] = useState(false)
-  const { query } = useRouter()
+  const { query } = router
 
-  const { setUser } = useContext(UserContext);
 
 
   useEffect(() => {
