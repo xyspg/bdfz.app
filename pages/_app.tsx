@@ -8,6 +8,7 @@ import { SessionContextProvider, Session } from '@supabase/auth-helpers-react'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Layout from '@/components/Layout'
+import { UserContextProvider } from '@/context/UserContext'
 
 export default function App({ Component, pageProps }: AppProps<{ initialSession: Session }>) {
   const [supabaseClient] = useState(() => createBrowserSupabaseClient())
@@ -19,9 +20,11 @@ export default function App({ Component, pageProps }: AppProps<{ initialSession:
         initialSession={pageProps.initialSession}
       >
         <ThemeProvider attribute="class">
+          <UserContextProvider>
           <Layout>
             <Component {...pageProps} />
           </Layout>
+          </UserContextProvider>
         </ThemeProvider>
       </SessionContextProvider>
       <Script

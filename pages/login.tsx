@@ -1,6 +1,6 @@
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 import * as React from 'react'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import Header from '@/components/Header'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,6 +11,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import { GitHubLogoIcon} from '@radix-ui/react-icons'
+import { UserContext } from '@/context/UserContext'
 
 const LoginPage = () => {
   const router = useRouter()
@@ -26,6 +27,9 @@ const LoginPage = () => {
   const [typingTimeout, setTypingTimeout] = useState<number | undefined>(undefined)
   const [showPasswordResetScreen, setShowPasswordResetScreen] = useState(false)
   const { query } = useRouter()
+
+  const { setUser } = useContext(UserContext);
+
 
   useEffect(() => {
     setAuthError(null)
@@ -146,9 +150,9 @@ const LoginPage = () => {
         handleSetNewPwd()
       }
       if (event == 'SIGNED_IN') {
-        if (query.redirect) {
-          router.push(decodeURIComponent(query.redirect as string))
-        } else if (!showPasswordResetScreen) {
+        const { data: {user} } = await supabaseClient.auth.getUser();
+        if (user) {
+          setUser(user);
           router.push('/')
         }
       }
