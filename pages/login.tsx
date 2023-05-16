@@ -150,6 +150,9 @@ const LoginPage = () => {
       if (event == 'PASSWORD_RECOVERY') {
         setShowPasswordResetScreen(true)
         handleSetNewPwd()
+
+      } else if (event == 'SIGNED_IN'){
+        router.push('/')
       }
     })
   }, [])
@@ -283,13 +286,6 @@ const LoginPage = () => {
       }
     }
   }
-
-  setInterval(()=>{
-    if (redirecting){
-      router.push('/')
-      console.log('redirecting')
-    }
-  },500);
 
   if (!user)
     return (
