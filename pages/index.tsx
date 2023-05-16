@@ -17,9 +17,8 @@ export default function Home() {
         router.push('/password')
       }
     })
-    if(!session) router.push('/login')
   }, [router, supabase.auth])
-
+  if (!session) router.push('/login')
   return (
     <>
       <Head>
