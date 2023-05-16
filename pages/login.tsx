@@ -32,9 +32,7 @@ const LoginPage = () => {
     setPasswordError(null)
   }, [loginOrSignup])
 
-  useEffect(()=>{
-    if(session) router.push('/')
-  },[router, session])
+
 
   const getURL = () => {
     let url =
@@ -146,12 +144,17 @@ const LoginPage = () => {
   }
 
   useEffect(() => {
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
-      if (event == 'PASSWORD_RECOVERY') {
-        router.push('/password')
+    const { data: authListener } = supabaseClient.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN') {
+          router.push('/')
+        } else if (event === 'PASSWORD_RECOVERY') {
+          router.push('/password')
+        }
       }
-    })
+    )
   }, [router, supabaseClient.auth])
+
 
   const handleSignUp = async (email: string, password: string) => {
     const allowedDomains = ['i.pkuschool.edu.cn']
@@ -279,7 +282,6 @@ const LoginPage = () => {
       }
     }
   }
-  if(session) router.push('/')
   if (!user) {
     return (
       <>
