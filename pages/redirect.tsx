@@ -4,6 +4,15 @@ import Header from '@/components/Header'
 
 const Redirect = () => {
   const router = useRouter()
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      router.push('/');
+    }, 3000);
+
+    // Clean up the timer when the component is unmounted
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <>
       <Header />
