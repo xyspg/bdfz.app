@@ -145,6 +145,13 @@ const LoginPage = () => {
         setShowPasswordResetScreen(true)
         handleSetNewPwd()
       }
+      if (event == 'SIGNED_IN') {
+        if (query.redirect) {
+          router.push(decodeURIComponent(query.redirect as string))
+        } else if (!showPasswordResetScreen) {
+          router.push('/')
+        }
+      }
     })
   }, [])
 
@@ -442,12 +449,6 @@ const LoginPage = () => {
         </div>
       </>
     )
-
-  if (query.redirect) {
-    router.push(decodeURIComponent(query.redirect as string))
-  } else if (!showPasswordResetScreen) {
-    router.push('/')
-  }
 }
 
 export default LoginPage
