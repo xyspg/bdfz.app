@@ -52,12 +52,12 @@ const LoginPage = () => {
     return null
   }
 
-  const handleClick = (email: string, password: string) => {
+  const handleClick = async (email: string, password: string) => {
     if (!email) return setAuthError('邮箱不能为空')
     if (!password && loginOrSignup !== 'reset') return setAuthError('密码不能为空')
 
     if (loginOrSignup === 'login') {
-      handleLogin(email, password)
+      await handleLogin(email, password)
     } else if (loginOrSignup === 'signup') {
       const error = checkPassword(password, passwordConfirm)
       if (error) {
@@ -65,7 +65,7 @@ const LoginPage = () => {
         alert(error)
         return
       }
-      handleSignUp(email, password)
+      await handleSignUp(email, password)
     }
   }
 
