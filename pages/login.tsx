@@ -58,6 +58,7 @@ const LoginPage = () => {
 
     if (loginOrSignup === 'login') {
       await handleLogin(email, password)
+       router.push('/')
     } else if (loginOrSignup === 'signup') {
       const error = checkPassword(password, passwordConfirm)
       if (error) {
