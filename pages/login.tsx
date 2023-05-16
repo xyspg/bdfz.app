@@ -152,7 +152,11 @@ const LoginPage = () => {
         handleSetNewPwd()
 
       } else if (event == 'SIGNED_IN'){
-        router.push('/')
+        setTimeout(function() {
+          console.log("Delayed code executed!");
+          router.push('/')
+        }, 1000);
+
       }
     })
   }, [])
