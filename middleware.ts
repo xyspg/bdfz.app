@@ -24,9 +24,15 @@ export async function middleware(req: NextRequest) {
   redirectUrl.searchParams.set(`redirect`, req.nextUrl.pathname)
   return NextResponse.redirect(redirectUrl)
 }
-
 export const config = {
   matcher: [
-    '/((?!_next/static|favicon.ico|login|).*)',
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
-}
+};

@@ -18,7 +18,6 @@ export default function Home() {
         router.push('/password')
       }
     })
-    if (!user) router.push('/login')
   }, [router, supabase.auth, user])
 
 
