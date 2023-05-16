@@ -31,6 +31,9 @@ const LoginPage = () => {
     setPasswordError(null)
   }, [loginOrSignup])
 
+  useEffect(()=>{
+    if(user) router.push('/')
+  },[router, user])
 
   const getURL = () => {
     let url =
@@ -448,8 +451,6 @@ const LoginPage = () => {
       </>
     )
   }
-  router.push('/')
-
 }
 
 export default LoginPage
