@@ -146,24 +146,12 @@ const LoginPage = () => {
   }
 
   useEffect(() => {
-    let intervalId: any;
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       if (event == 'PASSWORD_RECOVERY') {
         setShowPasswordResetScreen(true)
         handleSetNewPwd()
       }
-      if (event == 'SIGNED_IN'){
-        intervalId = setInterval(() => {
-          // Your router code here
-          router.push("/");
-        }, 1000);
-      }
     })
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    }
   }, [])
 
   const handleSetNewPwd = () => {
@@ -295,6 +283,13 @@ const LoginPage = () => {
       }
     }
   }
+
+  setInterval(()=>{
+    if(user){
+      router.replace('/')
+    }
+    console.log('check')
+  },500);
 
   if (!user)
     return (
