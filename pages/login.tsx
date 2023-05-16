@@ -147,7 +147,7 @@ const LoginPage = () => {
         router.push('/password')
       }
     })
-  }, [])
+  }, [router, supabaseClient.auth])
 
   const handleSignUp = async (email: string, password: string) => {
     const allowedDomains = ['i.pkuschool.edu.cn']

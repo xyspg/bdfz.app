@@ -21,7 +21,6 @@ export async function middleware(req: NextRequest) {
   // Auth condition not met, redirect to home page.
   const redirectUrl = req.nextUrl.clone()
   redirectUrl.pathname = '/login'
-  redirectUrl.searchParams.set(`redirectedFrom`, req.nextUrl.pathname)
   return NextResponse.redirect(redirectUrl)
 }
 
