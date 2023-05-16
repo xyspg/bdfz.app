@@ -448,12 +448,7 @@ const LoginPage = () => {
       </>
     )
   }
-
-  if (query.redirectedFrom) {
-    router.push(decodeURIComponent(query.redirectedFrom as string))
-  } else {
-    router.push('/')
-  }
+  router.push('/')
 
 }
 
