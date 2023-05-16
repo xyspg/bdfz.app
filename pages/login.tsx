@@ -153,7 +153,8 @@ const LoginPage = () => {
         const { data: {user} } = await supabaseClient.auth.getUser();
         if (user) {
           setUser(user);
-          router.push('/')
+          console.log(user)
+          router.replace('/')
         }
       }
     })
