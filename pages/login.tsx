@@ -284,7 +284,7 @@ const LoginPage = () => {
         <Header />
         <ToastContainer />
         <div>
-          <div className="flex flex-col items-center justify-center p-2">
+          <div className="flex flex-col items-center justify-center p-8">
             <div className="w-full md:w-1/2 max-w-md flex flex-col gap-6">
               {/*
               I don't know why adding a gap-6 here will
