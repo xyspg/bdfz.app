@@ -98,8 +98,6 @@ const LoginPage = () => {
           theme: 'light',
         })
       }
-    } else {
-      router.push('/')
     }
   }
 
@@ -144,7 +142,7 @@ const LoginPage = () => {
   }
 
   useEffect(() => {
-    const { data: authListener } = supabaseClient.auth.onAuthStateChange(
+    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_IN') {
           router.push('/')
@@ -152,8 +150,11 @@ const LoginPage = () => {
           router.push('/password')
         }
       }
-    )
-  }, [router, supabaseClient.auth])
+    );
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, [])
 
 
   const handleSignUp = async (email: string, password: string) => {
