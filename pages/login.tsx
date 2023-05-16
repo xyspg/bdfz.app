@@ -1,4 +1,4 @@
-import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
+import { useSupabaseClient, useUser, useSession } from '@supabase/auth-helpers-react'
 import * as React from 'react'
 import { useEffect, useState } from 'react'
 import Header from '@/components/Header'
@@ -14,6 +14,7 @@ import { GitHubLogoIcon} from '@radix-ui/react-icons'
 
 const LoginPage = () => {
   const router = useRouter()
+  const session = useSession()
   const supabaseClient = useSupabaseClient()
   const user = useUser()
   const [data, setData] = useState()
@@ -32,8 +33,8 @@ const LoginPage = () => {
   }, [loginOrSignup])
 
   useEffect(()=>{
-    if(user) router.push('/')
-  },[router, user])
+    if(session) router.push('/')
+  },[router, session])
 
   const getURL = () => {
     let url =
@@ -278,9 +279,7 @@ const LoginPage = () => {
       }
     }
   }
-
-
-
+  if(session) router.push('/')
   if (!user) {
     return (
       <>
