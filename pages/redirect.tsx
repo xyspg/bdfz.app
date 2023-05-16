@@ -6,7 +6,7 @@ const Redirect = () => {
   const router = useRouter()
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push('/');
+      router.replace('/');
     }, 3000);
 
     // Clean up the timer when the component is unmounted
