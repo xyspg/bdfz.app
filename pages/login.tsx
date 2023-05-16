@@ -445,13 +445,14 @@ const LoginPage = () => {
         </div>
       </>
     )
-  } else {
-    if (query.redirect) {
-      router.push(decodeURIComponent(query.redirect as string))
-    } else {
-      router.push('/')
-    }
   }
+
+  if (query.redirectedFrom) {
+    router.push(decodeURIComponent(query.redirectedFrom as string))
+  } else {
+    router.push('/')
+  }
+
 }
 
 export default LoginPage
