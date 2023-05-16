@@ -24,13 +24,13 @@ const LoginPage = () => {
   const [loginOrSignup, setLoginOrSignup] = useState<'login' | 'signup' | 'reset'>('login')
   const [authError, setAuthError] = useState<string | null>(null)
   const [typingTimeout, setTypingTimeout] = useState<number | undefined>(undefined)
-  const [showPasswordResetScreen, setShowPasswordResetScreen] = useState(false)
   const { query } = useRouter()
 
   useEffect(() => {
     setAuthError(null)
     setPasswordError(null)
   }, [loginOrSignup])
+
 
   const getURL = () => {
     let url =
@@ -111,7 +111,7 @@ const LoginPage = () => {
       theme: 'light',
     })
     const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-      redirectTo: `${getURL()}password`,
+      redirectTo: `${getURL()}`,
     })
     if (error) {
       toast.error(`${error.message}`, {
@@ -142,15 +142,11 @@ const LoginPage = () => {
   useEffect(() => {
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       if (event == 'PASSWORD_RECOVERY') {
-        setShowPasswordResetScreen(true)
-        handleSetNewPwd()
+        router.push('/password')
       }
     })
   }, [])
 
-  const handleSetNewPwd = () => {
-    router.push('/password')
-  }
   const handleSignUp = async (email: string, password: string) => {
     const allowedDomains = ['i.pkuschool.edu.cn']
     const emailDomain = email.split('@')[1]
@@ -442,12 +438,8 @@ const LoginPage = () => {
         </div>
       </>
     )
+    else router.push(decodeURIComponent(query.redirectedFrom as string) || '/')
 
-  if (query.redirect) {
-    router.push(decodeURIComponent(query.redirect as string))
-  } else if (!showPasswordResetScreen) {
-    router.push('/')
-  }
 }
 
 export default LoginPage

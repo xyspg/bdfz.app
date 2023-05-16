@@ -7,7 +7,16 @@ import { useRouter } from 'next/router'
 
 export default function Home() {
   const session = useSession()
+  const router = useRouter()
   const supabase = useSupabaseClient()
+
+  useEffect(() => {
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event == 'PASSWORD_RECOVERY') {
+        router.push('/password')
+      }
+    })
+  }, [router, supabase.auth])
 
   return (
     <>

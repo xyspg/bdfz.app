@@ -18,9 +18,6 @@ const Profile = () => {
   const [passwordConfirm, setPasswordConfirm] = useState('')
   const [passwordError, setPasswordError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (!session) router.push('/login')
-  }, [])
   const checkPassword = (password: string, passwordConfirm: string) => {
     if (passwordConfirm && password !== passwordConfirm) return '两次输入的密码不一致'
     if (password.length < 6) return '密码长度至少为 6 位'
