@@ -302,7 +302,13 @@ const Privacy = () => {
 
         <h2>11. 如何联系我们</h2>
 
-        <p> 如果您有任何本隐私政策中未解决的问题或疑虑，请联系 <a className='text-indigo-600 dark:text-indigo-300' href='mailto:support@bdfz.app'>support@bdfz.app</a> </p>
+        <p>
+          {' '}
+          如果您有任何本隐私政策中未解决的问题或疑虑，请联系{' '}
+          <a className="text-indigo-600 dark:text-indigo-300" href="mailto:support@bdfz.app">
+            support@bdfz.app
+          </a>{' '}
+        </p>
       </div>
     </>
   )

@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     data: { user },
   } = await supabaseServerClient.auth.getUser()
   if (req.method === 'POST') {
-    const {question, answer, f, timestamp, deviceInfo } = req.body
+    const { question, answer, f, timestamp, deviceInfo } = req.body
 
     try {
       const { error } = await supabase.from('feedback').insert([

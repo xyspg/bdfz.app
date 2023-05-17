@@ -19,10 +19,10 @@ export async function middleware(req: NextRequest) {
   }
   if (!session && req.nextUrl.pathname.startsWith('/api')) {
     // API route, return 401.
-    return new NextResponse(
-      JSON.stringify({success: false, message: 'Unauthorized'}),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
-    )
+    return new NextResponse(JSON.stringify({ success: false, message: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
   // Auth condition not met, redirect to home page.
   const redirectUrl = req.nextUrl.clone()
@@ -31,5 +31,5 @@ export async function middleware(req: NextRequest) {
   return NextResponse.redirect(redirectUrl)
 }
 export const config = {
-  matcher: ['/api/:path*','/profile','/'],
-};
+  matcher: ['/api/:path*', '/profile', '/'],
+}

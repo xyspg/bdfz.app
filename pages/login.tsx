@@ -10,13 +10,12 @@ import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
-import { GitHubLogoIcon} from '@radix-ui/react-icons'
+import { GitHubLogoIcon } from '@radix-ui/react-icons'
 
 const LoginPage = () => {
   const router = useRouter()
   const supabaseClient = useSupabaseClient()
   const user = useUser()
-  const [data, setData] = useState()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
@@ -26,8 +25,6 @@ const LoginPage = () => {
   const [typingTimeout, setTypingTimeout] = useState<number | undefined>(undefined)
   const [showPasswordResetScreen, setShowPasswordResetScreen] = useState(false)
   const { query } = router
-
-
 
   useEffect(() => {
     setAuthError(null)
@@ -146,7 +143,6 @@ const LoginPage = () => {
       if (event == 'PASSWORD_RECOVERY') {
         setShowPasswordResetScreen(true)
         handleSetNewPwd()
-
       } else if (event == 'SIGNED_IN') {
         window.location.href = '/'
       }
@@ -375,8 +371,8 @@ const LoginPage = () => {
                   loginOrSignup === 'login'
                     ? 'login'
                     : loginOrSignup === 'reset'
-                      ? 'reset pwd'
-                      : 'signup'
+                    ? 'reset pwd'
+                    : 'signup'
                 }
                 className="w-full bg-red-900 block shadow-md hover:bg-red-800 dark:bg-red-900 dark:hover:bg-red-800"
                 onClick={() => {
@@ -386,11 +382,11 @@ const LoginPage = () => {
                 {loginOrSignup === 'login'
                   ? '登录'
                   : loginOrSignup === 'reset'
-                    ? '重置密码'
-                    : '注册'}
+                  ? '重置密码'
+                  : '注册'}
               </Button>
               {loginOrSignup !== 'reset' && (
-                <div className='flex flex-col gap-4'>
+                <div className="flex flex-col gap-4">
                   <Button
                     className="w-full shadow-md bg-white hover:bg-slate-100 text-neutral-700 flex flex-row justify-center gap-2"
                     onClick={signInWithAzure}
@@ -413,7 +409,7 @@ const LoginPage = () => {
                     className="w-full shadow-md bg-white hover:bg-slate-100 text-neutral-700 flex flex-row justify-center gap-2"
                     onClick={signInWithGitHub}
                   >
-                    <GitHubLogoIcon width='20' height='20' />
+                    <GitHubLogoIcon width="20" height="20" />
                     <p> 使用 GitHub 登录</p>
                   </Button>
                 </div>

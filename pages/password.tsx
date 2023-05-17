@@ -10,7 +10,6 @@ import { useSupabaseClient, useUser, useSession } from '@supabase/auth-helpers-r
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 
-
 const Password = () => {
   const supabaseClient = useSupabaseClient()
   const user = useUser()

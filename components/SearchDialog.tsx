@@ -15,8 +15,8 @@ import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { ArrowUpIcon } from '@radix-ui/react-icons'
 import { useUser } from '@supabase/auth-helpers-react'
-import wordsCount from 'words-count';
-
+import wordsCount from 'words-count'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 
 const fpPromise = FingerprintJS.load()
 ;(async () => {
@@ -87,6 +87,7 @@ export function SearchDialog() {
   const [lastRequestTime, setLastRequestTime] = React.useState(0)
   const [totalTokens, setTotalTokens] = React.useState<number | null>(0)
   const delay = 5000 // ms
+  const supabase = useSupabaseClient()
 
   const user = useUser()
   const userId = user?.id
@@ -250,8 +251,14 @@ export function SearchDialog() {
       setPoliticalSensitive(false)
       setErrorMessage('')
 
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
       const eventSource = new SSE(`api/vector-search`, {
         headers: {
+          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
+          Authorization: `Bearer ${session?.access_token}`,
           'Content-Type': 'application/json',
         },
         payload: JSON.stringify({ query }),

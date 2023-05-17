@@ -10,10 +10,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     data: { user },
   } = await supabaseServerClient.auth.getUser()
 
-
   if (req.method === 'POST') {
-    const { question, answer, timestamp, words, deviceInfo, hasFlaggedContent } =
-      req.body
+    const { question, answer, timestamp, words, deviceInfo, hasFlaggedContent } = req.body
     try {
       const { error } = await supabaseServerClient.from('statistics').insert([
         {

@@ -118,11 +118,7 @@ const Profile = () => {
                   }}
                   onKeyDown={handleKeyDown}
                 />
-                {password !== '' && (
-                  <>
-
-                  </>
-                )}
+                {password !== '' && <></>}
               </div>
               <Button
                 data-umami-event="change password"

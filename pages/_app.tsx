@@ -17,7 +17,7 @@ export default function App({ Component, pageProps }: AppProps<{ initialSession:
         supabaseClient={supabaseClient}
         initialSession={pageProps.initialSession}
       >
-        <ThemeProvider attribute='class'>
+        <ThemeProvider attribute="class">
           <Layout>
             <Component {...pageProps} />
           </Layout>
@@ -25,8 +25,8 @@ export default function App({ Component, pageProps }: AppProps<{ initialSession:
       </SessionContextProvider>
       <Script
         async
-        src='https://analytics.umami.is/script.js'
-        data-website-id='2c84a5e3-0df4-41ba-bcc6-72028bae3279'
+        src="https://analytics.umami.is/script.js"
+        data-website-id="2c84a5e3-0df4-41ba-bcc6-72028bae3279"
       ></Script>
       <Analytics />
     </>

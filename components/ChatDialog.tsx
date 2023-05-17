@@ -15,8 +15,7 @@ import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { ArrowUpIcon } from '@radix-ui/react-icons'
 import { useUser } from '@supabase/auth-helpers-react'
-import wordsCount from 'words-count';
-
+import wordsCount from 'words-count'
 
 const fpPromise = FingerprintJS.load()
 ;(async () => {

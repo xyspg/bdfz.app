@@ -5,7 +5,6 @@ import GPT3Tokenizer from 'gpt3-tokenizer'
 import { CreateChatCompletionRequest } from 'openai'
 import { ApplicationError, UserError } from '@/lib/errors'
 import { politicalWords, pornWords } from '@/pages/api/sensitiveWords'
-
 // OpenAIApi does currently not work in Vercel Edge Functions as it uses Axios under the hood.
 export const config = {
   runtime: 'edge',
@@ -36,13 +35,25 @@ export default async function handler(req: NextRequest) {
       throw new UserError('Missing request data')
     }
 
-    const { query } = requestData
+    // Check if user is authenticated
+    const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new UserError('Missing Authorization header')
+    }
+    const jwt = authHeader.substring(7)
+    const {
+      data: { user },
+      error,
+    } = await supabaseClient.auth.getUser(jwt)
+    if (error || !user) {
+      throw new UserError('Invalid JWT token or user not found')
+    }
 
+    const { query } = requestData
     if (!query) {
       throw new UserError('请输入查询内容')
     }
-
-    const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
 
     // Moderate the content to comply with OpenAI T&C
     const sanitizedQuery = query.trim()
@@ -90,7 +101,6 @@ export default async function handler(req: NextRequest) {
         categories: results.categories,
       })
     }
-    console.log(`embedding sent: ${sanitizedQuery.replaceAll('\n', ' ')}`)
 
     const embeddingResponse = await fetch('https://' + openAiBaseUrl + '/v1/embeddings', {
       method: 'POST',
@@ -135,7 +145,6 @@ export default async function handler(req: NextRequest) {
     if (matchError) {
       throw new ApplicationError('Failed to match page sections', matchError)
     }
-    console.log('pageSections received', pageSections)
 
     const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
     let tokenCount = 0
@@ -146,14 +155,12 @@ export default async function handler(req: NextRequest) {
       const content = pageSection.content
       const encoded = tokenizer.encode(content)
       tokenCount += encoded.text.length
-
       if (tokenCount >= 4096) {
         break
       }
 
       contextText += `${content.trim()}\n---\n`
     }
-
     const prompt = codeBlock`
       ${oneLine`
        Pretend you are GPT-4 model , Act an encyclopedia of 北大附中 expertise. 
@@ -182,7 +189,19 @@ export default async function handler(req: NextRequest) {
       temperature: 0,
       stream: true,
     }
-    console.log(completionOptions)
+
+    try {
+      const { error } = await supabaseClient.from('embeddings_log').insert({
+        email: user.email,
+        question: query,
+        page_section: pageSections,
+        token_count: tokenCount,
+        context: contextText,
+        department,
+      })
+    } catch (error) {
+      console.log('error inserting:', error)
+    }
 
     const response = await fetch('https://' + openAiBaseUrl + '/v1/chat/completions', {
       method: 'POST',
@@ -217,10 +236,8 @@ export default async function handler(req: NextRequest) {
         }
       )
     } else if (err instanceof ApplicationError) {
-      // Print out application errors with their additional data
       console.error(`${err.message}: ${JSON.stringify(err.data)}`)
     } else {
-      // Print out unexpected errors as is to help with debugging
       console.error(err)
     }
 
