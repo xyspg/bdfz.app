@@ -405,6 +405,7 @@ const LoginPage = () => {
                     </svg>
                     <p> 使用 Microsoft 登录</p>
                   </Button>
+                  {/*
                   <Button
                     className="w-full shadow-md bg-white hover:bg-slate-100 text-neutral-700 flex flex-row justify-center gap-2"
                     onClick={signInWithGitHub}
@@ -412,6 +413,7 @@ const LoginPage = () => {
                     <GitHubLogoIcon width="20" height="20" />
                     <p> 使用 GitHub 登录</p>
                   </Button>
+                  */}
                 </div>
               )}
               <div className="flex flex-row justify-around">
