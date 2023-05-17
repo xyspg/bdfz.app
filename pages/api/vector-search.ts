@@ -198,6 +198,7 @@ export default async function handler(req: NextRequest) {
         token_count: tokenCount,
         context: contextText,
         department,
+        timestamp: new Date().toISOString(),
       })
     } catch (error) {
       console.log('error inserting:', error)
