@@ -78,7 +78,6 @@ const Password = () => {
         <title>设置密码 - bdfz.app</title>
         <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1" />
       </Head>
-      <Header />
       <ToastContainer />
       <div className="p-8 flex justify-center items-center">
         <div className="flex flex-col gap-2 w-full max-w-xl">

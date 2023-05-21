@@ -84,7 +84,6 @@ const Profile = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1" />
       </Head>
       <ToastContainer />
-      <Header />
       {session && (
         <div className="flex justify-center">
           <div className="p-8 flex justify-center flex-col gap-8 w-full md:w-1/2">

@@ -716,7 +716,7 @@ export function SearchDialog() {
                           text-sm text-neutral-700 dark:text-neutral-200
                           px-2.5 py-1.5 md:px-3 md:py-1.5
                           border-2 border-neutral-200 dark:border-neutral-600
-                          rounded-xl cursor-pointer
+                          rounded-lg cursor-pointer
                           bg-slate-50 hover:bg-slate-100
                           dark:bg-neutral-700  dark:hover:bg-gray-600
                           "

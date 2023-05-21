@@ -16,6 +16,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import { ArrowUpIcon } from '@radix-ui/react-icons'
 import { useUser } from '@supabase/auth-helpers-react'
 import wordsCount from 'words-count'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 
 const fpPromise = FingerprintJS.load()
 ;(async () => {
@@ -86,6 +87,7 @@ export function SearchDialog() {
   const [lastRequestTime, setLastRequestTime] = React.useState(0)
   const [totalTokens, setTotalTokens] = React.useState<number | null>(0)
   const delay = 5000 // ms
+  const supabase = useSupabaseClient()
 
   const user = useUser()
   const userId = user?.id
@@ -249,10 +251,14 @@ export function SearchDialog() {
       setPoliticalSensitive(false)
       setErrorMessage('')
 
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
       const eventSource = new SSE(`api/vector-search`, {
         headers: {
           apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+          Authorization: `Bearer ${session?.access_token}`,
           'Content-Type': 'application/json',
         },
         payload: JSON.stringify({ query }),
@@ -330,7 +336,6 @@ export function SearchDialog() {
 
     const fp = await fpPromise
     const result = await fp.get()
-    const visitorId = result.visitorId
 
     const words = answer && wordsCount(answer)
     console.log(`word count: ${words}`)
@@ -349,8 +354,6 @@ export function SearchDialog() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        visitorId,
-        userId,
         question,
         answer,
         words,
@@ -362,11 +365,11 @@ export function SearchDialog() {
   }
 
   const sendFeedback = async (f: string) => {
+    // If feedback is empty, do not send
     if (feedback !== '') return
     setFeedback(f)
     const fp = await fpPromise
     const result = await fp.get()
-    const visitorId = result.visitorId
 
     const deviceInfo = {
       platform: result.components.platform.value,
@@ -383,8 +386,6 @@ export function SearchDialog() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        visitorId,
-        userId,
         question,
         answer,
         f,

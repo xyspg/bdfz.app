@@ -288,7 +288,6 @@ const LoginPage = () => {
         </Head>
         <ToastContainer />
         <div className="">
-          <Header />
           <div className="flex flex-col items-center justify-center p-8">
             <div className="w-full md:w-1/2 max-w-md flex flex-col gap-6">
               <div className="flex flex-col gap-2">
@@ -403,7 +402,7 @@ const LoginPage = () => {
                       <path fill="#05a6f0" d="M1 12h10v10H1z" />
                       <path fill="#ffba08" d="M12 12h10v10H12z" />
                     </svg>
-                    <p> 使用 Microsoft 登录</p>
+                    <p> 使用学校 Microsoft 账号登录</p>
                   </Button>
                   {/*
                   <Button

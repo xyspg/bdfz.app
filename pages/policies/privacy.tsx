@@ -10,7 +10,6 @@ const Privacy = () => {
         <title>隐私政策 - bdfz.app</title>
         <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1" />
       </Head>
-      <Header />
       <div className="p-4 leading-8 text-neutral-700 dark:text-neutral-200">
         <h1 className="text-center text-2xl font-medium mb-2">隐私政策</h1>
 
