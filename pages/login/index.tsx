@@ -58,7 +58,7 @@ const LoginAzure = () => {
 
             <div className="flex justify-center">
               <Link
-                href='/login/email'
+                href="/login/email"
                 className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
               >
                 使用邮箱登录
