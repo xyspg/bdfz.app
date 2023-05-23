@@ -92,7 +92,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
   const [totalTokens, setTotalTokens] = React.useState<number | null>(0)
   const [chatHistory, setChatHistory] = React.useState(History)
   const [answerUpdated, setAnswerUpdated] = React.useState(false)
-  const [chatId, setChatId] = React.useState(uuidv4())
+
 
   React.useEffect(() => {
     setChatHistory(History)
@@ -104,7 +104,11 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
   const user = useUser()
   const userId = user?.id
   const router = useRouter()
-  const pathname = router.pathname
+  const pathname = router.asPath
+
+  const chatIdShouldBe = pathname.includes('/c/') ? pathname.slice(3) : uuidv4()
+  const [chatId, setChatId] = React.useState(chatIdShouldBe)
+
   const sampleQuestion = [
     '我在升旗仪式迟到了16分钟会发生什么?',
     '列出预科部的日程',
@@ -239,7 +243,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
         data: { session },
       } = await supabase.auth.getSession()
 
-      const eventSource = new SSE(`api/vector-search-chat`, {
+      const eventSource = new SSE(`/api/vector-search-chat`, {
         headers: {
           apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
           Authorization: `Bearer ${session?.access_token}`,
