@@ -5,7 +5,7 @@ import * as React from 'react'
 
 const isBrowser = () => typeof window !== 'undefined'
 
-function scrollToTop() {
+export function scrollToTop() {
   if (!isBrowser()) return
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
