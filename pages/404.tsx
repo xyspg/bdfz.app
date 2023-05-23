@@ -10,7 +10,10 @@ const NotFound = () => {
         <Link href="/">返回首页</Link>
       </Button>
       <p className="text-sm">
-        遇到问题？联系 <a className='text-indigo-900 cursor-pointer' href="mailto:support@bdfz.app">support@bdfz.app</a>
+        遇到问题？联系{' '}
+        <a className="text-indigo-900 cursor-pointer" href="mailto:support@bdfz.app">
+          support@bdfz.app
+        </a>
       </p>
     </div>
   )

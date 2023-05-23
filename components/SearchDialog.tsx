@@ -13,10 +13,12 @@ import remarkGfm from 'remark-gfm'
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { ArrowUpIcon } from '@radix-ui/react-icons'
+import { ArrowUpIcon, TrashIcon } from '@radix-ui/react-icons'
 import { useUser } from '@supabase/auth-helpers-react'
 import wordsCount from 'words-count'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import ModeSwitcher from '@/components/ModeSwitcher'
+import { encode } from 'gpt-tokenizer'
 
 const fpPromise = FingerprintJS.load()
 ;(async () => {
@@ -337,8 +339,8 @@ export function SearchDialog() {
     const fp = await fpPromise
     const result = await fp.get()
 
-    const words = answer && wordsCount(answer)
-    console.log(`word count: ${words}`)
+    const words = answer && encode(answer).length + encode(question).length
+    console.log(`token count: ${words}`)
     const deviceInfo = {
       platform: result.components.platform.value,
       osCpu: result.components.osCpu.value,
@@ -419,10 +421,10 @@ export function SearchDialog() {
   return (
     <>
       <div>
-        <div className="grid gap-4 text-slate-700 w-screen px-6 pb-4 max-w-3xl">
+        <div className="grid gap-5 text-slate-700 w-screen px-6 pb-4 max-w-3xl">
           <ToastContainer />
           {question && (
-            <div className="flex gap-4">
+            <div className="flex gap-4 py-4 rounded-xl p-4">
               <span className="bg-slate-100 dark:bg-slate-300 p-2 w-8 h-8 rounded-full text-center flex items-center justify-center">
                 <User width={18} />
               </span>
@@ -435,7 +437,7 @@ export function SearchDialog() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
-              className="flex items-center gap-4 dark:text-white max-w-3xl"
+              className="flex items-center gap-4 dark:text-white max-w-3xl p-4 rounded-xl bg-neutral-100"
             >
               <div className="w-7 ml-0.5 h-7 bg-gradient-to-r from-red-900 to-red-800 ring-red-600 ring-1 rounded-md border border-brand-400 flex items-center justify-center shadow-sm ">
                 <svg
@@ -458,7 +460,7 @@ export function SearchDialog() {
           )}
 
           {hasError && (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 p-4 bg-neutral-100 rounded-xl">
               <span className="bg-red-100 p-2 w-8 h-8 rounded-full text-center flex items-center justify-center">
                 <Frown width={18} />
               </span>
@@ -470,7 +472,7 @@ export function SearchDialog() {
 
           {answer && !hasError ? (
             <>
-              <div className="flex gap-4 my-1 dark:text-white max-w-[85vw]">
+              <div className="flex gap-4 my-1 dark:text-white max-w-[85vw] p-4 bg-neutral-100 rounded-xl">
                 <div className="w-7 min-w-[28px] ml-0.5 h-7 bg-gradient-to-r from-red-900 to-red-800 ring-red-600 ring-1 rounded-md border border-brand-400 flex items-center justify-center shadow-sm ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -585,7 +587,7 @@ export function SearchDialog() {
             )}
           </AnimatePresence>
           */}
-          <div className="relative">
+          <div className="relative flex flex-col md:flex-row gap-4">
             <Input
               ref={inputRef}
               placeholder="输入问题..."
@@ -597,8 +599,16 @@ export function SearchDialog() {
               className="col-span-3"
               autoFocus={true}
             />
+            <Button
+              //@ts-ignore
+              onClick={isGenerating ? stopGenerating : handleSubmit}
+              data-umami-event={isGenerating ? 'Click stop' : 'Click ask'}
+              className="md:w-20 w-full bg-red-900 block shadow-md hover:bg-red-800 dark:bg-red-900 dark:hover:bg-red-800"
+            >
+              {isGenerating ? 'Stop' : 'Ask'}
+            </Button>
           </div>
-          <div className="rounded-md border px-1.5 py-3 md:p-6 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 justify-between items-center bg-scale-400 border-scale-500 dark:bg-scale-100 dark:border-scale-300 mb-3 w-full gap-2">
+          <div className="rounded-md border px-1.5 py-3 md:px-3 md:py-3 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 justify-between items-center bg-scale-400 border-scale-500 dark:bg-scale-100 dark:border-scale-300 mb-3 w-full gap-2">
             <div className="text-scale-1200 dark:text-neutral-200 flex flex-row items-start gap-2 justify-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -610,7 +620,7 @@ export function SearchDialog() {
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text -scale-900"
+                className="text-scale-900"
               >
                 <path d="M6 18h8"></path>
                 <path d="M3 22h18"></path>
@@ -641,14 +651,6 @@ export function SearchDialog() {
                 </div>
               </div>
             </div>
-            <Button
-              //@ts-ignore
-              onClick={isGenerating ? stopGenerating : handleSubmit}
-              data-umami-event={isGenerating ? 'Click stop' : 'Click ask'}
-              className="md:w-20 w-full bg-red-900 block shadow-md hover:bg-red-800 dark:bg-red-900 dark:hover:bg-red-800"
-            >
-              {isGenerating ? 'Stop' : 'Ask'}
-            </Button>
           </div>
           <div className="text-xs text-gray-500 flex flex-col md:flex-row flex-grow space-y-2 md:space-y-0 gap-2 dark:text-gray-100 items-stretch md:items-start">
             <div className="pt-1.5 mx-auto md:w-20">Or try:</div>

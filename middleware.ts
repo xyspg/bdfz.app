@@ -31,5 +31,5 @@ export async function middleware(req: NextRequest) {
   return NextResponse.redirect(redirectUrl)
 }
 export const config = {
-  matcher: ['/api/:path*', '/profile', '/'],
+  matcher: ['/api/:path*', '/profile', '/', '/chat', '/history', '/c/:path*'],
 }

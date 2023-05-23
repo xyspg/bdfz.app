@@ -4,6 +4,8 @@ import Header from '@/components/Header'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
+import ModeSwitcher from '@/components/ModeSwitcher'
+import * as React from 'react'
 
 export default function Home() {
   const session = useSession()
@@ -40,7 +42,9 @@ export default function Home() {
       </Head>
       <div className="">
         {session && (
-          <div className="flex justify-center">
+          <div className="flex flex-col justify-center">
+            <ModeSwitcher />
+
             <SearchDialog />
           </div>
         )}

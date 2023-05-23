@@ -38,7 +38,7 @@ const LoginAzure = () => {
       </Head>
       <ToastContainer />
       <div className="">
-        <div className="flex flex-col items-center justify-center p-8 my-52">
+        <div className="flex flex-col items-center justify-center p-8 my-40">
           <div className="w-full md:w-1/2 max-w-md flex flex-col gap-6">
             <div className="flex flex-col gap-4">
               <Button

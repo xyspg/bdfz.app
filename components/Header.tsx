@@ -22,6 +22,7 @@ import {
   MoonIcon,
   SunIcon,
   EnvelopeClosedIcon,
+  ClockIcon,
 } from '@radix-ui/react-icons'
 import { AnimatePresence, motion } from 'framer-motion'
 
@@ -75,10 +76,10 @@ const DropDownNotLogin = () => {
               </Link>
             ) : (
               <>
-                <Link href="/">
+                <Link href="/history">
                   <DropdownMenuItem>
-                    <ChatBubbleIcon className="mr-2 h-4 w-4" />
-                    <span>BFDZ AI</span>
+                    <ClockIcon className="mr-2 h-4 w-4" />
+                    <span>历史记录</span>
                   </DropdownMenuItem>
                 </Link>
                 <Link href="/profile">
@@ -147,7 +148,7 @@ const Header = () => {
   const supabase = useSupabaseClient()
   return (
     <>
-      <header className="flex flex-row items-center justify-between mb-8 px-4 py-6 md:px-12 ">
+      <header className="flex flex-row items-center justify-between mb-2 px-4 py-6 md:px-12 ">
         <h1 className=" text-slate-700 font-bold text-2xl font-mono flex flex-row items-center gap-3 dark:text-slate-200 ">
           <div className="flex flex-row gap-1.5 relative">
             <Image src={'/icon.png'} width="32" height="32" alt="logo" /> <span>bdfz.app</span>

@@ -28,6 +28,79 @@ export interface Database {
   }
   public: {
     Tables: {
+      chat_statistics: {
+        Row: {
+          browser_vendor: string | null
+          chat_history: Json | null
+          chat_id: string
+          has_flagged_content: boolean
+          id: number
+          os_cpu: string | null
+          platform: string | null
+          screen_resolution: string | null
+          timestamp: string
+          total_word_count: number | null
+          user_id: string | null
+        }
+        Insert: {
+          browser_vendor?: string | null
+          chat_history?: Json | null
+          chat_id: string
+          has_flagged_content: boolean
+          id?: number
+          os_cpu?: string | null
+          platform?: string | null
+          screen_resolution?: string | null
+          timestamp: string
+          total_word_count?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          browser_vendor?: string | null
+          chat_history?: Json | null
+          chat_id?: string
+          has_flagged_content?: boolean
+          id?: number
+          os_cpu?: string | null
+          platform?: string | null
+          screen_resolution?: string | null
+          timestamp?: string
+          total_word_count?: number | null
+          user_id?: string | null
+        }
+      }
+      embeddings_log: {
+        Row: {
+          context: string | null
+          department: string | null
+          email: string
+          id: number
+          page_section: Json | null
+          question: string | null
+          timestamp: string | null
+          token_count: number | null
+        }
+        Insert: {
+          context?: string | null
+          department?: string | null
+          email: string
+          id?: number
+          page_section?: Json | null
+          question?: string | null
+          timestamp?: string | null
+          token_count?: number | null
+        }
+        Update: {
+          context?: string | null
+          department?: string | null
+          email?: string
+          id?: number
+          page_section?: Json | null
+          question?: string | null
+          timestamp?: string | null
+          token_count?: number | null
+        }
+      }
       feedback: {
         Row: {
           answer: string | null
@@ -39,7 +112,8 @@ export interface Database {
           question: string
           screen_resolution: string | null
           timestamp: string
-          visitor_id: string
+          user_id: string | null
+          visitor_id: string | null
         }
         Insert: {
           answer?: string | null
@@ -51,7 +125,8 @@ export interface Database {
           question: string
           screen_resolution?: string | null
           timestamp: string
-          visitor_id: string
+          user_id?: string | null
+          visitor_id?: string | null
         }
         Update: {
           answer?: string | null
@@ -63,7 +138,8 @@ export interface Database {
           question?: string
           screen_resolution?: string | null
           timestamp?: string
-          visitor_id?: string
+          user_id?: string | null
+          visitor_id?: string | null
         }
       }
       nods_page: {
@@ -138,7 +214,9 @@ export interface Database {
           question: string
           screen_resolution: string | null
           timestamp: string
-          visitor_id: string
+          user_id: string | null
+          visitor_id: string | null
+          word_count: number | null
         }
         Insert: {
           answer?: string | null
@@ -150,7 +228,9 @@ export interface Database {
           question: string
           screen_resolution?: string | null
           timestamp: string
-          visitor_id: string
+          user_id?: string | null
+          visitor_id?: string | null
+          word_count?: number | null
         }
         Update: {
           answer?: string | null
@@ -162,12 +242,34 @@ export interface Database {
           question?: string
           screen_resolution?: string | null
           timestamp?: string
-          visitor_id?: string
+          user_id?: string | null
+          visitor_id?: string | null
+          word_count?: number | null
+        }
+      }
+      users: {
+        Row: {
+          email: string | null
+          id: string
+        }
+        Insert: {
+          email?: string | null
+          id: string
+        }
+        Update: {
+          email?: string | null
+          id?: string
         }
       }
     }
     Views: {
-      [_ in never]: never
+      user_word_counts: {
+        Row: {
+          total_word_count: number | null
+          user_email: string | null
+          user_id: string | null
+        }
+      }
     }
     Functions: {
       get_page_parents: {
@@ -187,57 +289,23 @@ export interface Database {
         }
         Returns: unknown
       }
-      match_page_sections:
-        | {
-            Args: {
-              embedding: unknown
-              match_threshold: number
-              match_count: number
-              min_content_length: number
-            }
-            Returns: {
-              id: number
-              page_id: number
-              slug: string
-              heading: string
-              content: string
-              similarity: number
-            }[]
-          }
-        | {
-            Args: {
-              embedding: unknown
-              match_threshold: number
-              match_count: number
-              min_content_length: number
-              isdalton: boolean
-            }
-            Returns: {
-              id: number
-              page_id: number
-              slug: string
-              heading: string
-              content: string
-              similarity: number
-            }[]
-          }
-        | {
-            Args: {
-              embedding: unknown
-              match_threshold: number
-              match_count: number
-              min_content_length: number
-              department: string
-            }
-            Returns: {
-              id: number
-              page_id: number
-              slug: string
-              heading: string
-              content: string
-              similarity: number
-            }[]
-          }
+      match_page_sections: {
+        Args: {
+          embedding: unknown
+          match_threshold: number
+          match_count: number
+          min_content_length: number
+          department: string
+        }
+        Returns: {
+          id: number
+          page_id: number
+          slug: string
+          heading: string
+          content: string
+          similarity: number
+        }[]
+      }
       vector_avg: {
         Args: {
           '': number[]

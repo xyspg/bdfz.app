@@ -51,7 +51,7 @@ export default async function handler(req: NextRequest) {
     }
 
     const { query, messages } = requestData
-    console.log('request body messages',messages)
+    console.log('request body messages', messages)
     if (!query) {
       throw new UserError('请输入查询内容')
     }
@@ -182,7 +182,7 @@ export default async function handler(req: NextRequest) {
 
       Answer:
     `
-    messages.push({role: 'user', content: prompt});
+    messages.push({ role: 'user', content: prompt })
     console.log('Updated Messages:', messages)
 
     const completionOptions: CreateChatCompletionRequest = {
@@ -227,7 +227,7 @@ export default async function handler(req: NextRequest) {
         'Content-Type': 'text/event-stream',
       },
     })
-  } catch (err: unknown) {
+  } catch (err: any) {
     if (err instanceof UserError) {
       return new Response(
         JSON.stringify({
@@ -245,10 +245,9 @@ export default async function handler(req: NextRequest) {
       console.error(err)
     }
 
-    // TODO: include more response info in debug environments
     return new Response(
       JSON.stringify({
-        error: 'There was an error processing your request',
+        error: `发生错误：${JSON.stringify(err.data.error.message)}`,
       }),
       {
         status: 500,

@@ -13,16 +13,17 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
-import wordsCount from 'words-count'
 import ScrollToTopButton, { scrollToTop } from '@/components/ScrollToTop'
 import { TrashIcon } from '@radix-ui/react-icons'
+import { v4 as uuidv4 } from 'uuid'
+import { encode } from 'gpt-tokenizer'
+import { useRouter } from 'next/router'
 
 const fpPromise = FingerprintJS.load()
 ;(async () => {
   // Get the visitor identifier when you need it.
   const fp = await fpPromise
   const result = await fp.get()
-  console.log(result.visitorId)
 })()
 
 function promptDataReducer(
@@ -67,7 +68,11 @@ function promptDataReducer(
   return [...current]
 }
 
-export function ChatDialog() {
+interface ChatHistoryProps {
+  History: any
+}
+
+export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
   const [search, setSearch] = React.useState<string>('')
   const [question, setQuestion] = React.useState<string>('')
   const [answer, setAnswer] = React.useState<string | undefined>('')
@@ -85,16 +90,21 @@ export function ChatDialog() {
   const [showMore, setShowMore] = React.useState(false)
   const [lastRequestTime, setLastRequestTime] = React.useState(0)
   const [totalTokens, setTotalTokens] = React.useState<number | null>(0)
-  const [chatHistory, setChatHistory] = React.useState([
-    { role: 'system', content: 'You are a helpful assistant.' },
-  ])
+  const [chatHistory, setChatHistory] = React.useState(History)
+  const [answerUpdated, setAnswerUpdated] = React.useState(false)
+  const [chatId, setChatId] = React.useState(uuidv4())
+
+  React.useEffect(() => {
+    setChatHistory(History)
+  }, [History])
 
   const delay = 5000 // ms
   const supabase = useSupabaseClient()
 
   const user = useUser()
   const userId = user?.id
-
+  const router = useRouter()
+  const pathname = router.pathname
   const sampleQuestion = [
     '我在升旗仪式迟到了16分钟会发生什么?',
     '列出预科部的日程',
@@ -151,12 +161,6 @@ export function ChatDialog() {
   }, [])
 
   React.useEffect(() => {
-    if ((!isGenerating && answer) || politicalSensitive) {
-      sendStatistics()
-    }
-  }, [isGenerating, politicalSensitive])
-
-  React.useEffect(() => {
     if (question.includes('道尔顿') || question.includes('国际部')) {
       toast(
         '🤔️ When asking questions specific to Dalton, using English will yield better results.',
@@ -180,8 +184,16 @@ export function ChatDialog() {
         ...prevChatHistory,
         { role: 'assistant', content: answer },
       ])
+      setAnswerUpdated(true)
     }
   }, [isGenerating])
+
+  React.useEffect(() => {
+    if (answerUpdated) {
+      sendStatistics()
+      setAnswerUpdated(false)
+    }
+  }, [answerUpdated])
 
   const handleConfirm = React.useCallback(
     async (query: string) => {
@@ -307,7 +319,6 @@ export function ChatDialog() {
     const fp = await fpPromise
     const result = await fp.get()
 
-    const words = answer && wordsCount(answer)
     const deviceInfo = {
       platform: result.components.platform.value,
       osCpu: result.components.osCpu.value,
@@ -316,16 +327,23 @@ export function ChatDialog() {
     }
 
     const timestamp = new Date().toISOString() // Current timestamp in ISO format
+    const chat_history = chatHistory
+    console.log(uuidv4())
 
-    await fetch('/api/statistics', {
+    // Count total number of words in the chat history
+    const total_word_count =
+      chat_history.reduce((total, message) => total + encode(message.content).length, 0) +
+      encode(question).length
+
+    await fetch('/api/chat-statistics', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        question,
-        answer,
-        words,
+        chat_id: chatId,
+        chat_history,
+        total_word_count,
         timestamp,
         deviceInfo,
         hasFlaggedContent,
@@ -368,6 +386,7 @@ export function ChatDialog() {
     if (eventSourceRef.current) {
       eventSourceRef.current.close()
       setIsGenerating(false)
+      setIsLoading(false)
     }
   }
 
@@ -388,19 +407,16 @@ export function ChatDialog() {
   return (
     <>
       <div>
-        <div className="grid gap-4 text-slate-700 w-screen px-6 pb-4 max-w-3xl">
+        <div className="grid gap-5 text-slate-700 w-screen max-w-3xl">
           <ToastContainer />
-          <div className='flex flex-col'>
-          {chatHistory.length > 0 && (
+          {chatHistory.length > 1 && (
             <>
-              <div className="flex flex-col gap-2 my-1 dark:text-white max-w-[85vw]">
+              <div className="flex flex-col my-1 dark:text-white max-w-[85vw]">
                 {chatHistory
                   .slice(1, chatHistory.length) // Remove the first item
-                  .map((message, index, arr) => {
+                  .map((message, index) => {
                     // Check if it's the last item and role is assistant
-                    if (index === arr.length - 1 && message.role === 'assistant') {
-                      return null
-                    }
+
                     return (
                       <div
                         key={index}
@@ -430,45 +446,145 @@ export function ChatDialog() {
                             </div>
                           )}
                         </span>
-                        <p className={`mt-0.5 ${message.role === 'user' ? 'font-semibold' : 'font-normal'} text-slate-700 dark:text-slate-100`}>
+                        <p
+                          className={`mt-0.5 ${
+                            message.role === 'user' ? 'font-semibold' : 'font-normal'
+                          } text-slate-700 dark:text-slate-100`}
+                        >
                           {message.content}
                         </p>
                       </div>
                     )
                   })}
+                {isLoading && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="flex items-center gap-4 dark:text-white max-w-3xl p-4 rounded-xl bg-neutral-100"
+                  >
+                    <div className="w-7 ml-0.5 h-7 bg-gradient-to-r from-red-900 to-red-800 ring-red-600 ring-1 rounded-md border border-brand-400 flex items-center justify-center shadow-sm ">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        className="w-4 h-4 text-white"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+                        ></path>
+                      </svg>
+                    </div>
+                    <div className="ml-1 bg-neutral-500 h-[17px] w-[11px] animate-pulse animate-bounce" />
+                  </motion.div>
+                )}
+                {answer && !hasError && isGenerating ? (
+                  <>
+                    <div className="flex gap-4 my-1 dark:text-white max-w-[85vw] p-4 bg-neutral-100 rounded-xl">
+                      <div className="w-7 min-w-[28px] ml-0.5 h-7 bg-gradient-to-r from-red-900 to-red-800 ring-red-600 ring-1 rounded-md border border-brand-400 flex items-center justify-center shadow-sm ">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth="1.5"
+                          stroke="currentColor"
+                          className="w-4 h-4 text-white"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+                          ></path>
+                        </svg>
+                      </div>
+                      <div className="w-full overflow-x-auto">
+                        <ReactMarkdown
+                          linkTarget="_blank"
+                          className={style.reactMarkDown}
+                          remarkPlugins={[remarkGfm]}
+                        >
+                          {answer}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                    <div>
+                      {!isGenerating && (
+                        <>
+                          <div className="float-right flex flex-row gap-2 dark:text-neutral-200 text-neutral-700">
+                            <div
+                              className={`p-1.5 rounded-md ${
+                                feedback !== ''
+                                  ? `cursor-default`
+                                  : `cursor-pointer dark:hover:bg-neutral-700 hover:bg-neutral-200`
+                              } ${
+                                feedback === 'positive'
+                                  ? `bg-neutral-200 dark:bg-neutral-700`
+                                  : `bg-white dark:bg-neutral-800`
+                              }`}
+                              onClick={() => {
+                                sendFeedback('positive')
+                              }}
+                            >
+                              <svg
+                                stroke="currentColor"
+                                fill="none"
+                                strokeWidth="2"
+                                viewBox="0 0 24 24"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="h-4 w-4"
+                                height="1em"
+                                width="1em"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                              </svg>
+                            </div>
+                            <div
+                              className={`p-1.5 rounded-md ${
+                                feedback !== ''
+                                  ? `cursor-default`
+                                  : `cursor-pointer dark:hover:bg-neutral-700 hover:bg-neutral-200`
+                              } ${
+                                feedback === 'negative'
+                                  ? `bg-neutral-200 dark:bg-neutral-700`
+                                  : `bg-white dark:bg-neutral-800`
+                              }`}
+                              onClick={() => {
+                                sendFeedback('negative')
+                              }}
+                            >
+                              <svg
+                                stroke="currentColor"
+                                fill="none"
+                                strokeWidth="2"
+                                viewBox="0 0 24 24"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="h-4 w-4"
+                                height="1em"
+                                width="1em"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
+                              </svg>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </>
+                ) : null}
               </div>
             </>
           )}
 
-          {isLoading && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="flex items-center gap-4 dark:text-white max-w-3xl p-4 rounded-xl bg-neutral-100"
-            >
-              <div className="w-7 ml-0.5 h-7 bg-gradient-to-r from-red-900 to-red-800 ring-red-600 ring-1 rounded-md border border-brand-400 flex items-center justify-center shadow-sm ">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-4 h-4 text-white"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
-                  ></path>
-                </svg>
-              </div>
-              <div className="ml-1 bg-neutral-500 h-[17px] w-[11px] animate-pulse animate-bounce" />
-            </motion.div>
-          )}
-
           {hasError && (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 p-4 bg-neutral-100 rounded-xl">
               <span className="bg-red-100 p-2 w-8 h-8 rounded-full text-center flex items-center justify-center">
                 <Frown width={18} />
               </span>
@@ -478,109 +594,7 @@ export function ChatDialog() {
             </div>
           )}
 
-          {answer && !hasError ? (
-            <>
-              <div className="flex gap-4 my-1 dark:text-white max-w-[85vw] p-4 bg-neutral-100 rounded-xl">
-                <div className="w-7 min-w-[28px] ml-0.5 h-7 bg-gradient-to-r from-red-900 to-red-800 ring-red-600 ring-1 rounded-md border border-brand-400 flex items-center justify-center shadow-sm ">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-4 h-4 text-white"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
-                    ></path>
-                  </svg>
-                </div>
-                <div className="w-full overflow-x-auto">
-                  <ReactMarkdown
-                    linkTarget="_blank"
-                    className={style.reactMarkDown}
-                    remarkPlugins={[remarkGfm]}
-                  >
-                    {answer}
-                  </ReactMarkdown>
-                </div>
-              </div>
-              <div>
-                {/*  Feedback Button*/}
-                {!isGenerating && (
-                  <>
-                    <div
-                      className="float-right flex flex-row gap-2 dark:text-neutral-200 text-neutral-700
-              "
-                    >
-                      <div
-                        className={`p-1.5 rounded-md ${
-                          feedback !== ''
-                            ? `cursor-default`
-                            : `cursor-pointer dark:hover:bg-neutral-700 hover:bg-neutral-200`
-                        } ${
-                          feedback === 'positive'
-                            ? `bg-neutral-200 dark:bg-neutral-700`
-                            : `bg-white dark:bg-neutral-800`
-                        }`}
-                        onClick={() => {
-                          sendFeedback('positive')
-                        }}
-                      >
-                        <svg
-                          stroke="currentColor"
-                          fill="none"
-                          strokeWidth="2"
-                          viewBox="0 0 24 24"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="h-4 w-4"
-                          height="1em"
-                          width="1em"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
-                        </svg>
-                      </div>
-                      <div
-                        className={`p-1.5 rounded-md ${
-                          feedback !== ''
-                            ? `cursor-default`
-                            : `cursor-pointer dark:hover:bg-neutral-700 hover:bg-neutral-200`
-                        } ${
-                          feedback === 'negative'
-                            ? `bg-neutral-200 dark:bg-neutral-700`
-                            : `bg-white dark:bg-neutral-800`
-                        }`}
-                        onClick={() => {
-                          sendFeedback('negative')
-                        }}
-                      >
-                        <svg
-                          stroke="currentColor"
-                          fill="none"
-                          strokeWidth="2"
-                          viewBox="0 0 24 24"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="h-4 w-4"
-                          height="1em"
-                          width="1em"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
-                        </svg>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            </>
-          ) : null}
-          </div>
-          <div className="relative flex flex-col md:flex-row gap-2">
+          <div className="relative flex flex-col md:flex-row gap-4">
             <Input
               ref={inputRef}
               placeholder="输入问题..."
@@ -592,22 +606,36 @@ export function ChatDialog() {
               className="col-span-3"
               autoFocus={true}
             />
-            <div className='flex flex-row gap-2'>
-            <Button
-              //@ts-ignore
-              onClick={isGenerating ? stopGenerating : handleSubmit}
-              data-umami-event={isGenerating ? 'Click stop' : 'Click ask'}
-              className="md:w-20 w-3/4 bg-red-900 block shadow-md hover:bg-red-800 dark:bg-red-900 dark:hover:bg-red-800"
-            >
-              {isGenerating ? 'Stop' : 'Ask'}
-            </Button>
-            <Button
-              variant="outline"
-              className="md:w-12 w-1/4 shadow-md hover:bg-neutral-200 dark:hover:bg-neutral-700 flex items-center justify-center"
-            >
-             <span className='text-xl'><TrashIcon /></span>
-            </Button>
-          </div>
+            <div className="flex flex-row gap-2">
+              <Button
+                //@ts-ignore
+                onClick={isGenerating ? stopGenerating : handleSubmit}
+                data-umami-event={isGenerating ? 'Click stop' : 'Click ask'}
+                className="md:w-20 w-3/4 bg-red-900 block shadow-md hover:bg-red-800 dark:bg-red-900 dark:hover:bg-red-800"
+              >
+                {isGenerating ? 'Stop' : 'Ask'}
+              </Button>
+                <Button
+                  variant="outline"
+                  className="md:w-12 w-1/4 shadow-md hover:bg-neutral-200 dark:hover:bg-neutral-700 flex items-center justify-center"
+                  onClick={() => {
+                    stopGenerating()
+                    setChatHistory(History)
+                    setAnswer(undefined)
+                    setSearch('')
+                    setHasError(false)
+                    setFeedback('')
+                    setHasFlaggedContent(false)
+                    setPoliticalSensitive(false)
+                    setErrorMessage('')
+                    setChatId(uuidv4())
+                  }}
+                >
+                <span className="text-xl">
+                  <TrashIcon />
+                </span>
+                </Button>
+            </div>
           </div>
           <div className="rounded-md border px-1.5 py-3 md:px-3 md:py-3 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 justify-between items-center bg-scale-400 border-scale-500 dark:bg-scale-100 dark:border-scale-300 mb-3 w-full gap-2">
             <div className="text-scale-1200 dark:text-neutral-200 flex flex-row items-start gap-2 justify-center">
