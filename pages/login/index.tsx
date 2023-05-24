@@ -1,15 +1,16 @@
 import { Button } from '@/components/ui/button'
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { useEffect } from 'react'
 
 const LoginAzure = () => {
   const supabaseClient = useSupabaseClient()
   const router = useRouter()
-
+  const session = useSession()
   async function signInWithAzure() {
     const { data, error } = await supabaseClient.auth.signInWithOAuth({
       provider: 'azure',
@@ -30,6 +31,11 @@ const LoginAzure = () => {
       })
     }
   }
+  
+  useEffect(()=>{
+    if(session) window.location.href = '/'
+  })
+
   return (
     <>
       <Head>

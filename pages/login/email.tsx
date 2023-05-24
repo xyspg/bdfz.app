@@ -1,4 +1,4 @@
-import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
+import { useSupabaseClient, useUser, useSession } from '@supabase/auth-helpers-react'
 import * as React from 'react'
 import { useContext, useEffect, useState } from 'react'
 import Header from '@/components/Header'
@@ -25,6 +25,7 @@ const LoginPage = () => {
   const [typingTimeout, setTypingTimeout] = useState<number | undefined>(undefined)
   const [showPasswordResetScreen, setShowPasswordResetScreen] = useState(false)
   const { query } = router
+  const session = useSession()
 
   useEffect(() => {
     setAuthError(null)
@@ -148,6 +149,9 @@ const LoginPage = () => {
       }
     })
   }, [])
+  useEffect(()=>{
+    if(session) window.location.href = '/'
+  })
 
   const handleSetNewPwd = () => {
     router.push('/password')
