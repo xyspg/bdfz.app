@@ -9,7 +9,6 @@ import { Frown, User } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import FingerprintJS from '@fingerprintjs/fingerprintjs'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
@@ -18,13 +17,7 @@ import { TrashIcon } from '@radix-ui/react-icons'
 import { v4 as uuidv4 } from 'uuid'
 import { encode } from 'gpt-tokenizer'
 import { useRouter } from 'next/router'
-
-const fpPromise = FingerprintJS.load()
-;(async () => {
-  // Get the visitor identifier when you need it.
-  const fp = await fpPromise
-  const result = await fp.get()
-})()
+import FingerprintJS from '@fingerprintjs/fingerprintjs'
 
 function promptDataReducer(
   state: any[],
@@ -72,6 +65,11 @@ interface ChatHistoryProps {
   History: any
 }
 
+interface ChatMessage {
+  role: string
+  content: string
+}
+
 export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
   const [search, setSearch] = React.useState<string>('')
   const [question, setQuestion] = React.useState<string>('')
@@ -92,7 +90,6 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
   const [totalTokens, setTotalTokens] = React.useState<number | null>(0)
   const [chatHistory, setChatHistory] = React.useState(History)
   const [answerUpdated, setAnswerUpdated] = React.useState(false)
-
 
   React.useEffect(() => {
     setChatHistory(History)
@@ -184,7 +181,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
 
   React.useEffect(() => {
     if (answer) {
-      setChatHistory((prevChatHistory) => [
+      setChatHistory((prevChatHistory: ChatMessage[]) => [
         ...prevChatHistory,
         { role: 'assistant', content: answer },
       ])
@@ -223,7 +220,10 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
       Append the user input to the chat history
        */
       const userInput = query
-      setChatHistory((prevChatHistory) => [...prevChatHistory, { role: 'user', content: query }])
+      setChatHistory((prevChatHistory: ChatMessage[]) => [
+        ...prevChatHistory,
+        { role: 'user', content: query },
+      ])
 
       if (isGenerating) stopGenerating()
       setAnswer(undefined)
@@ -312,7 +312,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
     [promptIndex, promptData, lastRequestTime, chatHistory]
   )
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     handleConfirm(search)
   }
@@ -320,6 +320,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
   const sendStatistics = async () => {
     if (sampleQuestion.includes(question)) return
 
+    const fpPromise = FingerprintJS.load()
     const fp = await fpPromise
     const result = await fp.get()
 
@@ -336,8 +337,10 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
 
     // Count total number of words in the chat history
     const total_word_count =
-      chat_history.reduce((total, message) => total + encode(message.content).length, 0) +
-      encode(question).length
+      chat_history.reduce(
+        (total: number, message: { content: string }) => total + encode(message.content).length,
+        0
+      ) + encode(question).length
 
     await fetch('/api/chat-statistics', {
       method: 'POST',
@@ -359,6 +362,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
     // If feedback is empty, do not send
     if (feedback !== '') return
     setFeedback(f)
+    const fpPromise = FingerprintJS.load()
     const fp = await fpPromise
     const result = await fp.get()
 
@@ -408,29 +412,36 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
     }
   }, [])
 
+  type Message = {
+    role: string
+    content: string
+  }
+
   return (
     <>
       <div>
-        <div className="grid gap-5 text-slate-700 w-screen max-w-3xl">
+        <div className="grid gap-5 text-slate-700 w-screen max-w-3xl px-6 pb-4  ">
           <ToastContainer />
           {chatHistory.length > 1 && (
             <>
               <div className="flex flex-col my-1 dark:text-white max-w-[85vw]">
                 {chatHistory
                   .slice(1, chatHistory.length) // Remove the first item
-                  .map((message, index) => {
+                  .map((message: Message, index: number) => {
                     // Check if it's the last item and role is assistant
 
                     return (
                       <div
                         key={index}
                         className={`flex gap-x-4 p-4 rounded-xl ${
-                          message.role === 'assistant' && 'bg-neutral-100'
+                          message.role === 'assistant' && 'bg-neutral-100 dark:bg-neutral-700'
                         }`}
                       >
-                        <span className="bg-slate-100 dark:bg-slate-300 p-2 w-8 h-8 rounded-full text-center flex items-center justify-center">
+                        <span>
                           {message.role === 'user' ? (
-                            <User width={18} />
+                            <span className="bg-slate-100 dark:bg-slate-300 p-2 w-8 h-8 rounded-full text-center flex items-center justify-center ">
+                              <User width={18} />
+                            </span>
                           ) : (
                             <div className="w-7 min-w-[28px] ml-0.5 h-7 bg-gradient-to-r from-red-900 to-red-800 ring-red-600 ring-1 rounded-md border border-brand-400 flex items-center justify-center shadow-sm ">
                               <svg
@@ -453,7 +464,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
                         <p
                           className={`mt-0.5 ${
                             message.role === 'user' ? 'font-semibold' : 'font-normal'
-                          } text-slate-700 dark:text-slate-100`}
+                          } text-slate-700 dark:text-slate-100 `}
                         >
                           {message.content}
                         </p>
@@ -465,7 +476,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5 }}
-                    className="flex items-center gap-4 dark:text-white max-w-3xl p-4 rounded-xl bg-neutral-100"
+                    className="flex items-center gap-4 dark:text-white max-w-3xl p-4 rounded-xl bg-neutral-100 dark:bg-neutral-700"
                   >
                     <div className="w-7 ml-0.5 h-7 bg-gradient-to-r from-red-900 to-red-800 ring-red-600 ring-1 rounded-md border border-brand-400 flex items-center justify-center shadow-sm ">
                       <svg
@@ -488,7 +499,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
                 )}
                 {answer && !hasError && isGenerating ? (
                   <>
-                    <div className="flex gap-4 my-1 dark:text-white max-w-[85vw] p-4 bg-neutral-100 rounded-xl">
+                    <div className="flex gap-4 my-1 dark:text-white max-w-[85vw] p-4 bg-neutral-100 dark:bg-neutral-700 rounded-xl">
                       <div className="w-7 min-w-[28px] ml-0.5 h-7 bg-gradient-to-r from-red-900 to-red-800 ring-red-600 ring-1 rounded-md border border-brand-400 flex items-center justify-center shadow-sm ">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -588,7 +599,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
           )}
 
           {hasError && (
-            <div className="flex items-center gap-4 p-4 bg-neutral-100 rounded-xl">
+            <div className="flex items-center gap-4 p-4 bg-neutral-100 dark:bg-neutral-700 rounded-xl">
               <span className="bg-red-100 p-2 w-8 h-8 rounded-full text-center flex items-center justify-center">
                 <Frown width={18} />
               </span>
@@ -612,33 +623,33 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
             />
             <div className="flex flex-row gap-2">
               <Button
-                //@ts-ignore
                 onClick={isGenerating ? stopGenerating : handleSubmit}
                 data-umami-event={isGenerating ? 'Click stop' : 'Click ask'}
                 className="md:w-20 w-3/4 bg-red-900 block shadow-md hover:bg-red-800 dark:bg-red-900 dark:hover:bg-red-800"
               >
                 {isGenerating ? 'Stop' : 'Ask'}
               </Button>
-                <Button
-                  variant="outline"
-                  className="md:w-12 w-1/4 shadow-md hover:bg-neutral-200 dark:hover:bg-neutral-700 flex items-center justify-center"
-                  onClick={() => {
-                    stopGenerating()
-                    setChatHistory(History)
-                    setAnswer(undefined)
-                    setSearch('')
-                    setHasError(false)
-                    setFeedback('')
-                    setHasFlaggedContent(false)
-                    setPoliticalSensitive(false)
-                    setErrorMessage('')
-                    setChatId(uuidv4())
-                  }}
-                >
+              <Button
+                variant="outline"
+                className="md:w-12 w-1/4 shadow-md hover:bg-neutral-200 dark:hover:bg-neutral-700 flex items-center justify-center"
+                onClick={() => {
+                  stopGenerating()
+                  setChatHistory(History)
+                  setAnswer(undefined)
+                  setSearch('')
+                  setHasError(false)
+                  setFeedback('')
+                  setHasFlaggedContent(false)
+                  setPoliticalSensitive(false)
+                  setErrorMessage('')
+                  setChatId(uuidv4())
+                }}
+                disabled={pathname.startsWith('/c/')}
+              >
                 <span className="text-xl">
                   <TrashIcon />
                 </span>
-                </Button>
+              </Button>
             </div>
           </div>
           <div className="rounded-md border px-1.5 py-3 md:px-3 md:py-3 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 justify-between items-center bg-scale-400 border-scale-500 dark:bg-scale-100 dark:border-scale-300 mb-3 w-full gap-2">

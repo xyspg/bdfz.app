@@ -328,7 +328,7 @@ export function SearchDialog() {
     [promptIndex, promptData, lastRequestTime]
   )
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     handleConfirm(search)
   }
@@ -437,7 +437,7 @@ export function SearchDialog() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
-              className="flex items-center gap-4 dark:text-white max-w-3xl p-4 rounded-xl bg-neutral-100"
+              className="flex items-center gap-4 dark:text-white max-w-3xl p-4 rounded-xl bg-neutral-100 dark:bg-neutral-700"
             >
               <div className="w-7 ml-0.5 h-7 bg-gradient-to-r from-red-900 to-red-800 ring-red-600 ring-1 rounded-md border border-brand-400 flex items-center justify-center shadow-sm ">
                 <svg
@@ -460,7 +460,7 @@ export function SearchDialog() {
           )}
 
           {hasError && (
-            <div className="flex items-center gap-4 p-4 bg-neutral-100 rounded-xl">
+            <div className="flex items-center gap-4 p-4 bg-neutral-100 dark:bg-neutral-700 rounded-xl">
               <span className="bg-red-100 p-2 w-8 h-8 rounded-full text-center flex items-center justify-center">
                 <Frown width={18} />
               </span>
@@ -472,7 +472,7 @@ export function SearchDialog() {
 
           {answer && !hasError ? (
             <>
-              <div className="flex gap-4 my-1 dark:text-white max-w-[85vw] p-4 bg-neutral-100 rounded-xl">
+              <div className="flex gap-4 my-1 dark:text-white max-w-[85vw] p-4 bg-neutral-100 dark:bg-neutral-700 rounded-xl">
                 <div className="w-7 min-w-[28px] ml-0.5 h-7 bg-gradient-to-r from-red-900 to-red-800 ring-red-600 ring-1 rounded-md border border-brand-400 flex items-center justify-center shadow-sm ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -600,7 +600,6 @@ export function SearchDialog() {
               autoFocus={true}
             />
             <Button
-              //@ts-ignore
               onClick={isGenerating ? stopGenerating : handleSubmit}
               data-umami-event={isGenerating ? 'Click stop' : 'Click ask'}
               className="md:w-20 w-full bg-red-900 block shadow-md hover:bg-red-800 dark:bg-red-900 dark:hover:bg-red-800"

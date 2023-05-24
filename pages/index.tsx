@@ -42,9 +42,10 @@ export default function Home() {
       </Head>
       <div className="">
         {session && (
-          <div className="flex flex-col justify-center">
-            <ModeSwitcher />
-
+          <div className="flex flex-col justify-center items-center ">
+            <div className="w-full">
+              <ModeSwitcher />
+            </div>
             <SearchDialog />
           </div>
         )}

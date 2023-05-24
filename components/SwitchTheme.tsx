@@ -1,7 +1,6 @@
 'use client'
 import React from 'react'
 import { useTheme } from 'next-themes'
-// @ts-ignore
 import { SunIcon, MoonIcon } from '@radix-ui/react-icons'
 
 const SwitchTheme = () => {

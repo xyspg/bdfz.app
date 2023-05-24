@@ -5,7 +5,7 @@ import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-//@ts-ignore
+if (!supabaseUrl || !supabaseKey) throw new Error('Missing env variables')
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
