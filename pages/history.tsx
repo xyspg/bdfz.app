@@ -3,6 +3,7 @@ import useSWR, { mutate } from 'swr'
 import Link from 'next/link'
 import { TrashIcon } from '@radix-ui/react-icons'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Button } from '@/components/ui/button'
 
 const History = () => {
   const fetcher = (url: string) => fetch(url).then((res) => res.json())
@@ -107,7 +108,7 @@ const History = () => {
            "
             >
               <div className="flex flex-row justify-between relative cursor-pointer w-full">
-                <Link href={`/c/${item.chat_id}`} className="absolute inset-0" target='_blank' />
+                <Link href={`/c/${item.chat_id}`} className="absolute inset-0" target="_blank" />
                 <div>
                   <div className="text-xs text-neutral-700 dark:text-neutral-300">
                     {formattedTimestamp}
@@ -117,16 +118,14 @@ const History = () => {
                   </div>
                 </div>
               </div>
-              <div
-                className="flex justify-center items-center w-12 hover:bg-red-500 outline-2 rounded-md cursor-pointer
-                hover:text-white
-                "
+              <Button
                 onClick={() => {
                   handleRemove(item.chat_id)
                 }}
+                variant="destructive"
               >
                 <TrashIcon height={20} width={20} />
-              </div>
+              </Button>
             </div>
           )
         })}
