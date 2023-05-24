@@ -375,14 +375,15 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
 
     const timestamp = new Date().toISOString()
 
+
     await fetch('/api/feedback', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        question,
-        answer,
+        question: pathname.includes('/c/')? History[History.length - 2].content : question,
+        answer: pathname.includes('/c/')? History[History.length - 1].content : answer,
         f,
         timestamp,
         deviceInfo,
@@ -471,6 +472,70 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
                       </div>
                     )
                   })}
+                {!isGenerating && (
+                  <div className=''>
+                    <div className="float-right py-1 flex flex-row gap-2 dark:text-neutral-200 text-neutral-700">
+                      <div
+                        className={`p-1.5 rounded-md ${
+                          feedback !== ''
+                            ? `cursor-default`
+                            : `cursor-pointer dark:hover:bg-neutral-700 hover:bg-neutral-200`
+                        } ${
+                          feedback === 'positive'
+                            ? `bg-neutral-200 dark:bg-neutral-700`
+                            : `bg-white dark:bg-neutral-800`
+                        }`}
+                        onClick={() => {
+                          sendFeedback('positive')
+                        }}
+                      >
+                        <svg
+                          stroke="currentColor"
+                          fill="none"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="h-4 w-4"
+                          height="1em"
+                          width="1em"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                        </svg>
+                      </div>
+                      <div
+                        className={`p-1.5 rounded-md ${
+                          feedback !== ''
+                            ? `cursor-default`
+                            : `cursor-pointer dark:hover:bg-neutral-700 hover:bg-neutral-200`
+                        } ${
+                          feedback === 'negative'
+                            ? `bg-neutral-200 dark:bg-neutral-700`
+                            : `bg-white dark:bg-neutral-800`
+                        }`}
+                        onClick={() => {
+                          sendFeedback('negative')
+                        }}
+                      >
+                        <svg
+                          stroke="currentColor"
+                          fill="none"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="h-4 w-4"
+                          height="1em"
+                          width="1em"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 {isLoading && (
                   <motion.div
                     initial={{ opacity: 0 }}
@@ -497,6 +562,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
                     <div className="ml-1 bg-neutral-500 h-[17px] w-[11px] animate-pulse animate-bounce" />
                   </motion.div>
                 )}
+
                 {answer && !hasError && isGenerating ? (
                   <>
                     <div className="flex gap-4 my-1 dark:text-white max-w-[85vw] p-4 bg-neutral-100 dark:bg-neutral-700 rounded-xl">
@@ -525,72 +591,6 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
                           {answer}
                         </ReactMarkdown>
                       </div>
-                    </div>
-                    <div>
-                      {!isGenerating && (
-                        <>
-                          <div className="float-right flex flex-row gap-2 dark:text-neutral-200 text-neutral-700">
-                            <div
-                              className={`p-1.5 rounded-md ${
-                                feedback !== ''
-                                  ? `cursor-default`
-                                  : `cursor-pointer dark:hover:bg-neutral-700 hover:bg-neutral-200`
-                              } ${
-                                feedback === 'positive'
-                                  ? `bg-neutral-200 dark:bg-neutral-700`
-                                  : `bg-white dark:bg-neutral-800`
-                              }`}
-                              onClick={() => {
-                                sendFeedback('positive')
-                              }}
-                            >
-                              <svg
-                                stroke="currentColor"
-                                fill="none"
-                                strokeWidth="2"
-                                viewBox="0 0 24 24"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="h-4 w-4"
-                                height="1em"
-                                width="1em"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
-                              </svg>
-                            </div>
-                            <div
-                              className={`p-1.5 rounded-md ${
-                                feedback !== ''
-                                  ? `cursor-default`
-                                  : `cursor-pointer dark:hover:bg-neutral-700 hover:bg-neutral-200`
-                              } ${
-                                feedback === 'negative'
-                                  ? `bg-neutral-200 dark:bg-neutral-700`
-                                  : `bg-white dark:bg-neutral-800`
-                              }`}
-                              onClick={() => {
-                                sendFeedback('negative')
-                              }}
-                            >
-                              <svg
-                                stroke="currentColor"
-                                fill="none"
-                                strokeWidth="2"
-                                viewBox="0 0 24 24"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="h-4 w-4"
-                                height="1em"
-                                width="1em"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
-                              </svg>
-                            </div>
-                          </div>
-                        </>
-                      )}
                     </div>
                   </>
                 ) : null}

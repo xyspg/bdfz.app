@@ -28,6 +28,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     .select('chat_history')
     .eq('chat_id', chat_id)
     .eq('user_id', user?.id)
+    .eq('isRemoved',false)
 
   if (error) console.log(error)
 
