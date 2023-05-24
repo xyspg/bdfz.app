@@ -118,7 +118,9 @@ const History = () => {
                 </div>
               </div>
               <div
-                className="flex justify-center items-center w-12 hover:bg-red-500 hover:opacity-70 rounded-xl cursor-pointer"
+                className="flex justify-center items-center w-12 hover:bg-red-500 outline-2 rounded-md cursor-pointer
+                hover:text-white
+                "
                 onClick={() => {
                   handleRemove(item.chat_id)
                 }}

@@ -466,8 +466,13 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
                           className={`mt-0.5 ${
                             message.role === 'user' ? 'font-semibold' : 'font-normal'
                           } text-slate-700 dark:text-slate-100 `}
+                        ><ReactMarkdown
+                          linkTarget="_blank"
+                          className={style.reactMarkDown}
+                          remarkPlugins={[remarkGfm]}
                         >
                           {message.content}
+                        </ReactMarkdown>
                         </p>
                       </div>
                     )
