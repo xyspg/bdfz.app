@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from 'react'
-import Header from '@/components/Header'
 import { useSession, useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { Input } from '@/components/ui/input'
 import PasswordStrengthBar from 'react-password-strength-bar'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 
-const Profile = () => {
+const ChangePwd = () => {
   const user = useUser()
   const session = useSession()
   const router = useRouter()
   const supabase = useSupabaseClient()
+  const [admin, setAdmin] = useState(false)
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
   const [passwordError, setPasswordError] = useState<string | null>(null)
-
   const checkPassword = (password: string, passwordConfirm: string) => {
     if (passwordConfirm && password !== passwordConfirm) return '两次输入的密码不一致'
     if (password.length < 6) return '密码长度至少为 6 位'
@@ -44,6 +43,21 @@ const Profile = () => {
     }
     UpdatePassword(password)
   }
+
+  const adminQuery = async () => {
+    const { data: Admin, error } = await supabase
+      .from('users')
+      .select('is_super_admin')
+      .eq('id', user?.id)
+    if (error) {
+      console.log(error)
+    } else {
+      const result = { data: Admin }.data[0]
+      const isAdmin = result.is_super_admin === true
+      setAdmin(isAdmin)
+    }
+  }
+  adminQuery().then((r) => r)
 
   const UpdatePassword = async (password: string) => {
     const { data, error } = await supabase.auth.updateUser({ password: password })
@@ -85,15 +99,11 @@ const Profile = () => {
       </Head>
       <ToastContainer />
       {session && (
-        <div className="flex justify-center">
-          <div className="p-8 flex justify-center flex-col gap-8 w-full md:w-1/2">
-            <div className="flex flex-col gap-2">
-              <h1 className="text-xl font-bold">邮箱</h1>
-              <h2 className="text-sm md:text-md font-semibold font-mono">{user?.email}</h2>
-            </div>
+        <div className="flex ">
+          <div className="flex justify-center flex-col gap-8 w-full md:w-1/2">
             <div className="flex flex-col gap-2 w-full max-w-3xl">
               <div>
-                <h1 className="text-xl  font-bold mb-2 ">更改密码</h1>
+                <h1 className="text-lg font-medium mb-2 ">更改密码</h1>
                 <Input
                   type="password"
                   placeholder="输入新密码"
@@ -121,7 +131,7 @@ const Profile = () => {
               </div>
               <Button
                 data-umami-event="change password"
-                className="w-full bg-red-900 block shadow-md hover:bg-red-800 dark:bg-red-900 dark:hover:bg-red-800"
+                className="mt-4 w-full bg-red-900 block shadow-md hover:bg-red-800 dark:bg-red-900 dark:hover:bg-red-800"
                 onClick={() => handleClick(password)}
               >
                 修改密码
@@ -134,4 +144,4 @@ const Profile = () => {
   )
 }
 
-export default Profile
+export default ChangePwd

@@ -11,8 +11,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   } = await supabaseServerClient.auth.getUser()
 
   if (req.method === 'POST') {
-    const { chat_id, chat_history, timestamp, total_word_count, deviceInfo, hasFlaggedContent } =
-      req.body
+    const {
+      chat_id,
+      chat_history,
+      timestamp,
+      total_word_count,
+      deviceInfo,
+      hasFlaggedContent,
+      mode,
+    } = req.body
     try {
       // Attempt to find an existing chat_statistics record for this chat session
       const { data, error } = await supabaseServerClient
@@ -42,6 +49,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             browser_vendor: deviceInfo.browserVendor,
             screen_resolution: deviceInfo.screenResolution,
             has_flagged_content: hasFlaggedContent || data.has_flagged_content,
+            model: mode,
           })
           .eq('chat_id', chat_id)
 
@@ -65,6 +73,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             browser_vendor: deviceInfo.browserVendor,
             screen_resolution: deviceInfo.screenResolution,
             has_flagged_content: hasFlaggedContent,
+            model: mode,
           },
         ])
 

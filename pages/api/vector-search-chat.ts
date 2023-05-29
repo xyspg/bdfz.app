@@ -162,13 +162,18 @@ export default async function handler(req: NextRequest) {
 
       contextText += `${content.trim()}\n---\n`
     }
+    let contextTextMessage = ''
+    if (!contextText) {
+      contextTextMessage = 'Context text is empty'
+    }
     const prompt = codeBlock`
       ${oneLine`
        Pretend you are GPT-4 model , Act an encyclopedia of 北大附中 expertise. 
        I will ask you questions for which you will provide reference from the docs or relevant how-tos. 
        Please only provide reference related to this question. Based on the specific sections from the documentation, 
        try to answer the question using that information. Give the document name and section. 
-       如果用户询问你上下文中没有指出的人名，回复"对不起，我不知道。"
+       if the contextText is empty, prompt the user that no relavent information is found in 
+       school documents, and do not give extra output.
        Your output should be the same with the prompt language. If the prompt is Chinese,
        your output must be in Chinese except for course names and other proper nouns.
       `}
@@ -184,6 +189,7 @@ export default async function handler(req: NextRequest) {
     `
     messages.push({ role: 'user', content: prompt })
     console.log('Updated Messages:', messages)
+    console.log('page sections:', pageSections)
 
     const completionOptions: CreateChatCompletionRequest = {
       model: 'gpt-3.5-turbo',

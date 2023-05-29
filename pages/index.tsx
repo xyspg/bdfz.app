@@ -1,55 +1,55 @@
 import Head from 'next/head'
-import { SearchDialog } from '@/components/SearchDialog'
-import Header from '@/components/Header'
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
+
+import { CallToAction } from '@/components/intro/CallToAction'
+import { Faqs } from '@/components/intro/Faqs'
+import { IntroFooter } from '@/components/IntroFooter'
+import { NewHeader } from '@/components/newHeader'
+import { Hero } from '@/components/intro/Hero'
+import { Pricing } from '@/components/intro/Pricing'
+import { PrimaryFeatures } from '@/components/intro/PrimaryFeatures'
+import { Reviews } from '@/components/intro/Reviews'
+import { SecondaryFeatures } from '@/components/intro/SecondaryFeatures'
+import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
-import ModeSwitcher from '@/components/ModeSwitcher'
 import * as React from 'react'
+import { useTheme } from 'next-themes'
 
 export default function Home() {
+  const { systemTheme, theme, setTheme } = useTheme()
   const session = useSession()
   const router = useRouter()
-  const supabase = useSupabaseClient()
+  const pathname = router.pathname
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event == 'PASSWORD_RECOVERY') {
-        router.push('/password')
-      }
-    })
-  }, [router, supabase.auth])
+    if (session) window.location.href = '/chat'
+  }, [session])
 
+  useEffect(() => {
+    if (pathname === '/') {
+      setTheme('light')
+    }
+  }, [pathname, setTheme])
   return (
     <>
       <Head>
         <title>BDFZ AI</title>
         <meta
           name="description"
-          content="北大附中 AI 助手，支持学生手册、事物手册等查询，国际部课程建议等"
+          content="北大附中专属的AI文档搜索系统，利用先进的文本嵌入技术和OpenAI的GPT模型，帮助学生和教职员工快速、高效地查找学校手册、课程设置、请假流程等各类信息。无需翻阅大量文件，一键即可获取所需信息"
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1" />
-        <meta property="twitter:image" content="https://bdfz.app/meta.png" />
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="og:image" content="https://bdfz.app/meta.png" />
-        <meta property="og:title" content="BDFZ AI" />
-        <meta
-          property="og:description"
-          content="北大附中 AI 助手，支持学生手册、事物手册等查询，国际部课程建议等"
-        />
-        <meta property="og:url" content="https://bdfz.app" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="">
-        {session && (
-          <div className="flex flex-col justify-center items-center ">
-            <div className="w-full">
-              <ModeSwitcher />
-            </div>
-            <SearchDialog />
-          </div>
-        )}
-      </div>
+      <NewHeader />
+      <main>
+        <Hero />
+        <PrimaryFeatures />
+        <SecondaryFeatures />
+        <CallToAction />
+        {/*<Reviews />*/}
+        {/*<Pricing />*/}
+        <Faqs />
+      </main>
+      <IntroFooter />
     </>
   )
 }

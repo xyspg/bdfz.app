@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/input'
 import style from '@/styles/markdown-styles.module.css'
 import { SSE } from 'sse.js'
@@ -18,6 +18,13 @@ import { v4 as uuidv4 } from 'uuid'
 import { encode } from 'gpt-tokenizer'
 import { useRouter } from 'next/router'
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { atomDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
+import { Components } from 'react-markdown'
+import OpenAILogo from '@/images/logos/openai.svg'
+import OpenAIDarkLogo from '@/images/logos/openai_dark.svg'
+import Image from 'next/image'
+import { useTheme } from 'next-themes'
 
 function promptDataReducer(
   state: any[],
@@ -63,6 +70,7 @@ function promptDataReducer(
 
 interface ChatHistoryProps {
   History: any
+  Mode: any
 }
 
 interface ChatMessage {
@@ -70,7 +78,24 @@ interface ChatMessage {
   content: string
 }
 
-export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
+// Code block syntax highlighting
+const renderers: Partial<Components> = {
+  code({ node, inline, className, children, ...props }) {
+    const match = /language-(\w+)/.exec(className || '')
+    return !inline && match ? (
+      //@ts-ignore
+      <SyntaxHighlighter style={atomDark} language={match[1]} PreTag="div" {...props}>
+        {String(children).replace(/\n$/, '')}
+      </SyntaxHighlighter>
+    ) : (
+      <code className={className} {...props}>
+        {children}
+      </code>
+    )
+  },
+}
+
+export const ChatDialog: React.FC<ChatHistoryProps> = ({ History, Mode }) => {
   const [search, setSearch] = React.useState<string>('')
   const [question, setQuestion] = React.useState<string>('')
   const [answer, setAnswer] = React.useState<string | undefined>('')
@@ -90,6 +115,12 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
   const [totalTokens, setTotalTokens] = React.useState<number | null>(0)
   const [chatHistory, setChatHistory] = React.useState(History)
   const [answerUpdated, setAnswerUpdated] = React.useState(false)
+  const [hideInfo, setHideInfo] = React.useState(false)
+  React.useEffect(() => {
+    if (Mode === 'Normal') {
+      setHideInfo(true)
+    }
+  }, [Mode])
 
   React.useEffect(() => {
     setChatHistory(History)
@@ -102,6 +133,8 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
   const userId = user?.id
   const router = useRouter()
   const pathname = router.asPath
+  const { systemTheme, theme, setTheme } = useTheme()
+  const currentTheme = theme === 'system' ? systemTheme : theme
 
   const chatIdShouldBe = pathname.includes('/c/') ? pathname.slice(3) : uuidv4()
   const [chatId, setChatId] = React.useState(chatIdShouldBe)
@@ -237,13 +270,20 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
       setHasFlaggedContent(false)
       setPoliticalSensitive(false)
       setErrorMessage('')
-      console.log(chatHistory)
 
       const {
         data: { session },
       } = await supabase.auth.getSession()
+      let APIUrl
 
-      const eventSource = new SSE(`/api/vector-search-chat`, {
+      if (Mode === 'BDFZ') {
+        APIUrl = '/api/vector-search-chat'
+      } else if (Mode === 'Normal') {
+        APIUrl = '/api/chat-completion'
+      } else {
+        APIUrl = '/api/vector-search-chat'
+      }
+      const eventSource = new SSE(APIUrl, {
         headers: {
           apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
           Authorization: `Bearer ${session?.access_token}`,
@@ -317,6 +357,12 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
     handleConfirm(search)
   }
 
+  const getMode = () => {
+    if (Mode === 'BDFZ') return 'bdfz'
+    if (Mode === 'Normal') return 'gpt-4'
+    return 'bdfz'
+  }
+
   const sendStatistics = async () => {
     if (sampleQuestion.includes(question)) return
 
@@ -333,7 +379,8 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
 
     const timestamp = new Date().toISOString() // Current timestamp in ISO format
     const chat_history = chatHistory
-    console.log(uuidv4())
+
+    const mode = getMode()
 
     // Count total number of words in the chat history
     const total_word_count =
@@ -354,6 +401,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
         timestamp,
         deviceInfo,
         hasFlaggedContent,
+        mode,
       }),
     })
   }
@@ -375,15 +423,14 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
 
     const timestamp = new Date().toISOString()
 
-
     await fetch('/api/feedback', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        question: pathname.includes('/c/')? History[History.length - 2].content : question,
-        answer: pathname.includes('/c/')? History[History.length - 1].content : answer,
+        question: pathname.includes('/c/') ? History[History.length - 2].content : question,
+        answer: pathname.includes('/c/') ? History[History.length - 1].content : answer,
         f,
         timestamp,
         deviceInfo,
@@ -431,10 +478,11 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
                   .map((message: Message, index: number) => {
                     // Check if it's the last item and role is assistant
 
+                    // @ts-ignore
                     return (
                       <div
                         key={index}
-                        className={`flex gap-x-4 p-4 rounded-xl ${
+                        className={`flex gap-x-4 p-4 rounded-xl items-start ${
                           message.role === 'assistant' && 'bg-neutral-100 dark:bg-neutral-700'
                         }`}
                       >
@@ -443,7 +491,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
                             <span className="bg-slate-100 dark:bg-slate-300 p-2 w-8 h-8 rounded-full text-center flex items-center justify-center ">
                               <User width={18} />
                             </span>
-                          ) : (
+                          ) : !hideInfo ? (
                             <div className="w-7 min-w-[28px] ml-0.5 h-7 bg-gradient-to-r from-red-900 to-red-800 ring-red-600 ring-1 rounded-md border border-brand-400 flex items-center justify-center shadow-sm ">
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -460,25 +508,34 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
                                 ></path>
                               </svg>
                             </div>
+                          ) : (
+                            <div className=" rounded-sm flex items-start justify-center text-black h-7 w-7 ml-1">
+                              <Image
+                                src={currentTheme == 'light' ? OpenAILogo : OpenAIDarkLogo}
+                                alt="openai logo"
+                              />
+                            </div>
                           )}
                         </span>
-                        <p
+                        <div
                           className={`mt-0.5 ${
                             message.role === 'user' ? 'font-semibold' : 'font-normal'
                           } text-slate-700 dark:text-slate-100 `}
-                        ><ReactMarkdown
-                          linkTarget="_blank"
-                          className={style.reactMarkDown}
-                          remarkPlugins={[remarkGfm]}
                         >
-                          {message.content}
-                        </ReactMarkdown>
-                        </p>
+                          <ReactMarkdown
+                            linkTarget="_blank"
+                            className={style.reactMarkDown}
+                            remarkPlugins={[remarkGfm]}
+                            components={renderers as Components}
+                          >
+                            {message.content}
+                          </ReactMarkdown>
+                        </div>
                       </div>
                     )
                   })}
                 {!isGenerating && (
-                  <div className=''>
+                  <div className="">
                     <div className="float-right py-1 flex flex-row gap-2 dark:text-neutral-200 text-neutral-700">
                       <div
                         className={`p-1.5 rounded-md ${
@@ -548,29 +605,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
                     transition={{ duration: 0.5 }}
                     className="flex items-center gap-4 dark:text-white max-w-3xl p-4 rounded-xl bg-neutral-100 dark:bg-neutral-700"
                   >
-                    <div className="w-7 ml-0.5 h-7 bg-gradient-to-r from-red-900 to-red-800 ring-red-600 ring-1 rounded-md border border-brand-400 flex items-center justify-center shadow-sm ">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="w-4 h-4 text-white"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
-                        ></path>
-                      </svg>
-                    </div>
-                    <div className="ml-1 bg-neutral-500 h-[17px] w-[11px] animate-pulse animate-bounce" />
-                  </motion.div>
-                )}
-
-                {answer && !hasError && isGenerating ? (
-                  <>
-                    <div className="flex gap-4 my-1 dark:text-white max-w-[85vw] p-4 bg-neutral-100 dark:bg-neutral-700 rounded-xl">
+                    {!hideInfo ? (
                       <div className="w-7 min-w-[28px] ml-0.5 h-7 bg-gradient-to-r from-red-900 to-red-800 ring-red-600 ring-1 rounded-md border border-brand-400 flex items-center justify-center shadow-sm ">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -587,11 +622,52 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
                           ></path>
                         </svg>
                       </div>
+                    ) : (
+                      <div className=" rounded-sm flex items-start justify-center text-black h-7 w-7 ml-1">
+                        <Image
+                          src={currentTheme == 'light' ? OpenAILogo : OpenAIDarkLogo}
+                          alt="openai logo"
+                        />
+                      </div>
+                    )}
+                    <div className="ml-1 bg-neutral-500 h-[17px] w-[11px] animate-pulse animate-bounce" />
+                  </motion.div>
+                )}
+
+                {answer && !hasError && isGenerating ? (
+                  <>
+                    <div className="flex gap-4 my-1 dark:text-white max-w-[85vw] p-4 bg-neutral-100 dark:bg-neutral-700 rounded-xl items-center">
+                      {!hideInfo ? (
+                        <div className="w-7 min-w-[28px] ml-0.5 h-7 bg-gradient-to-r from-red-900 to-red-800 ring-red-600 ring-1 rounded-md border border-brand-400 flex items-center justify-center shadow-sm ">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="currentColor"
+                            className="w-4 h-4 text-white"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+                            ></path>
+                          </svg>
+                        </div>
+                      ) : (
+                        <div className=" rounded-sm flex items-start justify-center text-black h-7 w-7 ml-1">
+                          <Image
+                            src={currentTheme == 'light' ? OpenAILogo : OpenAIDarkLogo}
+                            alt="openai logo"
+                          />
+                        </div>
+                      )}
                       <div className="w-full overflow-x-auto">
                         <ReactMarkdown
                           linkTarget="_blank"
                           className={style.reactMarkDown}
                           remarkPlugins={[remarkGfm]}
+                          components={renderers as Components}
                         >
                           {answer}
                         </ReactMarkdown>
@@ -620,7 +696,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
               placeholder="输入问题..."
               name="search"
               value={search}
-              maxLength={4000}
+              maxLength={40000}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={handleKeyDown}
               className="col-span-3"
@@ -657,117 +733,119 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
               </Button>
             </div>
           </div>
-          <div className="rounded-md border px-1.5 py-3 md:px-3 md:py-3 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 justify-between items-center bg-scale-400 border-scale-500 dark:bg-scale-100 dark:border-scale-300 mb-3 w-full gap-2">
-            <div className="text-scale-1200 dark:text-neutral-200 flex flex-row items-start gap-2 justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-scale-900"
-              >
-                <path d="M6 18h8"></path>
-                <path d="M3 22h18"></path>
-                <path d="M14 22a7 7 0 1 0 0-14h-1"></path>
-                <path d="M9 14h2"></path>
-                <path d="M8 6h4"></path>
-                <path d="M13 10V6.5a.5.5 0 0 0-.5-.5.5.5 0 0 1-.5-.5V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5.5.5 0 0 0-.5.5V10c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2Z"></path>
-              </svg>
-              <div className="flex flex-1 items-center justify-between">
-                <div className="text-left">
-                  <h3 className="text-scale-1200 dark:text-neutral-200 block text-[13px] md:text-sm font-medium mb-1">
-                    BDFZ AI 处于 Beta 版本，可能会产生错误答案
-                  </h3>
-                  <div className="text-xs text-scale-900 dark:text-neutral-300 inline-flex flex-row leading-5">
-                    <p>
-                      回答由 AI 检索学校官方文件后生成，请以 <br className="md:hidden" />
-                      <a
-                        href="https://pkuschool.yuque.com/infodesk/sbook?#%20%E3%80%8A%E5%8C%97%E5%A4%A7%E9%99%84%E4%B8%AD%E5%AD%A6%E7%94%9F%E6%89%8B%E5%86%8C%E3%80%8B"
-                        target="_blank"
-                        className="text-neutral-500 underline dark:text-neutral-200 underline-offset-2 hover:opacity-70"
-                        rel="noopener noreferer"
-                      >
-                        北大附中学生手册
-                      </a>
-                      &nbsp;等文件为准
-                    </p>
+          {!hideInfo && (
+            <>
+              <div className="rounded-md border px-1.5 py-3 md:px-5 md:py-4 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 justify-between items-center bg-scale-400 border-scale-500 dark:bg-scale-100 dark:border-neutral-200 mb-3 w-full gap-2">
+                <div className="text-scale-1200 dark:text-neutral-200 flex flex-row items-start gap-2 justify-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-scale-900"
+                  >
+                    <path d="M6 18h8"></path>
+                    <path d="M3 22h18"></path>
+                    <path d="M14 22a7 7 0 1 0 0-14h-1"></path>
+                    <path d="M9 14h2"></path>
+                    <path d="M8 6h4"></path>
+                    <path d="M13 10V6.5a.5.5 0 0 0-.5-.5.5.5 0 0 1-.5-.5V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v2.5a.5.5 0 0 1-.5.5.5.5 0 0 0-.5.5V10c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2Z"></path>
+                  </svg>
+                  <div className="flex flex-1 items-center justify-between">
+                    <div className="text-left">
+                      <h3 className="text-scale-1200 dark:text-neutral-200 block text-[13px] md:text-sm font-medium mb-1">
+                        BDFZ AI 可能会产生错误答案
+                      </h3>
+                      <div className="text-xs text-scale-900 dark:text-neutral-300 inline-flex flex-row leading-5">
+                        <p>
+                          回答由 AI 检索学校官方文件后生成，请以 <br className="md:hidden" />
+                          <a
+                            href="https://pkuschool.yuque.com/infodesk/sbook?#%20%E3%80%8A%E5%8C%97%E5%A4%A7%E9%99%84%E4%B8%AD%E5%AD%A6%E7%94%9F%E6%89%8B%E5%86%8C%E3%80%8B"
+                            target="_blank"
+                            className="text-neutral-500 underline dark:text-neutral-200 underline-offset-2 hover:opacity-70"
+                            rel="noopener noreferer"
+                          >
+                            北大附中学生手册
+                          </a>
+                          &nbsp;等文件为准
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <div className="text-xs text-gray-500 flex flex-col md:flex-row flex-grow space-y-2 md:space-y-0 gap-2 dark:text-gray-100 items-stretch md:items-start">
-            <div className="pt-1.5 mx-auto md:w-20">Or try:</div>
-            <div className="flex flex-col gap-4">
-              <div className="mt-1 flex gap-3 md:gap-x-2.5 md:gap-y-1 flex-col md:flex-row w-full md:w-auto md:flex-wrap">
-                {sampleQuestion.map((q) => (
-                  <button
-                    key={q}
-                    type="button"
-                    data-umami-event={'ask: ' + q}
-                    className="px-1.5 py-3 md:py-0.5 md:px-1.5 md:w-fit h-full
+              <div className="text-xs text-gray-500 flex flex-col md:flex-row flex-grow space-y-2 md:space-y-0 gap-2 dark:text-gray-100 items-stretch md:items-start">
+                <div className="pt-1.5 mx-auto md:w-20">Or try:</div>
+                <div className="flex flex-col gap-4">
+                  <div className="mt-1 flex gap-3 md:gap-x-2.5 md:gap-y-1 flex-col md:flex-row w-full md:w-auto md:flex-wrap">
+                    {sampleQuestion.map((q) => (
+                      <button
+                        key={q}
+                        type="button"
+                        data-umami-event={'ask: ' + q}
+                        className="px-1.5 py-3 md:py-0.5 md:px-1.5 md:w-fit h-full
                     md:h-auto cursor-pointer
                   bg-slate-50 dark:bg-neutral-700 text-sm md:text-xs
                   hover:bg-slate-100 dark:hover:bg-gray-600
                   rounded-md border border-slate-200 dark:border-neutral-600
                   transition-colors"
-                    onClick={(_) => {
-                      setSearch(q)
-                      handleConfirm(q)
-                      scrollToTop()
-                    }}
-                  >
-                    {q}
-                  </button>
-                ))}
-              </div>
-              <div
-                className="md:w-fit h-full
+                        onClick={(_) => {
+                          setSearch(q)
+                          handleConfirm(q)
+                          scrollToTop()
+                        }}
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                  <div
+                    className="md:w-fit h-full
                   md:h-auto cursor-pointer
                   flex justify-center
                   bg-white dark:bg-neutral-800
                   dark:text-white text-[15px]
                   rounded-md underline-offset-4 underline
                   transition-colors"
-                onClick={() => {
-                  setShowMore(!showMore)
-                }}
-              >
-                {showMore ? '收起列表' : '查看更多...'}
+                    onClick={() => {
+                      setShowMore(!showMore)
+                    }}
+                  >
+                    {showMore ? '收起列表' : '查看更多...'}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          <AnimatePresence>
-            {showMore ? (
-              <>
-                <hr />
-                <motion.div
-                  initial={{ y: -20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -20, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <div className=" flex flex-col justify-start gap-4">
-                    {showMoreList.map((category) => (
-                      <>
-                        <div
-                          key={category.category}
-                          className="flex flex-col  md:flex-row items-center gap-4 md:gap-12"
-                        >
-                          <h1 className="text-xl font-bold dark:text-white md:w-1/4">
-                            {category.category}
-                          </h1>
-                          <div className="flex flex-wrap gap-4 md:w-3/4 justify-start">
-                            {category.content.map((content) => (
-                              <>
-                                <div
-                                  key={content}
-                                  className="
+              <AnimatePresence>
+                {showMore ? (
+                  <>
+                    <hr />
+                    <motion.div
+                      initial={{ y: -20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: -20, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className=" flex flex-col justify-start gap-4">
+                        {showMoreList.map((category) => (
+                          <>
+                            <div
+                              key={category.category}
+                              className="flex flex-col  md:flex-row items-center gap-4 md:gap-12"
+                            >
+                              <h1 className="text-xl font-bold dark:text-white md:w-1/4">
+                                {category.category}
+                              </h1>
+                              <div className="flex flex-wrap gap-4 md:w-3/4 justify-start">
+                                {category.content.map((content) => (
+                                  <>
+                                    <div
+                                      key={content}
+                                      className="
                           text-sm text-neutral-700 dark:text-neutral-200
                           px-2.5 py-1.5 md:px-3 md:py-1.5
                           border-2 border-neutral-200 dark:border-neutral-600
@@ -775,26 +853,28 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History }) => {
                           bg-slate-50 hover:bg-slate-100
                           dark:bg-neutral-700  dark:hover:bg-gray-600
                           "
-                                  data-umami-event={'ask: ' + content}
-                                  onClick={() => {
-                                    scrollToTop()
-                                    handleConfirm(content)
-                                  }}
-                                >
-                                  {content}
-                                </div>
-                              </>
-                            ))}
-                          </div>
-                        </div>
-                        <hr />
-                      </>
-                    ))}
-                  </div>
-                </motion.div>
-              </>
-            ) : null}
-          </AnimatePresence>
+                                      data-umami-event={'ask: ' + content}
+                                      onClick={() => {
+                                        scrollToTop()
+                                        handleConfirm(content)
+                                      }}
+                                    >
+                                      {content}
+                                    </div>
+                                  </>
+                                ))}
+                              </div>
+                            </div>
+                            <hr />
+                          </>
+                        ))}
+                      </div>
+                    </motion.div>
+                  </>
+                ) : null}
+              </AnimatePresence>
+            </>
+          )}
         </div>
       </div>
       <ScrollToTopButton />

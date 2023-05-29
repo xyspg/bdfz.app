@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useEffect } from 'react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/input'
 import style from '@/styles/markdown-styles.module.css'
 import { SSE } from 'sse.js'
@@ -25,7 +25,6 @@ const fpPromise = FingerprintJS.load()
   // Get the visitor identifier when you need it.
   const fp = await fpPromise
   const result = await fp.get()
-  console.log(result.visitorId)
 })()
 
 function promptDataReducer(
@@ -340,7 +339,6 @@ export function SearchDialog() {
     const result = await fp.get()
 
     const words = answer && encode(answer).length + encode(question).length
-    console.log(`token count: ${words}`)
     const deviceInfo = {
       platform: result.components.platform.value,
       osCpu: result.components.osCpu.value,
@@ -607,7 +605,7 @@ export function SearchDialog() {
               {isGenerating ? 'Stop' : 'Ask'}
             </Button>
           </div>
-          <div className="rounded-md border px-1.5 py-3 md:px-3 md:py-3 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 justify-between items-center bg-scale-400 border-scale-500 dark:bg-scale-100 dark:border-scale-300 mb-3 w-full gap-2">
+          <div className="rounded-md border px-1.5 py-3 md:px-5 md:py-4 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 justify-between items-center bg-scale-400 border-scale-500 dark:bg-scale-100 dark:border-neutral-200 mb-3 w-full gap-2">
             <div className="text-scale-1200 dark:text-neutral-200 flex flex-row items-start gap-2 justify-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -631,7 +629,7 @@ export function SearchDialog() {
               <div className="flex flex-1 items-center justify-between">
                 <div className="text-left">
                   <h3 className="text-scale-1200 dark:text-neutral-200 block text-[13px] md:text-sm font-medium mb-1">
-                    BDFZ AI 处于 Beta 版本，可能会产生错误答案
+                    BDFZ AI 可能会产生错误答案
                   </h3>
                   <div className="text-xs text-scale-900 dark:text-neutral-300 inline-flex flex-row leading-5">
                     <p>

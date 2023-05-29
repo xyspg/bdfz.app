@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import Header from '@/components/Header'
+import React, { useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 import PasswordStrengthBar from 'react-password-strength-bar'
 import 'react-toastify/dist/ReactToastify.css'
 
-import { useSupabaseClient, useUser, useSession } from '@supabase/auth-helpers-react'
+import { useSession, useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
+import Layout from '@/components/Layout'
 
 const Password = () => {
   const supabaseClient = useSupabaseClient()
@@ -73,7 +73,7 @@ const Password = () => {
   }
 
   return (
-    <>
+    <Layout>
       <Head>
         <title>设置密码 - bdfz.app</title>
         <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1" />
@@ -117,7 +117,7 @@ const Password = () => {
           </Button>
         </div>
       </div>
-    </>
+    </Layout>
   )
 }
 
