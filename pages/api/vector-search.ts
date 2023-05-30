@@ -57,6 +57,7 @@ export default async function handler(req: NextRequest) {
 
     // Moderate the content to comply with OpenAI T&C
     const sanitizedQuery = query.trim()
+    console.log('vector-search', query)
     const moderationResponse = await fetch('https://' + openAiBaseUrl + '/v1/moderations', {
       method: 'POST',
       headers: {
@@ -67,7 +68,6 @@ export default async function handler(req: NextRequest) {
         input: sanitizedQuery,
       }),
     }).then((res) => res.json())
-
     const [results] = moderationResponse.results
 
     if (/\bdeveloper mode\b/i.test(query)) {
@@ -113,7 +113,6 @@ export default async function handler(req: NextRequest) {
         input: sanitizedQuery.replaceAll('\n', ' '),
       }),
     })
-
     if (embeddingResponse.status !== 200) {
       throw new ApplicationError('Failed to create embedding for question', embeddingResponse)
     }
@@ -245,7 +244,8 @@ export default async function handler(req: NextRequest) {
     // TODO: include more response info in debug environments
     return new Response(
       JSON.stringify({
-        error: 'There was an error processing your request',
+        //@ts-ignore
+        error: `${err.message}: ${JSON.stringify(err.data)}`,
       }),
       {
         status: 500,

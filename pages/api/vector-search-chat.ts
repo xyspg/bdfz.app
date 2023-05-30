@@ -55,6 +55,7 @@ export default async function handler(req: NextRequest) {
     if (!query) {
       throw new UserError('请输入查询内容')
     }
+    console.log(query)
 
     // Moderate the content to comply with OpenAI T&C
     const sanitizedQuery = query.trim()
@@ -134,14 +135,14 @@ export default async function handler(req: NextRequest) {
     }
 
     const { error: matchError, data: pageSections } = await supabaseClient.rpc(
-      'match_page_sections',
-      {
-        embedding,
-        match_threshold: 0.78,
-        match_count: 10,
-        min_content_length: 50,
-        department,
-      }
+        'match_page_sections',
+        {
+          embedding,
+          match_threshold: 0.78,
+          match_count: 10,
+          min_content_length: 50,
+          department,
+        }
     )
     if (matchError) {
       throw new ApplicationError('Failed to match page sections', matchError)
@@ -162,9 +163,9 @@ export default async function handler(req: NextRequest) {
 
       contextText += `${content.trim()}\n---\n`
     }
-    let contextTextMessage = ''
-    if (!contextText) {
-      contextTextMessage = 'Context text is empty'
+    let contextTextMessage = '';
+    if(!contextText) {
+      contextTextMessage = "Context text is empty";
     }
     const prompt = codeBlock`
       ${oneLine`
@@ -189,7 +190,6 @@ export default async function handler(req: NextRequest) {
     `
     messages.push({ role: 'user', content: prompt })
     console.log('Updated Messages:', messages)
-    console.log('page sections:', pageSections)
 
     const completionOptions: CreateChatCompletionRequest = {
       model: 'gpt-3.5-turbo',
@@ -236,14 +236,14 @@ export default async function handler(req: NextRequest) {
   } catch (err: any) {
     if (err instanceof UserError) {
       return new Response(
-        JSON.stringify({
-          error: err.message,
-          data: err.data,
-        }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        }
+          JSON.stringify({
+            error: err.message,
+            data: err.data,
+          }),
+          {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' },
+          }
       )
     } else if (err instanceof ApplicationError) {
       console.error(`${err.message}: ${JSON.stringify(err.data)}`)
@@ -252,13 +252,13 @@ export default async function handler(req: NextRequest) {
     }
 
     return new Response(
-      JSON.stringify({
-        error: `发生错误：${JSON.stringify(err.data.error.message)}`,
-      }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      }
+        JSON.stringify({
+          error: 'There was an error processing your request',
+        }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        }
     )
   }
 }
