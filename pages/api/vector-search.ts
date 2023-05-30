@@ -221,6 +221,7 @@ export default async function handler(req: NextRequest) {
       headers: {
         Authorization: `Bearer ${openAiKey}`,
         'Content-Type': 'application/json',
+        "X-Api-Key": `Bearer ${process.env.LLM_REPORT_API_KEY}`,
       },
       body: JSON.stringify(completionOptions),
     })
