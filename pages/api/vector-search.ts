@@ -57,7 +57,6 @@ export default async function handler(req: NextRequest) {
 
     // Moderate the content to comply with OpenAI T&C
     const sanitizedQuery = query.trim()
-    console.log('vector-search', query)
     const moderationResponse = await fetch('https://' + openAiBaseUrl + '/v1/moderations', {
       method: 'POST',
       headers: {
@@ -68,6 +67,7 @@ export default async function handler(req: NextRequest) {
         input: sanitizedQuery,
       }),
     }).then((res) => res.json())
+    console.log(moderationResponse);
     const [results] = moderationResponse.results
 
     if (/\bdeveloper mode\b/i.test(query)) {
@@ -102,20 +102,33 @@ export default async function handler(req: NextRequest) {
       })
     }
 
-    const embeddingResponse = await fetch('https://' + openAiBaseUrl + '/v1/embeddings', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${openAiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'text-embedding-ada-002',
-        input: sanitizedQuery.replaceAll('\n', ' '),
-      }),
-    })
-    if (embeddingResponse.status !== 200) {
-      throw new ApplicationError('Failed to create embedding for question', embeddingResponse)
+    let embeddingResponse;
+
+    try {
+      embeddingResponse = await fetch('https://' + openAiBaseUrl + '/v1/embeddings', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${openAiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'text-embedding-ada-002',
+          input: sanitizedQuery.replaceAll('\n', ' '),
+        }),
+      });
+
+      console.log(embeddingResponse);
+
+      if (embeddingResponse.status !== 200) {
+        if (embeddingResponse.status === 401) {
+            throw new Error('Invalid OpenAI API key');
+        }
+        throw new Error('Failed to create embedding for question');
+      }
+    } catch (error: any) {
+      throw new ApplicationError('Application Error: ' + error.message, embeddingResponse);
     }
+
 
     const {
       data: [{ embedding }],

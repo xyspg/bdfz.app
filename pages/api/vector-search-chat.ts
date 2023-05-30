@@ -104,20 +104,31 @@ export default async function handler(req: NextRequest) {
       })
     }
 
-    const embeddingResponse = await fetch('https://' + openAiBaseUrl + '/v1/embeddings', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${openAiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'text-embedding-ada-002',
-        input: sanitizedQuery.replaceAll('\n', ' '),
-      }),
-    })
+    let embeddingResponse;
 
-    if (embeddingResponse.status !== 200) {
-      throw new ApplicationError('Failed to create embedding for question', embeddingResponse)
+    try {
+      embeddingResponse = await fetch('https://' + openAiBaseUrl + '/v1/embeddings', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${openAiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'text-embedding-ada-002',
+          input: sanitizedQuery.replaceAll('\n', ' '),
+        }),
+      });
+
+      console.log(embeddingResponse);
+
+      if (embeddingResponse.status !== 200) {
+        if (embeddingResponse.status === 401) {
+          throw new Error('Invalid OpenAI API key');
+        }
+        throw new Error('Failed to create embedding for question');
+      }
+    } catch (error: any) {
+      throw new ApplicationError('Application Error: ' + error.message, embeddingResponse);
     }
 
     const {
