@@ -67,7 +67,6 @@ export default async function handler(req: NextRequest) {
         input: sanitizedQuery,
       }),
     }).then((res) => res.json())
-    console.log(moderationResponse);
     const [results] = moderationResponse.results
 
     if (/\bdeveloper mode\b/i.test(query)) {
@@ -117,7 +116,7 @@ export default async function handler(req: NextRequest) {
         }),
       });
 
-      console.log(embeddingResponse);
+      console.log('embeddings response: ',embeddingResponse);
 
       if (embeddingResponse.status !== 200) {
         if (embeddingResponse.status === 401) {
@@ -225,7 +224,7 @@ export default async function handler(req: NextRequest) {
       },
       body: JSON.stringify(completionOptions),
     })
-
+      console.log(response)
     if (!response.ok) {
       const error = await response.json()
       throw new ApplicationError('Failed to generate completion', error)

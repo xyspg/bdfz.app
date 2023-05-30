@@ -69,6 +69,11 @@ export default async function handler(req: NextRequest) {
         input: sanitizedQuery,
       }),
     }).then((res) => res.json())
+// Check the response for error
+    if (moderationResponse.error) {
+      const { message, type, param, code } = moderationResponse.error;
+      throw new ApplicationError(`Error: ${message}, Type: ${type}, Param: ${param}, Code: ${code}`);
+    }
 
     const [results] = moderationResponse.results
 
@@ -265,7 +270,8 @@ export default async function handler(req: NextRequest) {
 
     return new Response(
         JSON.stringify({
-          error: 'There was an error processing your request',
+          //@ts-ignore
+          error: `${err.message}: ${JSON.stringify(err.data)}`,
         }),
         {
           status: 500,
