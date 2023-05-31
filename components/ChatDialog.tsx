@@ -74,6 +74,7 @@ interface ChatMessage {
   content: string
 }
 
+
 // Code block syntax highlighting
 const renderers: Partial<Components> = {
   code({node, inline, className, children, ...props}) {
@@ -120,9 +121,6 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History, Mode }) => {
     }
   }, [Mode])
 
-  React.useEffect(() => {
-    setChatHistory(History)
-  }, [History])
 
   const delay = 5000 // ms
   const supabase = useSupabaseClient()
@@ -467,6 +465,14 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History, Mode }) => {
     role: string
     content: string
   }
+  React.useEffect(() => {
+    console.log("Component mounted");
+
+    return () => {
+      console.log("Component unmounted");
+    };
+  }, []);
+
 
   return (
       <>
