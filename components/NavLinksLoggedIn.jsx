@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
@@ -7,25 +7,29 @@ export function NavLinks() {
   const [isAdmin, setIsAdmin] = useState(false)
   const user = useUser()
   const supabase = useSupabaseClient()
-  const adminQuery = async () => {
-    const { data: Admin, error } = await supabase
-      .from('users')
-      .select('is_super_admin')
-      .eq('id', user?.id)
-    if (error) {
-      console.log(error)
-    } else {
-      const result = { data: Admin }.data[0]
-      const isAdmin = result.is_super_admin === true
-      setIsAdmin(isAdmin)
+
+  useEffect(() => {
+    const adminQuery = async () => {
+      const { data: Admin, error } = await supabase
+          .from('users')
+          .select('is_super_admin')
+          .eq('id', user?.id)
+
+      if (error) {
+        console.log(error);
+      } else {
+        const result = { data: Admin }.data[0];
+        const isAdmin = result.is_super_admin === true;
+        setIsAdmin(isAdmin);
+      }
     }
-  }
-  adminQuery().then((r) => r)
-  let [hoveredIndex, setHoveredIndex] = useState(null)
+
+    adminQuery();
+  }, [supabase, user?.id]);
+  const [hoveredIndex, setHoveredIndex] = useState(null)
 
   return [
     isAdmin && ['GPT4', '/gpt4'],
-    isAdmin && ['账单与付款', '/billing'],
     ['历史记录', '/history'],
     ['设置', '/settings'],
   ]

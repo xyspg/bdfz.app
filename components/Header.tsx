@@ -107,7 +107,6 @@ export function NewHeader() {
 
   const MobileNavLinks = [
     isAdmin && { name: 'GPT4', href: '/gpt4' },
-    isAdmin && { name: '付款', href: '/billing' },
     { name: '历史记录', href: '/history' },
     { name: '设置', href: '/settings' },
   ]
