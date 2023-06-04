@@ -36,7 +36,7 @@ export default function Home() {
         <title>BDFZ AI</title>
         <meta
           name="description"
-          content="北大附中专属的AI文档搜索系统，利用先进的文本嵌入技术和OpenAI的GPT模型，帮助学生和教职员工快速、高效地查找学校手册、课程设置、请假流程等各类信息。无需翻阅大量文件，一键即可获取所需信息"
+          content="BDFZ AI 是北大附中专属的AI文档搜索系统，利用先进的文本嵌入技术和OpenAI的GPT模型，帮助学生和教职员工快速、高效地查找学校手册、课程设置、请假流程等各类信息。无需翻阅大量文件，一键即可获取所需信息"
         />
       </Head>
       <NewHeader />
