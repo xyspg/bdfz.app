@@ -20,6 +20,9 @@ export default function Document() {
         />
         <meta property="og:url" content="https://bdfz.app" />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <noscript>
           您的浏览器不支持现代 Javascript 技术，而我们需要现代 Javascript 才可以为您展示信息
         </noscript>

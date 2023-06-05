@@ -2,14 +2,12 @@ import '@/styles/globals.css'
 import type { AppProps } from 'next/app'
 import { ThemeProvider } from 'next-themes'
 import Script from 'next/script'
-import { Analytics } from '@vercel/analytics/react'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { Session, SessionContextProvider } from '@supabase/auth-helpers-react'
 import { UserStatusProvider } from '@/lib/userContext'
-import { useState } from 'react'
-import Layout from '@/components/Layout'
-import { useRouter } from 'next/router'
 import * as React from 'react'
+import { useState } from 'react'
+import { useRouter } from 'next/router'
 import Head from 'next/head'
 
 export default function App({ Component, pageProps }: AppProps<{ initialSession: Session }>) {
@@ -38,7 +36,6 @@ export default function App({ Component, pageProps }: AppProps<{ initialSession:
         data-website-id="de651054-0c49-4294-ba67-fd0c988f5b40"
         data-domains="bdfz.app"
       ></Script>
-      <Analytics />
     </>
   )
 }

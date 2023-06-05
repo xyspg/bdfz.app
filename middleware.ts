@@ -20,7 +20,8 @@ export async function middleware(req: NextRequest) {
     // Authentication successful, forward request to protected route.
     if (
       req.nextUrl.pathname.startsWith('/gpt4') ||
-      req.nextUrl.pathname.startsWith('/api/chat-completion')
+      req.nextUrl.pathname.startsWith('/api/chat-completion') ||
+      req.nextUrl.pathname.startsWith('/admin')
     ) {
       const { data: userData, error } = await supabase
         .from('users')
@@ -37,9 +38,18 @@ export async function middleware(req: NextRequest) {
         if (userData && userData[0]) {
           const result = userData[0]
           const isPaidUser = result.is_paid_user === true
-
-          if (isPaidUser) {
-            // User is an admin, allow them to visit /gpt4
+          const isAdmin = result.is_admin === true
+          if (req.nextUrl.pathname.startsWith('/admin')){
+            if(isAdmin){
+              return res
+          } else {
+              return new NextResponse(JSON.stringify({ success: false, message: 'Forbidden' }), {
+                status: 403,
+                headers: { 'Content-Type': 'application/json' },
+              })
+            }
+          }
+          if (isPaidUser && req.nextUrl.pathname.startsWith('/gpt4')) {
             return res
           } else {
             if (!isPaidUser && req.nextUrl.pathname.startsWith('/api/chat-completion')) {
@@ -76,6 +86,7 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: [
     '/c/:path*',
+    '/admin/:path*',
     '/chat/:path*',
     '/gpt4/:path*',
     '/api/:path*',
