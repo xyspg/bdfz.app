@@ -22,6 +22,7 @@
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^3.4.1",
     "@headlessui/react": "^1.7.0",
+    "@heroicons/react": "1.0.6",
     "@hookform/resolvers": "^3.1.0",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-dialog": "^1.0.3",
@@ -41,6 +42,7 @@
     "@supabase/auth-ui-shared": "^0.1.6",
     "@supabase/supabase-js": "^2.21.0",
     "@tailwindcss/forms": "^0.5.3",
+    "@tremor/react": "^2.11.0",
     "@types/node": "18.15.10",
     "@types/react": "18.0.30",
     "@types/react-dom": "18.0.11",
