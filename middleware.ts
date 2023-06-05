@@ -21,7 +21,7 @@ export async function middleware(req: NextRequest) {
     if (
       req.nextUrl.pathname.startsWith('/gpt4') ||
       req.nextUrl.pathname.startsWith('/api/chat-completion') ||
-      req.nextUrl.pathname.startsWith('/admin')
+      req.nextUrl.pathname.startsWith('/dashboard')
     ) {
       const { data: userData, error } = await supabase
         .from('users')
@@ -39,7 +39,7 @@ export async function middleware(req: NextRequest) {
           const result = userData[0]
           const isPaidUser = result.is_paid_user === true
           const isAdmin = result.is_admin === true
-          if (req.nextUrl.pathname.startsWith('/admin')){
+          if (req.nextUrl.pathname.startsWith('/dashboard')){
             if(isAdmin){
               return res
           } else {
@@ -86,7 +86,7 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: [
     '/c/:path*',
-    '/admin/:path*',
+    '/dashboard/:path*',
     '/chat/:path*',
     '/gpt4/:path*',
     '/api/:path*',

@@ -8,7 +8,7 @@ export function NavLinks() {
 
   const [hoveredIndex, setHoveredIndex] = useState(null)
 
-  return [isPaidUser && ['GPT4', '/gpt4'], ['历史记录', '/history'], ['设置', '/settings']]
+  return [isPaidUser && ['GPT4', '/gpt4'], isAdmin && ['仪表盘', '/dashboard'], ['历史记录', '/history'], ['设置', '/settings']]
     .filter(Boolean)
     .map(([label, href], index) => (
       <Link

@@ -14,8 +14,9 @@ import {
 } from '@/components/react-hook-form/form'
 import { useUser } from '@supabase/auth-helpers-react'
 import useSWR from 'swr'
-import React from 'react'
+import React, { useContext } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
+import { UserStatusContext } from '@/lib/userContext'
 
 const profileFormSchema = z.object({
   username: z
@@ -73,6 +74,7 @@ export function Profile() {
   }
 
   const user = useUser()
+  const { isPaidUser, isAdmin } = useContext(UserStatusContext)
 
   const fetcher = (url: string) => fetch(url).then((res) => res.json())
   const { data, error, isLoading } = useSWR('/api/history', fetcher)
@@ -128,6 +130,31 @@ export function Profile() {
                       </>
                     ) : (
                       <span>{data?.gpt4_token_count}</span>
+                    )}
+                  </p>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+        {(isPaidUser || isAdmin) && (
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>身份</FormLabel>
+                <FormControl>
+                  <p className="text-md font-mono text-neutral-800 dark:text-neutral-200">
+                    {isLoading ? (
+                      <>
+                        <Skeleton className="bg-neutral-300 dark:bg-neutral-400 h-4 w-[100px]" />
+                      </>
+                    ) : (
+                      <div className='flex flex-col gap-2 '>{isPaidUser && <span>付费用户</span>}
+                          {isAdmin && <span>管理员</span>}
+                      </div>
                     )}
                   </p>
                 </FormControl>

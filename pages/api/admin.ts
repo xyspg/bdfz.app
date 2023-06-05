@@ -63,7 +63,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
         const tokenCount = await supabase
             .from('user_token_count')
-            .select('user_id, token_count, gpt4_token_count')
+            .select('user_email, token_count, gpt4_token_count')
+            .order('token_count', { ascending: false })
         tokens = tokenCount.data
     } catch (error) {
         console.log(error)

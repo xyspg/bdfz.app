@@ -85,6 +85,7 @@ export function NewHeader() {
   const { isPaidUser, isAdmin } = useContext(UserStatusContext)
   const MobileNavLinks = [
     isPaidUser && { name: 'GPT4', href: '/gpt4' },
+      isAdmin && {name: '仪表盘', href: '/dashboard'},
     { name: '历史记录', href: '/history' },
     { name: '设置', href: '/settings' },
   ]
