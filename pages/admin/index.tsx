@@ -27,8 +27,14 @@ const Admin = () => {
   const { data: data2, error: error2, isLoading: isLoading2 } = useSWR(session?.access_token ? '/api/admin?tokens' : null, fetcher)
   console.log(data2)
   // data 2 is a array with objects, each objects has a token_count
-  const totalToken = data2?.tokens.reduce((a, b) => a + b.token_count, 0)
-  const totalCost = data2?.tokens.reduce((a, b) => a + (b.token_count - b.gpt4_token_count)/1000 * 0.02 + (b.gpt4_token_count)/1000 * 0.231, 0).toFixed(2)
+  interface Token {
+    token_count: number;
+    gpt4_token_count: number;
+    // other properties of the token object
+  }
+  const totalToken = data2?.tokens.reduce((a: number,b : Token) => a + b.token_count, 0);
+  const totalCost = data2?.tokens.reduce((a: number, b: Token) => a + (b.token_count - b.gpt4_token_count)/1000 * 0.02 + (b.gpt4_token_count)/1000 * 0.231, 0).toFixed(2);
+
   return (
     <Layout>
       <>
