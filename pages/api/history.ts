@@ -33,7 +33,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     const { data: adminData, error: admin_error } = await supabase
       .from('users')
-      .select('is_super_admin')
+      .select('is_paid_user')
       .eq('id', user?.id)
       .single()
 
@@ -54,13 +54,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       return
     }
 
-    res
-      .status(200)
-      .json({
-        data,
-        token_count: tokenData?.token_count,
-        gpt4_token_count: tokenData?.gpt4_token_count,
-      })
+    res.status(200).json({
+      data,
+      token_count: tokenData?.token_count,
+      gpt4_token_count: tokenData?.gpt4_token_count,
+    })
   } else if (req.method === 'POST') {
     if (clear) {
       const { error } = await supabase

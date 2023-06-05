@@ -69,10 +69,10 @@ export default async function handler(req: NextRequest) {
         input: sanitizedQuery,
       }),
     }).then((res) => res.json())
-// Check the response for error
+    // Check the response for error
     if (moderationResponse.error) {
-      const { message, type, param, code } = moderationResponse.error;
-      throw new ApplicationError(`Error: ${message}, Type: ${type}, Param: ${param}, Code: ${code}`);
+      const { message, type, param, code } = moderationResponse.error
+      throw new ApplicationError(`Error: ${message}, Type: ${type}, Param: ${param}, Code: ${code}`)
     }
 
     const [results] = moderationResponse.results
@@ -109,7 +109,7 @@ export default async function handler(req: NextRequest) {
       })
     }
 
-    let embeddingResponse;
+    let embeddingResponse
 
     try {
       embeddingResponse = await fetch('https://' + openAiBaseUrl + '/v1/embeddings', {
@@ -122,18 +122,18 @@ export default async function handler(req: NextRequest) {
           model: 'text-embedding-ada-002',
           input: sanitizedQuery.replaceAll('\n', ' '),
         }),
-      });
+      })
 
-      console.log(embeddingResponse);
+      console.log(embeddingResponse)
 
       if (embeddingResponse.status !== 200) {
         if (embeddingResponse.status === 401) {
-          throw new Error('Invalid OpenAI API key');
+          throw new Error('Invalid OpenAI API key')
         }
-        throw new Error('Failed to create embedding for question');
+        throw new Error('Failed to create embedding for question')
       }
     } catch (error: any) {
-      throw new ApplicationError('Application Error: ' + error.message, embeddingResponse);
+      throw new ApplicationError('Application Error: ' + error.message, embeddingResponse)
     }
 
     const {
@@ -151,14 +151,14 @@ export default async function handler(req: NextRequest) {
     }
 
     const { error: matchError, data: pageSections } = await supabaseClient.rpc(
-        'match_page_sections',
-        {
-          embedding,
-          match_threshold: 0.78,
-          match_count: 10,
-          min_content_length: 50,
-          department,
-        }
+      'match_page_sections',
+      {
+        embedding,
+        match_threshold: 0.78,
+        match_count: 10,
+        min_content_length: 50,
+        department,
+      }
     )
     if (matchError) {
       throw new ApplicationError('Failed to match page sections', matchError)
@@ -179,9 +179,9 @@ export default async function handler(req: NextRequest) {
 
       contextText += `${content.trim()}\n---\n`
     }
-    let contextTextMessage = '';
-    if(!contextText) {
-      contextTextMessage = "Context text is empty";
+    let contextTextMessage = ''
+    if (!contextText) {
+      contextTextMessage = 'Context text is empty'
     }
     const prompt = codeBlock`
       ${oneLine`
@@ -234,7 +234,7 @@ export default async function handler(req: NextRequest) {
       headers: {
         Authorization: `Bearer ${openAiKey}`,
         'Content-Type': 'application/json',
-        "X-Api-Key": `Bearer ${process.env.LLM_REPORT_API_KEY}`,
+        'X-Api-Key': `Bearer ${process.env.LLM_REPORT_API_KEY}`,
       },
       body: JSON.stringify(completionOptions),
     })
@@ -253,14 +253,14 @@ export default async function handler(req: NextRequest) {
   } catch (err: any) {
     if (err instanceof UserError) {
       return new Response(
-          JSON.stringify({
-            error: err.message,
-            data: err.data,
-          }),
-          {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-          }
+        JSON.stringify({
+          error: err.message,
+          data: err.data,
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
       )
     } else if (err instanceof ApplicationError) {
       console.error(`${err.message}: ${JSON.stringify(err.data)}`)
@@ -269,14 +269,14 @@ export default async function handler(req: NextRequest) {
     }
 
     return new Response(
-        JSON.stringify({
-          //@ts-ignore
-          error: `${err.message}: ${JSON.stringify(err.data)}`,
-        }),
-        {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        }
+      JSON.stringify({
+        //@ts-ignore
+        error: `${err.message}: ${JSON.stringify(err.data)}`,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
     )
   }
 }

@@ -13,7 +13,6 @@ const ChangePwd = () => {
   const session = useSession()
   const router = useRouter()
   const supabase = useSupabaseClient()
-  const [admin, setAdmin] = useState(false)
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
   const [passwordError, setPasswordError] = useState<string | null>(null)
@@ -43,21 +42,6 @@ const ChangePwd = () => {
     }
     UpdatePassword(password)
   }
-
-  const adminQuery = async () => {
-    const { data: Admin, error } = await supabase
-      .from('users')
-      .select('is_super_admin')
-      .eq('id', user?.id)
-    if (error) {
-      console.log(error)
-    } else {
-      const result = { data: Admin }.data[0]
-      const isAdmin = result.is_super_admin === true
-      setAdmin(isAdmin)
-    }
-  }
-  adminQuery().then((r) => r)
 
   const UpdatePassword = async (password: string) => {
     const { data, error } = await supabase.auth.updateUser({ password: password })

@@ -5,6 +5,7 @@ import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/react'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { Session, SessionContextProvider } from '@supabase/auth-helpers-react'
+import { UserStatusProvider } from '@/lib/userContext'
 import { useState } from 'react'
 import Layout from '@/components/Layout'
 import { useRouter } from 'next/router'
@@ -25,9 +26,11 @@ export default function App({ Component, pageProps }: AppProps<{ initialSession:
         supabaseClient={supabaseClient}
         initialSession={pageProps.initialSession}
       >
-        <ThemeProvider attribute="class">
-          <Component {...pageProps} />
-        </ThemeProvider>
+        <UserStatusProvider>
+          <ThemeProvider attribute="class">
+            <Component {...pageProps} />
+          </ThemeProvider>
+        </UserStatusProvider>
       </SessionContextProvider>
       <Script
         async

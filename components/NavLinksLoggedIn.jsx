@@ -1,38 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useContext, useState } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
+import { UserStatusContext } from '@/lib/userContext'
 
 export function NavLinks() {
-  const [isAdmin, setIsAdmin] = useState(false)
-  const user = useUser()
-  const supabase = useSupabaseClient()
+  const { isPaidUser, isAdmin } = useContext(UserStatusContext)
 
-  useEffect(() => {
-    const adminQuery = async () => {
-      const { data: Admin, error } = await supabase
-          .from('users')
-          .select('is_super_admin')
-          .eq('id', user?.id)
-
-      if (error) {
-        console.log(error);
-      } else {
-        const result = { data: Admin }.data[0];
-        const isAdmin = result.is_super_admin === true;
-        setIsAdmin(isAdmin);
-      }
-    }
-
-    adminQuery();
-  }, [supabase, user?.id]);
   const [hoveredIndex, setHoveredIndex] = useState(null)
 
-  return [
-    isAdmin && ['GPT4', '/gpt4'],
-    ['历史记录', '/history'],
-    ['设置', '/settings'],
-  ]
+  return [isPaidUser && ['GPT4', '/gpt4'], ['历史记录', '/history'], ['设置', '/settings']]
     .filter(Boolean)
     .map(([label, href], index) => (
       <Link

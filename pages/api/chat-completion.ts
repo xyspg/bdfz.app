@@ -53,10 +53,10 @@ export default async function handler(req: NextRequest) {
     // Check if user is an admin
     const { data: adminData, error: adminError } = await supabaseClient
       .from('users')
-      .select('is_super_admin')
+      .select('is_paid_user')
       .eq('id', user.id)
 
-    if (adminError || !adminData || !adminData[0].is_super_admin) {
+    if (adminError || !adminData || !adminData[0].is_paid_user) {
       await supabaseClient.from('security_audit_log').insert({
         user_id: user.id,
         endpoint: '/api/chat-completion',

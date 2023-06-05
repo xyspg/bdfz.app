@@ -1,5 +1,5 @@
 //@ts-nocheck
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -16,6 +16,7 @@ import { useSession, useSupabaseClient, useUser } from '@supabase/auth-helpers-r
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import SwitchTheme from '@/components/SwitchTheme'
+import { UserStatusContext } from '@/lib/userContext'
 
 function MenuIcon(props) {
   return (
@@ -80,33 +81,10 @@ export function NewHeader() {
 
   const { systemTheme, theme, setTheme } = useTheme()
   const currentTheme = theme === 'system' ? systemTheme : theme
-  const [isAdmin, setIsAdmin] = useState(false)
-  const supabase = useSupabaseClient()
 
-  useEffect(() => {
-    if (user && user.id) {
-      adminQuery()
-    }
-  }, [user?.id])
-
-  const adminQuery = async () => {
-    const userId = user?.id
-    if (!userId) return
-    const { data: Admin, error } = await supabase
-      .from('users')
-      .select('is_super_admin')
-      .eq('id', userId)
-    if (error) {
-      console.log(error)
-    } else {
-      const result = { data: Admin }.data[0]
-      const isAdmin = result.is_super_admin === true
-      setIsAdmin(isAdmin)
-    }
-  }
-
+  const { isPaidUser, isAdmin } = useContext(UserStatusContext)
   const MobileNavLinks = [
-    isAdmin && { name: 'GPT4', href: '/gpt4' },
+    isPaidUser && { name: 'GPT4', href: '/gpt4' },
     { name: '历史记录', href: '/history' },
     { name: '设置', href: '/settings' },
   ]

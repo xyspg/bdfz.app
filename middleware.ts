@@ -3,11 +3,8 @@ import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
 export async function middleware(req: NextRequest) {
-  // We need to create a response and hand it to the supabase client to be able to modify the response headers.
   const res = NextResponse.next()
-  // Create authenticated Supabase Client.
   const supabase = createMiddlewareSupabaseClient({ req, res })
-  // Check if we have a session
   const {
     data: { session },
   } = await supabase.auth.getSession()
@@ -25,9 +22,9 @@ export async function middleware(req: NextRequest) {
       req.nextUrl.pathname.startsWith('/gpt4') ||
       req.nextUrl.pathname.startsWith('/api/chat-completion')
     ) {
-      const { data: adminData, error } = await supabase
+      const { data: userData, error } = await supabase
         .from('users')
-        .select('is_super_admin')
+        .select('is_paid_user, is_admin')
         .eq('id', session.user.id)
       if (error) {
         console.log(error)
@@ -37,15 +34,15 @@ export async function middleware(req: NextRequest) {
           headers: { 'Content-Type': 'application/json' },
         })
       } else {
-        if (adminData && adminData[0]) {
-          const result = adminData[0]
-          const isAdmin = result.is_super_admin === true
+        if (userData && userData[0]) {
+          const result = userData[0]
+          const isPaidUser = result.is_paid_user === true
 
-          if (isAdmin) {
+          if (isPaidUser) {
             // User is an admin, allow them to visit /gpt4
             return res
           } else {
-            if (!isAdmin && req.nextUrl.pathname.startsWith('/api/chat-completion')) {
+            if (!isPaidUser && req.nextUrl.pathname.startsWith('/api/chat-completion')) {
               return new NextResponse(JSON.stringify({ success: false, message: 'Forbidden' }), {
                 status: 403,
                 headers: { 'Content-Type': 'application/json' },

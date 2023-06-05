@@ -105,7 +105,7 @@ const bodyAnimation = {
 function InviteScreen({ custom, animated = false }) {
   return (
     <AppScreen className="w-full">
-      <Image src={rules} alt="rules" priority={true} />
+      <Image src={rules} alt="rules" priority="true" />
     </AppScreen>
   )
 }
@@ -113,7 +113,7 @@ function InviteScreen({ custom, animated = false }) {
 function StocksScreen({ custom, animated = false }) {
   return (
     <AppScreen className="w-full">
-      <Image src={ask_for_leave} alt="ask_for_leave" priority={true} />
+      <Image src={ask_for_leave} alt="ask_for_leave" priority="true" />
     </AppScreen>
   )
 }
@@ -121,7 +121,7 @@ function StocksScreen({ custom, animated = false }) {
 function InvestScreen({ custom, animated = false }) {
   return (
     <AppScreen className="w-full">
-      <Image src={course} alt="course" priority={true} />
+      <Image src={course} alt="course" priority="true" />
     </AppScreen>
   )
 }
