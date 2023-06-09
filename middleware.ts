@@ -15,60 +15,57 @@ export async function middleware(req: NextRequest) {
       headers: { 'Content-Type': 'application/json' },
     })
   }
-  // Check auth condition
-  if (session) {
-    // Authentication successful, forward request to protected route.
-    if (
-      req.nextUrl.pathname.startsWith('/gpt4') ||
-      req.nextUrl.pathname.startsWith('/api/chat-completion') ||
-      req.nextUrl.pathname.startsWith('/dashboard')
-    ) {
-      const { data: userData, error } = await supabase
-        .from('users')
-        .select('is_paid_user, is_admin')
-        .eq('id', session.user.id)
-      if (error) {
-        console.log(error)
-        // Maybe return a server error response here
-        return new NextResponse(JSON.stringify({ success: false, message: 'Server error' }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        })
-      } else {
-        if (userData && userData[0]) {
-          const result = userData[0]
-          const isPaidUser = result.is_paid_user === true
-          const isAdmin = result.is_admin === true
-          if (req.nextUrl.pathname.startsWith('/dashboard')){
-            if(isAdmin){
-              return res
-          } else {
-              return new NextResponse(JSON.stringify({ success: false, message: 'Forbidden' }), {
-                status: 403,
-                headers: { 'Content-Type': 'application/json' },
-              })
-            }
-          }
-          if (isPaidUser && req.nextUrl.pathname.startsWith('/gpt4')) {
+ // Check auth condition
+if (session) {
+  // Authentication successful, forward request to protected route.
+  if (
+    req.nextUrl.pathname.startsWith('/gpt4') ||
+    req.nextUrl.pathname.startsWith('/api/chat-completion') ||
+    req.nextUrl.pathname.startsWith('/dashboard')
+  ) {
+    const { data: userData, error } = await supabase
+      .from('users')
+      .select('is_paid_user, is_admin')
+      .eq('id', session.user.id)
+    if (error) {
+      console.log(error)
+      // Maybe return a server error response here
+      return new NextResponse(JSON.stringify({ success: false, message: 'Server error' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    } else {
+      if (userData && userData[0]) {
+        const result = userData[0]
+        const isPaidUser = result.is_paid_user === true
+        const isAdmin = result.is_admin === true
+        if (req.nextUrl.pathname.startsWith('/dashboard')) {
+          if (isAdmin) {
             return res
           } else {
-            if (!isPaidUser && req.nextUrl.pathname.startsWith('/api/chat-completion')) {
-              return new NextResponse(JSON.stringify({ success: false, message: 'Forbidden' }), {
-                status: 403,
-                headers: { 'Content-Type': 'application/json' },
-              })
-            } else {
-              const redirectUrl = req.nextUrl.clone()
-              redirectUrl.pathname = '/unauthorized'
-              return NextResponse.redirect(redirectUrl)
-            }
+            return new NextResponse(JSON.stringify({ success: false, message: 'Forbidden' }), {
+              status: 403,
+              headers: { 'Content-Type': 'application/json' },
+            })
           }
         }
+        if (req.nextUrl.pathname.startsWith('/gpt4') || req.nextUrl.pathname.startsWith('/api/chat-completion')) {
+          if (isPaidUser) {
+            return res
+          } else {
+            return new NextResponse(JSON.stringify({ success: false, message: 'Forbidden' }), {
+              status: 403,
+              headers: { 'Content-Type': 'application/json' },
+            })
+          }
+        } 
       }
-    } else {
-      return res
     }
+  } else {
+    return res
   }
+}
+
   if (!session && req.nextUrl.pathname.startsWith('/api')) {
     // API route, return 401.
     return new NextResponse(JSON.stringify({ success: false, message: 'Unauthorized' }), {
