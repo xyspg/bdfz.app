@@ -76,7 +76,7 @@ if (session) {
 
   // Auth condition not met, redirect to home page.
   const redirectUrl = req.nextUrl.clone()
-  redirectUrl.pathname = '/'
+  redirectUrl.pathname = '/login'
   // redirectUrl.searchParams.set(`redirect`, req.nextUrl.pathname)
   return NextResponse.redirect(redirectUrl)
 }

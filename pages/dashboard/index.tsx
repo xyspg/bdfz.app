@@ -1,15 +1,30 @@
 import React from 'react'
 import Layout from '@/components/Layout'
 import { useState } from 'react'
-import { Card, Grid, Metric, Tab, TabList, Text, Title, List, ListItem, BarList, Bold } from '@tremor/react'
+import {
+  Card,
+  Grid,
+  Metric,
+  Tab,
+  TabList,
+  Text,
+  Title,
+  List,
+  ListItem,
+  DateRangePicker,
+  DateRangePickerValue,
+} from '@tremor/react'
 import { useUser, useSession } from '@supabase/auth-helpers-react'
 import useSWR from 'swr'
 import axios from 'axios'
+import { zhCN } from 'date-fns/locale'
+import {sub} from 'date-fns'
 
 const Admin = () => {
   const [selectedView, setSelectedView] = useState('1')
   const user = useUser()
   const session = useSession()
+  const [dateRange, setDateRange] = useState<DateRangePickerValue>();
   const fetcher = (url: string) => {
     if (!session?.access_token) {
       throw new Error('Session is not initialized yet.')
@@ -45,6 +60,14 @@ const Admin = () => {
       0
     )
     .toFixed(2)
+  const options = [
+    { value: '1', text: '今天', startDate: new Date() },
+    { value: '2', text: '昨天', startDate: sub(new Date(), { days: 1 }) },
+    { value: '3', text: '最近7天', startDate: sub(new Date(), { days: 7 }) },
+    { value: '4', text: '最近30天', startDate: sub(new Date(), { days: 30 }) },
+    { value: '5', text: '最近90天', startDate: sub(new Date(), { days: 90 }) },
+    { value: '6', text: '最近180天', startDate: sub(new Date(), { days: 180 }) },
+  ]
   return (
     <Layout>
       <>
@@ -82,13 +105,13 @@ const Admin = () => {
                 <Card>
                   <Title>Token 使用情况</Title>
                   <List>
-                    {data2?.tokens.map((item: Token)=>(
-                        <>
+                    {data2?.tokens.map((item: Token) => (
+                      <>
                         <ListItem key={item.user_email}>
                           <span>{item.user_email}</span>
                           <span>{item.token_count} Tokens</span>
                         </ListItem>
-                        </>
+                      </>
                     ))}
                   </List>
                 </Card>
@@ -96,7 +119,17 @@ const Admin = () => {
             </>
           ) : (
             <Card className="mt-6">
-              <div className="h-96 flex justify-center items-center"><Text>Under Construction...</Text></div>
+              <DateRangePicker
+                className="max-w-md "
+                enableDropdown={true}
+                locale={zhCN}
+                placeholder={'选择日期'}
+                dropdownPlaceholder={'选择时间段'}
+                options={options}
+              />
+              <div className="h-96 flex justify-center items-center">
+                <Text>Under Construction...</Text>
+              </div>
             </Card>
           )}
         </main>

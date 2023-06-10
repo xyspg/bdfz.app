@@ -71,6 +71,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         throw new UserError('Error fetching tokens')
     }
 
+
     if (req.method === 'GET' && 'users' in req.query ) {
         return res.status(200).json({ users })
     }
