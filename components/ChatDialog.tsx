@@ -21,6 +21,8 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { atomDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 import { Components } from 'react-markdown'
+import {IconOpenAI} from '@/components/Icons'
+import ChatPanel from "@/components/ChatPanel";
 
 function promptDataReducer(
   state: any[],
@@ -453,6 +455,14 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History, Mode }) => {
     }
   }, [])
 
+  const regenerate = () => {
+    if (chatHistory.length <= 1) return
+    const lastMessage = chatHistory[chatHistory.length - 1]
+    if (lastMessage.role === 'user') {
+      handleConfirm(lastMessage.content)
+    }
+  }
+
   type Message = {
     role: string
     content: string
@@ -714,6 +724,10 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History, Mode }) => {
                 {errorMessage ? errorMessage : '服务器繁忙，请稍后再试'}
               </span>
             </div>
+          )}
+          {chatHistory.length > 1 && (
+
+              <ChatPanel isLoading={isLoading} stop={stopGenerating} reload={regenerate} messages={chatHistory} />
           )}
 
           <div className="relative flex flex-col md:flex-row gap-4">
