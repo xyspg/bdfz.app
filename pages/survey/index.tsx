@@ -1,4 +1,4 @@
-//@ts-nocheckn
+//@ts-nocheck
 import React from 'react';
 import Head from 'next/head';
 
