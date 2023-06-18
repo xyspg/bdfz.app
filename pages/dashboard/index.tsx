@@ -12,7 +12,14 @@ import {
   List,
   ListItem,
   DateRangePicker,
-  DateRangePickerValue,
+  TableRow,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableBody,
+  BadgeDelta,
+  DeltaType,
+  DateRangePickerValue, Table,
 } from '@tremor/react'
 import { useUser, useSession } from '@supabase/auth-helpers-react'
 import useSWR from 'swr'
@@ -45,6 +52,13 @@ const Admin = () => {
     error: error2,
     isLoading: isLoading2,
   } = useSWR(session?.access_token ? '/api/admin?tokens' : null, fetcher)
+
+  const { data: data3, error: error3, isLoading: isLoading3 } = useSWR(
+        session?.access_token ? '/api/admin?feedback' : null,
+        fetcher
+  )
+
+
   interface Token {
     token_count: number
     gpt4_token_count: number
@@ -128,7 +142,30 @@ const Admin = () => {
                 options={options}
               />
               <div className="h-96 flex justify-center items-center">
-                <Text>Under Construction...</Text>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableHeaderCell>问题</TableHeaderCell>
+                      <TableHeaderCell >回答</TableHeaderCell>
+                      <TableHeaderCell>反馈</TableHeaderCell>
+                      <TableHeaderCell >补充</TableHeaderCell>
+                    </TableRow>
+                  </TableHead>
+<TableBody>
+                    {data3?.feedbacks.map((item: any) => (
+                      <>
+                        <TableRow key={item.user_id}>
+                          <TableCell>{item.question}</TableCell>
+                          <TableCell>{item.answer}</TableCell>
+                          <TableCell>{item.feedback}</TableCell>
+                          {item.ischecked1 && <TableCell>这个回答有害</TableCell>}
+                          {item.ischecked2 && <TableCell>这个回答内容不实</TableCell>}
+                            {item.ischecked3 && <TableCell>这个回答没有帮助</TableCell>}
+                        </TableRow>
+                      </>
+                    ))}
+</TableBody>
+                </Table>
               </div>
             </Card>
           )}

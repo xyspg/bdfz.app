@@ -21,6 +21,7 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { atomDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 import { Components } from 'react-markdown'
+import Feedback from "@/components/Feedback";
 
 function promptDataReducer(
   state: any[],
@@ -431,6 +432,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History, Mode }) => {
     })
   }
 
+
   const stopGenerating = () => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close()
@@ -539,7 +541,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History, Mode }) => {
                     )
                   })}
                 {!isGenerating && (
-                  <div className="">
+                  <div className="flex flex-row gap-2 justify-end">
                     <div className="float-right py-1 flex flex-row gap-2 dark:text-neutral-200 text-neutral-700">
                       <div
                         className={`p-1.5 rounded-md ${
@@ -600,6 +602,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History, Mode }) => {
                         </svg>
                       </div>
                     </div>
+                    <Feedback question={question} answer={answer}/>
                   </div>
                 )}
                 {isLoading && (
