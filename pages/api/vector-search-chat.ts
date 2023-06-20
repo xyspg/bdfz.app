@@ -124,8 +124,6 @@ export default async function handler(req: NextRequest) {
         }),
       })
 
-      console.log(embeddingResponse)
-
       if (embeddingResponse.status !== 200) {
         if (embeddingResponse.status === 401) {
           throw new Error('Invalid OpenAI API key')
@@ -177,6 +175,7 @@ export default async function handler(req: NextRequest) {
         break
       }
 
+      console.log('page sections: ', pageSections)
       contextText += `${content.trim()}\n---\n`
     }
     let contextTextMessage = ''
