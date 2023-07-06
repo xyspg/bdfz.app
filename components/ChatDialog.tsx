@@ -120,7 +120,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History, Mode }) => {
     }
   }, [Mode])
 
-  const delay = 5000 // ms
+  const delay = 2000 // ms
   const supabase = useSupabaseClient()
 
   const user = useUser()
@@ -225,7 +225,6 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History, Mode }) => {
       setHasFlaggedContent(false)
       setPoliticalSensitive(false)
       setErrorMessage('')
-      console.log(chatHistory)
 
       const {
         data: { session },
@@ -335,10 +334,8 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History, Mode }) => {
 
     const timestamp = new Date().toISOString() // Current timestamp in ISO format
     const chat_history = chatHistory
-    console.log(uuidv4())
 
     const mode = getMode()
-    console.log(mode)
 
     // Count total number of words in the chat history
     const total_word_count =
@@ -418,16 +415,45 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History, Mode }) => {
     }
   }, [])
 
+  type ChatHistory = ChatMessage[]
 
   const regenerate = () => {
-    if (chatHistory.length <= 1) return
-    const lastMessage = chatHistory[chatHistory.length - 1]
-    if (lastMessage.role === 'user') {
+    const currentTime = new Date().getTime()
+    if (currentTime - lastRequestTime < delay) {
+      return
+    }
+    let lastMessage = null
+    let lastUserMessageIndex = -1
+    /*
+
+    Consider two cases: Whether the chat was cancelled before a response is returned
+    if no response is present, the last item in the chat history object is the user's input
+    if a response is present, the second last item in the chat history object is the response from api
+
+     */
+
+    for (let i = chatHistory.length - 1; i >= 0; i--) {
+      if (chatHistory[i].role === 'user') {
+        lastMessage = chatHistory[i]
+        lastUserMessageIndex = i
+        break
+      }
+    }
+
+    if (lastUserMessageIndex >= 0) {
+      if (lastUserMessageIndex !== chatHistory.length - 1) {
+        // Response present, delete both the user message and the response
+        setChatHistory(
+          chatHistory
+            .slice(0, lastUserMessageIndex)
+            .concat(chatHistory.slice(lastUserMessageIndex + 2))
+        )
+      } else if (lastUserMessageIndex === chatHistory.length - 1) {
+        // No response present, delete only the user message
+        setChatHistory(chatHistory.slice(0, lastUserMessageIndex))
+      }
       handleConfirm(lastMessage.content)
     }
-  }
-  const handleOnQuery = (query: string) => {
-    handleConfirm(query)
   }
 
   type Message = {
@@ -486,7 +512,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History, Mode }) => {
                       </div>
                     )
                   })}
-                {!isGenerating && (
+                {!isGenerating && !hasError && (
                   <FeedbackPanel
                     onFeedbackSubmit={sendFeedback}
                     question={question}
@@ -554,8 +580,12 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History, Mode }) => {
             </div>
           )}
           {chatHistory.length > 1 && (
-
-              <ChatPanel isLoading={isLoading} stop={stopGenerating} reload={regenerate} messages={chatHistory} />
+            <ChatPanel
+              isLoading={isGenerating}
+              stop={stopGenerating}
+              reload={regenerate}
+              messages={chatHistory}
+            />
           )}
 
           <div className="relative flex flex-col md:flex-row gap-4">
@@ -572,11 +602,12 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History, Mode }) => {
             />
             <div className="flex flex-row gap-2">
               <Button
-                onClick={isGenerating ? stopGenerating : handleSubmit}
-                data-umami-event={isGenerating ? 'Click stop' : 'Click ask'}
+                onClick={isGenerating ? () => {} : handleSubmit}
+                disabled={isGenerating}
+                data-umami-event={isGenerating ? 'Click stop (deprecated)' : 'Click ask'}
                 className="md:w-20 w-3/4 bg-red-900 block shadow-md hover:bg-red-800 dark:bg-red-900 dark:hover:bg-red-800"
               >
-                {isGenerating ? 'Stop' : 'Ask'}
+                Ask
               </Button>
               <Button
                 variant="outline"
@@ -601,7 +632,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History, Mode }) => {
               </Button>
             </div>
           </div>
-          {!hideInfo && <SampleQuestion onQuery={handleOnQuery} />}
+          {!hideInfo && <SampleQuestion onQuery={handleConfirm} />}
         </div>
       </div>
       <ScrollToTopButton />
