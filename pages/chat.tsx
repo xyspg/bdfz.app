@@ -29,9 +29,6 @@ export default function Home() {
         <div className="">
           {session && (
             <div className="flex flex-col justify-center items-center ">
-              <div className="w-full">
-                <ModeSwitcher />
-              </div>
               <ChatDialog
                 History={[{ role: 'system', content: 'You are a helpful assistant.' }]}
                 Mode="BDFZ"
