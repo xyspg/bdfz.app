@@ -68,6 +68,7 @@ export function NewHeader() {
   const supabaseClient = useSupabaseClient()
   const session = useSession()
   const user = useUser()
+  const userid = user?.id
   const router = useRouter()
   const pathname = router.pathname
   const signOutUser = async () => {
@@ -88,6 +89,7 @@ export function NewHeader() {
       isAdmin && {name: '仪表盘', href: '/dashboard'},
     { name: '历史记录', href: '/history' },
     { name: '设置', href: '/settings' },
+    {name: '贡献新文档', href: `/survey/upload?id=${userid}`}
   ]
 
   return (

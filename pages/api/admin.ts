@@ -71,12 +71,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         throw new UserError('Error fetching tokens')
     }
 
+    let feedbacks
+
+    try {
+        const feedback = await supabase
+            .from('feedback_text')
+            .select('question, answer, feedback, timestamp, ischecked1, ischecked2, ischecked3')
+            .order('timestamp', { ascending: false })
+        feedbacks = feedback.data
+    } catch (error) {
+        console.log(error)
+        throw new UserError('Error fetching feedbacks')
+    }
+
 
     if (req.method === 'GET' && 'users' in req.query ) {
         return res.status(200).json({ users })
     }
     if (req.method === 'GET' && 'tokens' in req.query ){
         return res.status(200).json({ tokens })
+    }
+    if (req.method === 'GET' && 'feedback' in req.query ){
+        return res.status(200).json({ feedbacks })
     }
 
 }
