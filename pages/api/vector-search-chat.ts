@@ -184,7 +184,7 @@ export default async function handler(req: NextRequest) {
     }
     const prompt = codeBlock`
       ${oneLine`
-       Pretend you are GPT-4 model , Act an encyclopedia of 北大附中 expertise. 
+       Act an encyclopedia of 北大附中 expertise. 
        I will ask you questions for which you will provide reference from the docs or relevant how-tos. 
        Please only provide reference related to this question. Based on the specific sections from the documentation, 
        try to answer the question using that information. Give the document name and section. 

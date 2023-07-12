@@ -20,6 +20,8 @@ export default function Home() {
     })
   }, [router, supabase.auth])
 
+  const today = new Date()
+
   return (
     <>
       <Head>
@@ -30,7 +32,12 @@ export default function Home() {
           {session && (
             <div className="flex flex-col justify-center items-center ">
               <ChatDialog
-                History={[{ role: 'system', content: 'You are a helpful assistant.' }]}
+                History={[
+                  {
+                    role: 'system',
+                    content: `You are a large language model trained by The Affilated High School of Peking University. \nKnowledge Cut off: 2023-07\nToday: ${today}`,
+                  },
+                ]}
                 Mode="BDFZ"
               />
             </div>

@@ -1,5 +1,5 @@
 //@ts-nocheck
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useContext } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -15,7 +15,6 @@ import OpenAIDarkLogo from '@/images/logos/openai_dark.svg'
 import { useSession, useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
-import SwitchTheme from '@/components/SwitchTheme'
 import { UserStatusContext } from '@/lib/userContext'
 
 function MenuIcon(props) {
@@ -86,10 +85,10 @@ export function NewHeader() {
   const { isPaidUser, isAdmin } = useContext(UserStatusContext)
   const MobileNavLinks = [
     isPaidUser && { name: 'GPT4', href: '/gpt4' },
-      isAdmin && {name: '仪表盘', href: '/dashboard'},
+    isAdmin && { name: '仪表盘', href: '/dashboard' },
     { name: '历史记录', href: '/history' },
     { name: '设置', href: '/settings' },
-    {name: '贡献新文档', href: `/survey/upload?id=${userid}`}
+    { name: '贡献新文档', href: `/survey/upload?id=${userid}` },
   ]
 
   return (
@@ -156,8 +155,8 @@ export function NewHeader() {
                             className="absolute inset-x-0 top-0 z-0 origin-top rounded-b-2xl bg-gray-50 dark:bg-gray-900 px-6 pb-6 pt-32 shadow-2xl shadow-gray-900/20"
                           >
                             <div className="space-y-4">
-                              {MobileNavLinks.map((link) => (
-                                <MobileNavLink key={link.name} href={link.href}>
+                              {MobileNavLinks.filter((link) => link).map((link) => (
+                                <MobileNavLink key={link.name} href={link?.href}>
                                   <span className="flex flex-row gap-1 items-center dark:text-neutral-200">
                                     <span>{link.name}</span>
                                   </span>

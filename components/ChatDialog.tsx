@@ -174,6 +174,7 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History, Mode }) => {
         { role: 'assistant', content: answer },
       ])
       setAnswerUpdated(true)
+      console.log('Chat History: ', chatHistory)
     }
   }, [isGenerating])
 
