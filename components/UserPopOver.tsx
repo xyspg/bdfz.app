@@ -52,7 +52,7 @@ const DropDownNotLogin = () => {
         <DropdownMenuTrigger asChild className="inline-block w-12 h-12 cursor-pointer">
           <HamburgerMenuIcon className="w-5 h-5 m-2" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="mt-0.5 pt-2 w-56 bg-white min-w-min">
+        <DropdownMenuContent className="mr-8 mt-0.5 pt-2 w-56 bg-white min-w-min">
           {!session ? (
             <Link href="/">
               <DropdownMenuLabel>BDFZ AI</DropdownMenuLabel>
@@ -67,7 +67,7 @@ const DropDownNotLogin = () => {
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>
                 <Settings className="mr-2 h-4 w-4" />
-                <span>设置</span>
+                <span>主题</span>
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
                 <DropdownMenuSubContent className="bg-white">
@@ -120,7 +120,6 @@ const UserPopOver = () => {
   const supabase = useSupabaseClient()
   return (
     <>
-      <header className="flex flex-row items-center justify-between mb-2 px-4 py-6 md:px-12 ">
         <AnimatePresence>
           <motion.div
             initial={{ opacity: 0 }}
@@ -130,7 +129,6 @@ const UserPopOver = () => {
             <DropDownNotLogin />
           </motion.div>
         </AnimatePresence>
-      </header>
     </>
   )
 }

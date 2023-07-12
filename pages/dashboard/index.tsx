@@ -122,7 +122,7 @@ const Admin = () => {
                     {data2?.tokens.map((item: Token) => (
                       <>
                         <ListItem key={item.user_email}>
-                          <span>{item.user_email}</span>
+                          <span className='w-1/2 overflow-auto'>{item.user_email}</span>
                           <span>{item.token_count} Tokens</span>
                         </ListItem>
                       </>

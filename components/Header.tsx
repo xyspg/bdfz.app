@@ -16,6 +16,7 @@ import { useSession, useSupabaseClient, useUser } from '@supabase/auth-helpers-r
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import { UserStatusContext } from '@/lib/userContext'
+import UserPopOver from '@/components/UserPopOver'
 
 function MenuIcon(props) {
   return (
@@ -88,7 +89,9 @@ export function NewHeader() {
     isAdmin && { name: '仪表盘', href: '/dashboard' },
     { name: '历史记录', href: '/history' },
     { name: '设置', href: '/settings' },
-    { name: '贡献新文档', href: `/survey/upload?id=${userid}` },
+    { name: '贡献新文档', href: `/survey/upload?id=${userid}`, target: '_blank' },
+    { name: '寻求帮助', href: 'mailto:support@bdfz.app' },
+    { name: 'GitHub', href: 'https://github.com/xyspg/bdfz.app', target: '_blank' },
   ]
 
   return (
@@ -156,7 +159,11 @@ export function NewHeader() {
                           >
                             <div className="space-y-4">
                               {MobileNavLinks.filter((link) => link).map((link) => (
-                                <MobileNavLink key={link.name} href={link?.href}>
+                                <MobileNavLink
+                                  key={link.name}
+                                  href={link?.href}
+                                  target={link?.target ? link.target : '_self'}
+                                >
                                   <span className="flex flex-row gap-1 items-center dark:text-neutral-200">
                                     <span>{link.name}</span>
                                   </span>
@@ -191,9 +198,10 @@ export function NewHeader() {
               </div>
             </div>
             <div className="hidden lg:flex items-center">
-              <Button onClick={() => signOutUser()} variant="outline">
-                退出登录
-              </Button>
+              {/*<Button onClick={() => signOutUser()} variant="outline">*/}
+              {/*  退出登录*/}
+              {/*</Button>*/}
+              <UserPopOver />
             </div>
           </div>
         </Container>
