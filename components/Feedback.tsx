@@ -21,7 +21,6 @@ const FeedbackDialog:React.FC<FeedbackProps> = ({
 
     const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault()
-      console.log(feedBackBody)
       const timestamp = new Date().toISOString()
       const res = await fetch('/api/feedback-text', {
         body: JSON.stringify({
