@@ -1,11 +1,10 @@
 import React, { useState } from 'react'
-import { useRouter } from "next/router";
 import { Logo } from '@/components/intro/Logo'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 
-const onBoarding = () => {
+const OnBoarding = () => {
   const [selectedIndex, setSelectedIndex] = useState(1)
-  const router = useRouter()
   const handleIncreaseIndex = () => {
     setSelectedIndex((prevIndex) => prevIndex + 1)
   }
@@ -16,8 +15,13 @@ const onBoarding = () => {
   switch (selectedIndex) {
     case 1:
       return (
-        <>
-          <div className="flex flex-col transition-colors duration-200 p-6 min-h-screen place-content-center bg-neutral-100">
+        <main className='bg-neutral-100'>
+          <motion.div
+            initial={{ opacity: 0, x: 150 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col transition-colors duration-200 p-6 min-h-screen place-content-center bg-neutral-100"
+          >
             <div className="max-w-md mx-auto">
               <div className="flex justify-center">
                 <Logo />
@@ -28,7 +32,7 @@ const onBoarding = () => {
                 </h1>
                 <div className="mb-4 font-styrene text-center leading-snug">点击开始以继续</div>
               </section>
-              <div className="mt-4 gap-2 flex flex-row justify-center">
+              <div className="mt-4 gap-2 fzlex flex-row justify-center">
                 <button
                   onClick={handleIncreaseIndex}
                   className=" px-10 py-2 font-styrene text-base rounded-2xl bg-black text-white"
@@ -37,8 +41,8 @@ const onBoarding = () => {
                 </button>
               </div>
             </div>
-          </div>
-        </>
+          </motion.div>
+        </main>
       )
 
     case 2:
@@ -67,17 +71,18 @@ const onBoarding = () => {
               <li className="border-solid border border-black rounded-2xl flex items-start gap-4 p-3 font-styrene bg-manilla-100">
                 <div className="flex items-center justify-center rounded-full bg-black p-2 text-white">
                   <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      viewBox="0 0 256 256"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    viewBox="0 0 256 256"
                   >
                     <path d="M128,24A104,104,0,0,0,36.18,176.88L24.83,210.93a16,16,0,0,0,20.24,20.24l34.05-11.35A104,104,0,1,0,128,24ZM84,140a12,12,0,1,1,12-12A12,12,0,0,1,84,140Zm44,0a12,12,0,1,1,12-12A12,12,0,0,1,128,140Zm44,0a12,12,0,1,1,12-12A12,12,0,0,1,172,140Z"></path>
                   </svg>
                 </div>
                 <div className="">
-                  如果问题的相关内容没有明确在学校文件中写明，BDFZ AI 将无法返回准确的答案。您可尝试换一种提问方式，如"书院活动室"的准确率高于"书活"。
+                  如果问题的相关内容没有明确在学校文件中写明，BDFZ AI
+                  将无法返回准确的答案。您可尝试换一种提问方式，如“书院活动室”的准确率高于“书活”。
                 </div>
               </li>
               <li className="border-solid border border-black rounded-2xl flex items-start gap-4 p-3 font-styrene bg-manilla-100">
@@ -135,9 +140,7 @@ const onBoarding = () => {
                       <path d="M200,48H136V16a8,8,0,0,0-16,0V48H56A32,32,0,0,0,24,80V192a32,32,0,0,0,32,32H200a32,32,0,0,0,32-32V80A32,32,0,0,0,200,48ZM172,96a12,12,0,1,1-12,12A12,12,0,0,1,172,96ZM96,184H80a16,16,0,0,1,0-32H96ZM84,120a12,12,0,1,1,12-12A12,12,0,0,1,84,120Zm60,64H112V152h32Zm32,0H160V152h16a16,16,0,0,1,0,32Z"></path>
                     </svg>
                   </div>
-                  <div className="">
-                   请勿将 BDFZ AI 用于生成违法、霸凌或欺骗性内容等有害用途。
-                  </div>
+                  <div className="">请勿将 BDFZ AI 用于生成违法、霸凌或欺骗性内容等有害用途。</div>
                 </li>
                 <li className="border-solid border border-black rounded-2xl flex items-start gap-4 p-3 font-styrene bg-white-100">
                   <div className="flex items-center justify-center rounded-full bg-black p-2 text-white">
@@ -226,9 +229,7 @@ const onBoarding = () => {
                     <path d="M234,80.12A24,24,0,0,0,216,72H160V56a40,40,0,0,0-40-40,8,8,0,0,0-7.16,4.42L75.06,96H32a16,16,0,0,0-16,16v88a16,16,0,0,0,16,16H204a24,24,0,0,0,23.82-21l12-96A24,24,0,0,0,234,80.12ZM32,112H72v88H32Z"></path>
                   </svg>
                 </div>
-                <div className="">
-                 我们可能会根据用户的使用情况，调整使用限制、功能或政策。
-                </div>
+                <div className="">我们可能会根据用户的使用情况，调整使用限制、功能或政策。</div>
               </li>
               <li className="border-solid border border-black rounded-2xl flex items-start gap-4 p-3 font-styrene bg-manilla-100">
                 <div className="flex items-center justify-center rounded-full bg-black p-2 text-white">
@@ -243,7 +244,7 @@ const onBoarding = () => {
                   </svg>
                 </div>
                 <div className="">
-                 如果某个回答没有帮助，请点击{' '}
+                  如果某个回答没有帮助，请点击{' '}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="1em"
@@ -282,13 +283,10 @@ const onBoarding = () => {
               >
                 返回
               </button>
-              <Link
-                href='/chat'>
-              <button
-                className="px-10 py-2 font-styrene text-base rounded-2xl bg-black text-white"
-              >
-                完成
-              </button>
+              <Link href="/chat">
+                <button className="px-10 py-2 font-styrene text-base rounded-2xl bg-black text-white">
+                  完成
+                </button>
               </Link>
             </div>
           </div>
@@ -297,4 +295,4 @@ const onBoarding = () => {
   }
 }
 
-export default onBoarding
+export default OnBoarding
