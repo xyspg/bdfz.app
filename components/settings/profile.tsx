@@ -152,8 +152,9 @@ export function Profile() {
                         <Skeleton className="bg-neutral-300 dark:bg-neutral-400 h-4 w-[100px]" />
                       </>
                     ) : (
-                      <div className='flex flex-col gap-2 '>{isPaidUser && <span>付费用户</span>}
-                          {isAdmin && <span>管理员</span>}
+                      <div className="flex flex-col gap-2 ">
+                        {isPaidUser && <span>付费用户</span>}
+                        {isAdmin && <span>管理员</span>}
                       </div>
                     )}
                   </p>

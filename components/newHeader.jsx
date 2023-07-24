@@ -98,9 +98,9 @@ export function NewHeader() {
                             <MobileNavLink href="#faqs">FAQs</MobileNavLink>
                           </div>
                           <div className="mt-8 flex flex-col gap-4">
-                            <Button variant="outline" className='relative'>
+                            <Button variant="outline" className="relative">
                               登录
-                              <Link href='/login' className='absolute inset-0' />
+                              <Link href="/login" className="absolute inset-0" />
                             </Button>
                           </div>
                         </Popover.Panel>

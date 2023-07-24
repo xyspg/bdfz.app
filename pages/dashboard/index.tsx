@@ -19,19 +19,20 @@ import {
   TableBody,
   BadgeDelta,
   DeltaType,
-  DateRangePickerValue, Table,
+  DateRangePickerValue,
+  Table,
 } from '@tremor/react'
 import { useUser, useSession } from '@supabase/auth-helpers-react'
 import useSWR from 'swr'
 import axios from 'axios'
 import { zhCN } from 'date-fns/locale'
-import {sub} from 'date-fns'
+import { sub } from 'date-fns'
 
 const Admin = () => {
   const [selectedView, setSelectedView] = useState('1')
   const user = useUser()
   const session = useSession()
-  const [dateRange, setDateRange] = useState<DateRangePickerValue>();
+  const [dateRange, setDateRange] = useState<DateRangePickerValue>()
   const fetcher = (url: string) => {
     if (!session?.access_token) {
       throw new Error('Session is not initialized yet.')
@@ -53,11 +54,11 @@ const Admin = () => {
     isLoading: isLoading2,
   } = useSWR(session?.access_token ? '/api/admin?tokens' : null, fetcher)
 
-  const { data: data3, error: error3, isLoading: isLoading3 } = useSWR(
-        session?.access_token ? '/api/admin?feedback' : null,
-        fetcher
-  )
-
+  const {
+    data: data3,
+    error: error3,
+    isLoading: isLoading3,
+  } = useSWR(session?.access_token ? '/api/admin?feedback' : null, fetcher)
 
   interface Token {
     token_count: number
@@ -122,7 +123,7 @@ const Admin = () => {
                     {data2?.tokens.map((item: Token) => (
                       <>
                         <ListItem key={item.user_email}>
-                          <span className='w-1/2 overflow-auto'>{item.user_email}</span>
+                          <span className="w-1/2 overflow-auto">{item.user_email}</span>
                           <span>{item.token_count} Tokens</span>
                         </ListItem>
                       </>
@@ -146,12 +147,12 @@ const Admin = () => {
                   <TableHead>
                     <TableRow>
                       <TableHeaderCell>问题</TableHeaderCell>
-                      <TableHeaderCell >回答</TableHeaderCell>
+                      <TableHeaderCell>回答</TableHeaderCell>
                       <TableHeaderCell>反馈</TableHeaderCell>
-                      <TableHeaderCell >补充</TableHeaderCell>
+                      <TableHeaderCell>补充</TableHeaderCell>
                     </TableRow>
                   </TableHead>
-<TableBody>
+                  <TableBody>
                     {data3?.feedbacks.map((item: any) => (
                       <>
                         <TableRow key={item.user_id}>
@@ -160,11 +161,11 @@ const Admin = () => {
                           <TableCell>{item.feedback}</TableCell>
                           {item.ischecked1 && <TableCell>这个回答有害</TableCell>}
                           {item.ischecked2 && <TableCell>这个回答内容不实</TableCell>}
-                            {item.ischecked3 && <TableCell>这个回答没有帮助</TableCell>}
+                          {item.ischecked3 && <TableCell>这个回答没有帮助</TableCell>}
                         </TableRow>
                       </>
                     ))}
-</TableBody>
+                  </TableBody>
                 </Table>
               </div>
             </Card>

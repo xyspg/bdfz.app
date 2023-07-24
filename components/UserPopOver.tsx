@@ -120,15 +120,15 @@ const UserPopOver = () => {
   const supabase = useSupabaseClient()
   return (
     <>
-        <AnimatePresence>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <DropDownNotLogin />
-          </motion.div>
-        </AnimatePresence>
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <DropDownNotLogin />
+        </motion.div>
+      </AnimatePresence>
     </>
   )
 }

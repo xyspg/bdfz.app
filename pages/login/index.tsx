@@ -22,6 +22,7 @@ const LoginPage = () => {
   const [passwordError, setPasswordError] = useState<string | null>(null)
   const [loginOrSignup, setLoginOrSignup] = useState<'login' | 'signup' | 'reset'>('login')
   const [authError, setAuthError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
   const [typingTimeout, setTypingTimeout] = useState<number | undefined>(undefined)
   const [showPasswordResetScreen, setShowPasswordResetScreen] = useState(false)
   const { query } = router
@@ -145,7 +146,7 @@ const LoginPage = () => {
         setShowPasswordResetScreen(true)
         handleSetNewPwd()
       } else if (event == 'SIGNED_IN') {
-        window.location.href = '/chat'
+        window.location.href = '/onboarding'
       }
     })
   }, [])
@@ -193,6 +194,7 @@ const LoginPage = () => {
       })
       return
     }
+
     toast.info('请稍候', {
       position: 'top-right',
       autoClose: 5000,
@@ -239,7 +241,7 @@ const LoginPage = () => {
       provider: 'azure',
       options: {
         scopes: 'email',
-        redirectTo: getURL() + '/chat',
+        redirectTo: getURL() + '/onboarding',
       },
     })
     if (error) {

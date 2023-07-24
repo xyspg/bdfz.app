@@ -6,9 +6,7 @@ export function useEnterSubmit(): {
 } {
   const formRef = useRef<HTMLFormElement>(null)
 
-  const handleKeyDown = (
-    event: React.KeyboardEvent<HTMLTextAreaElement>
-  ): void => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>): void => {
     if (event.key === 'Enter' && !event.shiftKey) {
       formRef.current?.requestSubmit()
       event.preventDefault()

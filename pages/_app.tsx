@@ -9,7 +9,7 @@ import * as React from 'react'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
-import { Analytics } from '@vercel/analytics/react';
+import { Analytics } from '@vercel/analytics/react'
 
 export default function App({ Component, pageProps }: AppProps<{ initialSession: Session }>) {
   const [supabaseClient] = useState(() => createBrowserSupabaseClient())
@@ -31,7 +31,7 @@ export default function App({ Component, pageProps }: AppProps<{ initialSession:
           </ThemeProvider>
         </UserStatusProvider>
       </SessionContextProvider>
-        <Analytics />
+      <Analytics />
       <Script
         async
         src="https://analytics.xyspg.moe/script.js"

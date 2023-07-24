@@ -2,22 +2,28 @@ import { useContext, useState } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
 import { UserStatusContext } from '@/lib/userContext'
-import { useUser } from "@supabase/auth-helpers-react";
+import { useUser } from '@supabase/auth-helpers-react'
 
 export function NavLinks() {
   const { isPaidUser, isAdmin } = useContext(UserStatusContext)
 
   const [hoveredIndex, setHoveredIndex] = useState(null)
-    const user = useUser()
-    const userid = user?.id
+  const user = useUser()
+  const userid = user?.id
 
-  return [isPaidUser && ['GPT4', '/gpt4'], isAdmin && ['仪表盘', '/dashboard'], ['历史记录', '/history'], ['设置', '/settings'],['贡献新文档',`/survey/upload?id=${userid}`]]
+  return [
+    isPaidUser && ['GPT4', '/gpt4'],
+    isAdmin && ['仪表盘', '/dashboard'],
+    ['历史记录', '/history'],
+    ['设置', '/settings'],
+    ['贡献新文档', `/survey/upload?id=${userid}`],
+  ]
     .filter(Boolean)
     .map(([label, href], index) => (
       <Link
         key={label}
         href={href}
-        target={href.startsWith('/survey') ? '_blank': '_self'}
+        target={href.startsWith('/survey') ? '_blank' : '_self'}
         className="relative -my-2 -mx-3 rounded-lg px-3 py-2 text-sm text-gray-700 transition-colors delay-150 hover:text-gray-900 hover:delay-[0ms] dark:text-neutral-200"
         onMouseEnter={() => setHoveredIndex(index)}
         onMouseLeave={() => setHoveredIndex(null)}

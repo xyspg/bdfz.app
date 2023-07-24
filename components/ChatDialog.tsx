@@ -21,11 +21,10 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { atomDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 
-import ChatPanel from "@/components/ChatPanel";
+import ChatPanel from '@/components/ChatPanel'
 import FeedbackPanel from '@/components/chat/FeedbackPanel'
 import SampleQuestion from '@/components/chat/SampleQuestion'
 import { AIIcon, OpenAIIcon } from '@/components/Icon'
-
 
 function promptDataReducer(
   state: any[],

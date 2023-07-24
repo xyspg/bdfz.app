@@ -1,7 +1,7 @@
 import React from 'react'
-import { ButtonScrollToBottom } from "@/components/ui/button-scroll-to-bottom";
+import { ButtonScrollToBottom } from '@/components/ui/button-scroll-to-bottom'
 import { Button } from '@/components/ui/Button'
-import {IconRefresh, IconStop} from "@/components/Icons";
+import { IconRefresh, IconStop } from '@/components/Icons'
 
 export interface ChatPanelProps {
   isLoading: boolean
@@ -10,7 +10,7 @@ export interface ChatPanelProps {
   messages: []
 }
 
-const ChatPanel: React.FC<ChatPanelProps> = ({isLoading, stop, reload, messages }) => {
+const ChatPanel: React.FC<ChatPanelProps> = ({ isLoading, stop, reload, messages }) => {
   return (
     <>
       <div className=" inset-x-0 bg-gradient-to-b from-muted/10 from-10% to-muted/30 to-50%">

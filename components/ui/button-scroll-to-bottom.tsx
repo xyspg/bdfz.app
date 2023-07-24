@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 
 import { cn } from '@/lib/utils'
@@ -22,7 +21,7 @@ export function ButtonScrollToBottom({ className, ...props }: ButtonProps) {
       onClick={() =>
         window.scrollTo({
           top: document.body.offsetHeight,
-          behavior: 'smooth'
+          behavior: 'smooth',
         })
       }
       {...props}
