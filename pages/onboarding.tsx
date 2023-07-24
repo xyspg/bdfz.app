@@ -32,7 +32,7 @@ const OnBoarding = () => {
                 </h1>
                 <div className="mb-4 font-styrene text-center leading-snug">点击开始以继续</div>
               </section>
-              <div className="mt-4 gap-2 fzlex flex-row justify-center">
+              <div className="mt-4 gap-2 flex flex-row justify-center">
                 <button
                   onClick={handleIncreaseIndex}
                   className=" px-10 py-2 font-styrene text-base rounded-2xl bg-black text-white"
