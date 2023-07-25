@@ -181,19 +181,19 @@ const LoginPage = () => {
       return
     }
 
-    if (!allowedDomains.includes(emailDomain)) {
-      toast.error(`为防止滥用，请使用学校邮箱注册`, {
-        position: 'top-right',
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      })
-      return
-    }
+    // if (!allowedDomains.includes(emailDomain)) {
+    //   toast.error(`为防止滥用，请使用学校邮箱注册`, {
+    //     position: 'top-right',
+    //     autoClose: 3000,
+    //     hideProgressBar: false,
+    //     closeOnClick: true,
+    //     pauseOnHover: true,
+    //     draggable: true,
+    //     progress: undefined,
+    //     theme: 'light',
+    //   })
+    //   return
+    // }
 
     toast.info('请稍候', {
       position: 'top-right',
