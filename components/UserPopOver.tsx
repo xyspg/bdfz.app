@@ -50,7 +50,7 @@ const DropDownNotLogin = () => {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild className="inline-block w-12 h-12 cursor-pointer">
-          <HamburgerMenuIcon className="w-5 h-5 m-2" />
+          <HamburgerMenuIcon className="w-5 h-5 m-2 dark:text-white" />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="mr-8 mt-0.5 pt-2 w-56 bg-white min-w-min">
           {!session ? (
