@@ -594,7 +594,6 @@ export const ChatDialog: React.FC<ChatHistoryProps> = ({ History, Mode }) => {
               placeholder="输入问题..."
               name="search"
               value={search}
-              maxLength={4000}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={handleKeyDown}
               className="col-span-3"
