@@ -67,6 +67,7 @@ const LoginPage = () => {
       handleSignUp(email, password)
     }
   }
+/* eslint-disable react-hooks/rules-of-hooks */
 
   const useErrorToast = (message: string) => (
     toast.error(message, {
@@ -96,6 +97,7 @@ const LoginPage = () => {
       }
     }
   }
+/* eslint-enable react-hooks/rules-of-hooks */
 
   const handleReset = async (email: string) => {
     toast.info('请稍候', {
