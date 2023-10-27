@@ -22,15 +22,15 @@ const features = [
     icon: DeviceClockIcon,
   },
   {
-    name: '优雅的用户界面',
+    name: '优雅的用户体验',
     description:
-      '我们秉持最新的 UI/UX 设计理念，为您提供简洁、直观的用户体验。网站同时提供浅色与深色模式任您选择。',
+      '我们为您提供简洁、直观的用户体验。网站同时提供浅色与深色模式。您还可以对回答添加反馈，来持续改进我们的服务。',
     icon: DeviceListIcon,
   },
   {
     name: '严密的安全防护',
     description:
-      '我们使用业界领先的安全技术来保障您的数据安全。所有信息均通过 HTTPS 加密传输，您的登录凭据会采用 bcrypt 哈希算法进行加密存储，而我们则通过 Json Web Token 来进行用户认证。',
+      '我们使用业界领先的安全技术来保障您的数据安全。所有信息均通过 HTTPS 加密传输，您的登录凭据会采用 bcrypt 哈希算法进行加密存储，并使用符合业界标准的 JWT 等技术进行验证。',
     icon: DeviceLockIcon,
   },
   {

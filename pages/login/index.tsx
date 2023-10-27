@@ -68,6 +68,19 @@ const LoginPage = () => {
     }
   }
 
+  const useErrorToast = (message: string) => (
+    toast.error(message, {
+      position: 'top-right',
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+    })
+  )
+
   const handleLogin = async (email: string, password: string) => {
     const { error } = await supabaseClient.auth.signInWithPassword({
       email,
@@ -75,27 +88,11 @@ const LoginPage = () => {
     })
     if (error) {
       if (error.message === 'Invalid login credentials') {
-        toast.error(`用户名或密码错误`, {
-          position: 'top-right',
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-        })
+        useErrorToast("用户名或密码错误")
+      } else if (error.message === 'Failed to fetch') {
+        useErrorToast("网络开小差了")
       } else {
-        toast.error(`${error.message}`, {
-          position: 'top-right',
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-        })
+        useErrorToast(error.message)
       }
     }
   }

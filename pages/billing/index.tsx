@@ -1,3 +1,9 @@
+/*
+
+* This page is only for demostration purpose only. No payment logic is implemented
+
+*/
+
 import React, { useEffect, useState } from 'react'
 import { QrCode } from 'lucide-react'
 import QRCode from 'qrcode'

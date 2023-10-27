@@ -32,7 +32,7 @@ const features = [
   },
   {
     name: '课程相关',
-    description: '提供本部及国际部课程查询，选课建议、课程 Prerequisite 等查询',
+    description: '提供本部及国际部课程查询，选课建议、课程前置条件等查询',
     icon: DeviceTouchIcon,
     screen: InvestScreen,
   },
