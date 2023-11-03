@@ -150,7 +150,7 @@ const LoginPage = () => {
     })
   }, [])
   useEffect(() => {
-    if (session) window.location.href = '/chat'
+    if (session) window.location.href = '/onboarding'
   })
 
   const handleSetNewPwd = () => {
