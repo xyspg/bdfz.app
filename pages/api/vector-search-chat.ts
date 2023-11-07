@@ -46,16 +46,25 @@ export default async function handler(req: NextRequest) {
       data: { user },
       error,
     } = await supabaseClient.auth.getUser(jwt)
+
+    const email = user?.email;
+
+    if (email?.split('@')[1] !== 'i.pkuschool.edu.cn') {
+        throw new UserError("Guest access has been disabled. Please sign in with your" +
+            " PKUSchool email address to continue.")
+    }
+
     if (error || !user) {
-      throw new UserError('Invalid JWT token or user not found')
+      throw new UserError('This key is associated with a deactivated account. ' +
+          'If you believe this is an error, please contact support@bdfz.app')
     }
 
     const { query, messages } = requestData
     console.log('request body messages', messages)
+
     if (!query) {
       throw new UserError('请输入查询内容')
     }
-    console.log(query)
 
     // Moderate the content to comply with OpenAI T&C
     const sanitizedQuery = query.trim()
