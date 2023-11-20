@@ -10,12 +10,14 @@ import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import { Analytics } from '@vercel/analytics/react'
+import { NextIntlClientProvider } from 'next-intl';
 
-export default function App({ Component, pageProps }: AppProps<{ initialSession: Session }>) {
+
+export default function App({ Component, pageProps }: AppProps<{
+    messages: any;
+    initialSession: Session }>) {
   const [supabaseClient] = useState(() => createBrowserSupabaseClient())
   const router = useRouter()
-  const pathname = router.asPath
-
   return (
     <>
       <Head>
@@ -25,11 +27,17 @@ export default function App({ Component, pageProps }: AppProps<{ initialSession:
         supabaseClient={supabaseClient}
         initialSession={pageProps.initialSession}
       >
+          <NextIntlClientProvider
+              locale={router.locale}
+              timeZone="Asia/Shanghai"
+              messages={pageProps.messages}
+          >
         <UserStatusProvider>
           <ThemeProvider attribute="class">
             <Component {...pageProps} />
           </ThemeProvider>
         </UserStatusProvider>
+          </NextIntlClientProvider>
       </SessionContextProvider>
       <Analytics />
       <Script

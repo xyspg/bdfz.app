@@ -1,0 +1,106 @@
+{
+  "landing_page": {
+    "hero": {
+      "title": "Document Information, One-Click Search",
+      "subtitle": "Utilizing OpenAI Embeddings technology, our smart document retrieval system offers you a one-stop school information search service. Whether it's regulations, course descriptions, or class selection information, you can quickly find what you need with just one click, without the hassle of searching on various platforms.",
+      "button": {
+        "main": "Go to App",
+        "read_more": "Learn More"
+      }
+    },
+    "primary_features": {
+      "title": "Regulations, Campus Information, Available Anytime",
+      "description": "Using Embeddings technology, we convert school documents and user queries into numerical vectors, then perform fast and accurate information retrieval in vector space based on semantic similarity. Even if the query and document descriptions do not match exactly, relevant information can still be effectively found, greatly improving the efficiency and flexibility of searches.",
+      "cards": {
+        "1": {
+          "name": "School Regulations and Discipline",
+          "description": "Search for various school regulations and disciplines, such as training objectives, attendance system, entry and exit regulations, etc."
+        },
+        "2": {
+          "name": "School Affairs",
+          "description": "Inquire about various school matters, such as 'How to apply for an honors diploma', 'How to ask for leave', 'Where is the medical office', etc."
+        },
+        "3": {
+          "name": "Course Related",
+          "description": "Provide course inquiries for the main campus and international section, including course selection suggestions, prerequisites, etc."
+        }
+      }
+    },
+    "secondary_features": {
+      "title": "Explore More",
+      "subtitle": "BDFZ AI employs a series of SOTA (State of the Art) technologies to provide you with an exceptional usage experience",
+      "cards": {
+        "1": {
+          "name": "Comprehensive Document Library",
+          "description": "We have integrated a wide range of document resources including Peking University High School Student Handbook, High School Student Affairs Handbook, Main Campus and Dalton College Course Manuals, Peking University High School Diploma Program, Club Operation and Management Plan, providing you with detailed information support."
+        },
+        "2": {
+          "name": "Outstanding Text Completion",
+          "description": "BDFZ AI relies on the OpenAI API, using the same gpt-3.5-turbo model as the ChatGPT official website, capable of deep understanding and precise answering, helping you quickly obtain the answers you need."
+        },
+        "3": {
+          "name": "Personalized History Records",
+          "description": "With our history record feature, you can effortlessly review your conversation history, so you don’t have to worry about losing information. At the same time, you can also choose to delete or export your data, realizing self-management of personal information."
+        },
+        "4": {
+          "name": "Elegant User Experience",
+          "description": "We provide you with a simple, intuitive user experience. The website offers both light and dark modes. You can also add feedback to the answers to continuously improve our service."
+        },
+        "5": {
+          "name": "Strict Security Protection",
+          "description": "We use industry-leading security technology to ensure the safety of your data. All information is transmitted encrypted via HTTPS. Your login credentials are encrypted and stored using the bcrypt hashing algorithm, and authentication is performed using industry-standard technologies such as JWT."
+        },
+        "6": {
+          "name": "Continual Availability",
+          "description": "Our service is capable of high concurrent processing (Serverless Function execution up to 100 GB-Hrs), ensuring stable system operation."
+        }
+      }
+    },
+    "call_to_action": {
+      "title": "Experience BDFZ AI Now",
+      "subtitle": "Directly use your Peking University High School email account to log in and experience",
+      "button": "Go and Experience"
+    },
+    "faqs": {
+      "title": "If you have other questions, <a href=\"mailto:support@bdfz.app\" className=\"text-gray-900 underline\">feel free to ask us</a>",
+      "section": {
+        "1": {
+          "question": "Why can't I find the content I'm looking for?",
+          "answer": "BDFZ AI builds a text index from school-related documents in the database, so if the content related to your question is not explicitly stated in school documents, it cannot return accurate answers. Additionally, you can try changing the way you ask your question, for example, use 'Academy activity room' instead of 'Book activities'. If you still can't find an answer, you can click the button to submit feedback."
+        },
+        "2": {
+          "question": "Why can't I find some content about Dalton College?",
+          "answer": "Most of Dalton College's documents, including course manuals and course selection guides, are in English. Therefore, based on actual testing, asking questions in English usually yields better results than in Chinese."
+        },
+        "3": {
+          "question": "Is BDFZ AI free?",
+          "answer": "BDFZ AI is free for school teachers and students who have an @i.pkuschool.edu.cn email address. There are no plans to open it to the public in the beta version."
+        },
+        "4": {
+          "question": "How do I search for specific files or documents?",
+          "answer": "You can search for specific files by clearly stating the file name in your question. When asking, please be as specific as possible about the content you want to search for and use relevant keywords to help the system accurately match your needs."
+        },
+        "5": {
+          "question": "Can BDFZ AI guarantee the accuracy of search results?",
+          "answer": "BDFZ AI strives to provide accurate search results by building text indices and using advanced semantic matching technology. However, due to updates and changes in school documents, we cannot guarantee that all information is up-to-date and complete. We recommend verifying important information again and referring to official channels."
+        },
+        "6": {
+          "question": "Can I provide feedback or suggestions on BDFZ AI?",
+          "answer": "Yes, we welcome your feedback and suggestions to help us improve and perfect BDFZ AI's functionality. You can click the feedback button on the Q&A interface or contact support@bdfz.app to submit your opinions and suggestions."
+        },
+        "7": {
+          "question": "What school life-related information can BDFZ AI provide?",
+          "answer": "BDFZ AI provides a wide range of school life-related information, including student handbooks, affairs handbooks, course manuals, diploma programs, club operations and management plans, etc. You can obtain the information you need by searching with keywords."
+        },
+        "8": {
+          "question": "Does BDFZ AI have an APP or a WeChat mini-program?",
+          "answer": "BDFZ AI is currently only available as a web application. You can conveniently access and use BDFZ AI's features by visiting bdfz.app in the browser of your phone, tablet, or computer."
+        },
+        "9": {
+          "question": "How does BDFZ AI operate?",
+          "answer": "BDFZ AI prepares the knowledge base for searching during the preprocessing stage, then stores embedding vectors in PostgreSQL using pgvector; during runtime, it performs vector similarity searches to find content relevant to the user's question, finally injecting the found content into OpenAI's text autocompletion and streaming the response to the client."
+        }
+      }
+    }
+  }
+}

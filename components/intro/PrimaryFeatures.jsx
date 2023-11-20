@@ -13,30 +13,11 @@ import { BackpackIcon, GraduationCapIcon, SchoolIcon } from 'lucide-react'
 import rules from 'public/rules.png'
 import ask_for_leave from 'public/ask_for_leave.png'
 import course from 'public/course.png'
+import { useTranslations } from "next-intl";
 
 const MotionAppScreenHeader = motion(AppScreen.Header)
 const MotionAppScreenBody = motion(AppScreen.Body)
 
-const features = [
-  {
-    name: '校规校纪',
-    description: '查询各类校规校纪，如培养目标、考勤制度、出入校门制度等。',
-    icon: DeviceUserIcon,
-    screen: InviteScreen,
-  },
-  {
-    name: '学校事务',
-    description: '查询学校各类事物，如 "如何申请荣誉文凭"，"如何请假"，"医务室在哪里" 等',
-    icon: DeviceNotificationIcon,
-    screen: StocksScreen,
-  },
-  {
-    name: '课程相关',
-    description: '提供本部及国际部课程查询，选课建议、课程前置条件等查询',
-    icon: DeviceTouchIcon,
-    screen: InvestScreen,
-  },
-]
 
 function DeviceUserIcon(props) {
   return (
@@ -151,6 +132,28 @@ function FeaturesDesktop() {
     { leading: false }
   )
 
+  const t = useTranslations('landing_page.primary_features');
+  const features = [
+    {
+      name: t("cards.1.name"),
+      description: t("cards.1.description"),
+      icon: DeviceUserIcon,
+      screen: InviteScreen,
+    },
+    {
+      name: t("cards.2.name"),
+      description: t("cards.2.description"),
+      icon: DeviceNotificationIcon,
+      screen: StocksScreen,
+    },
+    {
+      name: t("cards.3.name"),
+      description: t("cards.3.description"),
+      icon: DeviceTouchIcon,
+      screen: InvestScreen,
+    },
+  ]
+
   return (
     <Tab.Group
       as="div"
@@ -245,6 +248,28 @@ function FeaturesMobile() {
     }
   }, [slideContainerRef, slideRefs])
 
+  const t = useTranslations('landing_page.primary_features');
+  const features = [
+    {
+      name: t("cards.1.name"),
+      description: t("cards.1.description"),
+      icon: DeviceUserIcon,
+      screen: InviteScreen,
+    },
+    {
+      name: t("cards.2.name"),
+      description: t("cards.2.description"),
+      icon: DeviceNotificationIcon,
+      screen: StocksScreen,
+    },
+    {
+      name: t("cards.3.name"),
+      description: t("cards.3.description"),
+      icon: DeviceTouchIcon,
+      screen: InvestScreen,
+    },
+  ]
+
   return (
     <>
       <div
@@ -302,17 +327,16 @@ function FeaturesMobile() {
 }
 
 export function PrimaryFeatures() {
+  const t = useTranslations('landing_page.primary_features')
   return (
     <section id="features" className="bg-gray-900 py-20 sm:py-32">
       <Container>
         <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-3xl">
           <h2 className="text-3xl font-medium tracking-tight text-white">
-            规章制度，校园信息，随时查询
+            {t('title')}
           </h2>
           <p className="mt-2 text-lg text-gray-400">
-            我们通过 Embeddings
-            技术，将学校文档和用户查询转化为数值向量，然后在向量空间中根据语义相似性进行快速准确的信息检索，即使查询和文档的表述不完全一致，也能有效找到相关信息，大大提升了查询的效率和灵活性。
-          </p>
+            {t('description')}</p>
         </div>
       </Container>
       <div className="mt-16 md:hidden">

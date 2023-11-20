@@ -7,12 +7,12 @@ import { AppScreen } from 'components/intro/AppScreen'
 import { AppStoreLink } from 'components/intro/AppStoreLink'
 import { Button } from '@/components/ui/Button'
 import { Container } from 'components/intro/Container'
+import { useTranslations } from "next-intl";
 import Link from 'next/link'
 import appScreenshot from '@/public/App.png'
 
 function BackgroundIllustration(props) {
   let id = useId()
-
   return (
     <div {...props}>
       <svg
@@ -313,21 +313,19 @@ function AppDemo() {
 }
 
 export function Hero() {
+  const t = useTranslations("landing_page.hero");
   return (
     <div className="overflow-hidden py-16 sm:py-32 lg:pb-32 xl:pb-36">
       <Container>
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-8 lg:gap-y-20">
           <div className="relative z-10 mx-auto max-w-2xl lg:col-span-7 lg:max-w-none lg:pt-6 xl:col-span-6">
-            <h1 className="text-4xl font-medium tracking-tight text-gray-900">文档信息，一键搜</h1>
-            <p className="mt-6 text-lg text-gray-600">
-              利用 OpenAI Embeddings
-              技术，我们的智能文档检索系统为您提供一站式的学校信息搜索服务。无论是规章制度、课程说明还是选课信息，只需一键查询，便可迅速找到所需内容，无需在各个平台繁琐查找。
-            </p>
+            <h1 className="text-4xl font-medium tracking-tight text-gray-900">{t('title')}</h1>
+            <p className="mt-6 text-lg text-gray-600">{t('subtitle')}</p>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-4">
               <AppStoreLink />
               <Link href="#features">
                 <Button variant="outline">
-                  <span className="">了解更多</span>
+                  <span className="">{t('button.read_more')}</span>
                 </Button>
               </Link>
             </div>

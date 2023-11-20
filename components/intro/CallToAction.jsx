@@ -1,8 +1,10 @@
 import { AppStoreLink } from 'components/intro/AppStoreLink'
 import { CircleBackground } from 'components/intro/CircleBackground'
 import { Container } from 'components/intro/Container'
+import { useTranslations } from "next-intl";
 
 export function CallToAction() {
+  const t = useTranslations('landing_page.call_to_action');
   return (
     <section
       id="get-free-shares-today"
@@ -14,9 +16,9 @@ export function CallToAction() {
       <Container className="relative">
         <div className="mx-auto max-w-md sm:text-center">
           <h2 className="text-3xl font-medium tracking-tight text-white sm:text-4xl">
-            立即体验 BDFZ AI
+            {t('title')}
           </h2>
-          <p className="mt-4 text-lg text-gray-300">直接使用北大附中邮箱账号即可登录体验</p>
+          <p className="mt-4 text-lg text-gray-300">{t('subtitle')}</p>
           <div className="mt-8 flex justify-center">
             <AppStoreLink />
           </div>

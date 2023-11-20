@@ -88,6 +88,7 @@ export function NewHeader() {
     isPaidUser && { name: 'GPT4', href: '/gpt4' },
     isAdmin && { name: '仪表盘', href: '/dashboard' },
     { name: '历史记录', href: '/history' },
+    { name: '首页', href: '/home' },
     { name: '设置', href: '/settings' },
     { name: '贡献新文档', href: `/survey/upload?id=${userid}`, target: '_blank' },
     { name: '寻求帮助', href: 'mailto:support@bdfz.app' },

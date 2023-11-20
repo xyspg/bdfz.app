@@ -20,6 +20,7 @@ import {
   LaptopIcon,
   MoonIcon,
   SunIcon,
+    HomeIcon
 } from '@radix-ui/react-icons'
 import { AnimatePresence, motion } from 'framer-motion'
 
@@ -88,6 +89,12 @@ const DropDownNotLogin = () => {
             </DropdownMenuSub>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
+          <Link href="/home">
+            <DropdownMenuItem>
+              <HomeIcon className="mr-2 h-4 w-4" />
+              <span>首页</span>
+            </DropdownMenuItem>
+          </Link>
           <a href="mailto:support@bdfz.app">
             <DropdownMenuItem>
               <EnvelopeClosedIcon className="mr-2 h-4 w-4" />

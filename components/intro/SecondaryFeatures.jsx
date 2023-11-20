@@ -1,45 +1,9 @@
 import { useId } from 'react'
 
 import { Container } from 'components/intro/Container'
+import { useTranslations } from "next-intl";
 
-const features = [
-  {
-    name: '全面的文档库',
-    description:
-      '我们整合了包括北大附中学生手册、高中学生事务手册、本部及道尔顿学院课程手册、北大附中文凭方案、社团运行和管理方案在内的广泛文档资源，为您提供详尽的信息支持。',
-    icon: DeviceArrowIcon,
-  },
-  {
-    name: '卓越的文本补全',
-    description:
-      'BDFZ AI 依托 OpenAI API，使用与 ChatGPT 官网相同的 gpt-3.5-turbo 模型，具备深度的理解力和精准的回答能力，帮您迅速获取所需答案。',
-    icon: DeviceCardsIcon,
-  },
-  {
-    name: '个性化历史记录',
-    description:
-      '通过我们的历史记录功能，您可以无障碍查看对话历史，从而不必担心信息的丢失。同时，您也可以选择删除或导出自己的数据，实现个人信息的自主管理。',
-    icon: DeviceClockIcon,
-  },
-  {
-    name: '优雅的用户体验',
-    description:
-      '我们为您提供简洁、直观的用户体验。网站同时提供浅色与深色模式。您还可以对回答添加反馈，来持续改进我们的服务。',
-    icon: DeviceListIcon,
-  },
-  {
-    name: '严密的安全防护',
-    description:
-      '我们使用业界领先的安全技术来保障您的数据安全。所有信息均通过 HTTPS 加密传输，您的登录凭据会采用 bcrypt 哈希算法进行加密存储，并使用符合业界标准的 JWT 等技术进行验证。',
-    icon: DeviceLockIcon,
-  },
-  {
-    name: '持续的可用性',
-    description:
-      '我们的服务具有高并发处理能力（Serverless Function 执行高达 100 GB-Hrs），保证系统的稳定运行。',
-    icon: DeviceChartIcon,
-  },
-]
+
 
 function DeviceArrowIcon(props) {
   return (
@@ -172,6 +136,42 @@ function DeviceChartIcon(props) {
 }
 
 export function SecondaryFeatures() {
+
+    const t = useTranslations("landing_page.secondary_features")
+
+    const features = [
+        {
+            name: t('cards.1.name'),
+            description: t('cards.1.description'),
+            icon: DeviceArrowIcon,
+        },
+        {
+            name: t('cards.2.name'),
+            description: t('cards.2.description'),
+            icon: DeviceCardsIcon,
+        },
+        {
+            name: t('cards.3.name'),
+            description: t('cards.3.description'),
+            icon: DeviceClockIcon,
+        },
+        {
+            name: t('cards.4.name'),
+            description: t('cards.4.description'),
+            icon: DeviceListIcon,
+        },
+        {
+            name: t('cards.5.name'),
+            description: t('cards.5.description'),
+            icon: DeviceLockIcon,
+        },
+        {
+            name: t('cards.6.name'),
+            description: t('cards.6.description'),
+            icon: DeviceChartIcon,
+        },
+    ]
+
   return (
     <section
       id="secondary-features"
@@ -180,10 +180,8 @@ export function SecondaryFeatures() {
     >
       <Container>
         <div className="mx-auto max-w-2xl sm:text-center">
-          <h2 className="text-3xl font-medium tracking-tight text-gray-900">探索更多</h2>
-          <p className="mt-2 text-lg text-gray-600">
-            BDFZ AI 采用了一系列 SOTA 技术，为您提供卓越的使用体验
-          </p>
+          <h2 className="text-3xl font-medium tracking-tight text-gray-900">{t('title')}</h2>
+          <p className="mt-2 text-lg text-gray-600">{t('subtitle')}</p>
         </div>
         <ul
           role="list"
