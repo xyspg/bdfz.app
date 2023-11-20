@@ -1,4 +1,7 @@
 {
+  "common": {
+    "meta_description": "BDFZ AI is the exclusive AI document search system of Peking University Affiliated High School. It uses advanced text embedding technology and OpenAI's GPT model to help students and faculty quickly and efficiently search for school manuals, curriculum, leave procedures, etc. Information. No need to flip through a lot of documents, you can get the information you need with one click."
+  },
   "landing_page": {
     "hero": {
       "title": "Document Information, One-Click Search",

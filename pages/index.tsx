@@ -14,12 +14,15 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import * as React from 'react'
 import { useTheme } from 'next-themes'
+import { useTranslations } from "next-intl";
 
 export default function Home() {
   const { systemTheme, theme, setTheme } = useTheme()
   const session = useSession()
   const router = useRouter()
   const pathname = router.pathname
+
+    const t = useTranslations("common");
 
   useEffect(() => {
     if (session) window.location.href = '/chat'
@@ -36,7 +39,7 @@ export default function Home() {
         <title>BDFZ AI</title>
         <meta
           name="description"
-          content="BDFZ AI 是北大附中专属的AI文档搜索系统，利用先进的文本嵌入技术和OpenAI的GPT模型，帮助学生和教职员工快速、高效地查找学校手册、课程设置、请假流程等各类信息。无需翻阅大量文件，一键即可获取所需信息"
+          content={t('meta_description')}
         />
       </Head>
       <NewHeader />
