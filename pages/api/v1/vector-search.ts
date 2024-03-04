@@ -36,18 +36,6 @@ export default async function handler(req: NextRequest) {
 
     const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Check if user is authenticated
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new UserError('Missing Authorization header')
-    }
-
-    const auth = process.env.API_KEY
-
-    if (authHeader.substring(7) !== auth) {
-      throw new UserError('Invalid token')
-    }
-
     const { query } = requestData
     if (!query) {
       throw new UserError('请输入查询内容')
