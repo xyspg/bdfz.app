@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { createClient } from '@supabase/supabase-js'
 import { createHash } from 'crypto'
 import dotenv from 'dotenv'
