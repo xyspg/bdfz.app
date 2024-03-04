@@ -16,6 +16,10 @@ export async function middleware(req: NextRequest) {
     })
   }
 
+  if (req.nextUrl.pathname.startsWith('/api/v1')) {
+    return NextResponse.next()
+  }
+
   // Check auth condition
   if (session) {
     // If the user has a session and is accessing the homepage (/), forward to /chat.
@@ -73,7 +77,7 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  if (!session && req.nextUrl.pathname.startsWith('/api')) {
+  if (!session && req.nextUrl.pathname.startsWith('/api') && !req.nextUrl.pathname.startsWith('/api/v1')) {
     // API route, return 401.
     return new NextResponse(JSON.stringify({ success: false, message: 'Unauthorized' }), {
       status: 401,

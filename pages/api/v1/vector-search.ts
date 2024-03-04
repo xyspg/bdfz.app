@@ -2,7 +2,6 @@ import type { NextRequest } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { codeBlock, oneLine } from 'common-tags'
 import GPT3Tokenizer from 'gpt3-tokenizer'
-import CreateChatCompletionRequest from 'openai'
 import { ApplicationError, UserError } from '@/lib/errors'
 import { politicalWords, pornWords } from '@/pages/api/sensitiveWords'
 // OpenAIApi does currently not work in Vercel Edge Functions as it uses Axios under the hood.
@@ -35,19 +34,18 @@ export default async function handler(req: NextRequest) {
       throw new UserError('Missing request data')
     }
 
-    // Check if user is authenticated
     const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
+
+    // Check if user is authenticated
     const authHeader = req.headers.get('Authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       throw new UserError('Missing Authorization header')
     }
-    const jwt = authHeader.substring(7)
-    const {
-      data: { user },
-      error,
-    } = await supabaseClient.auth.getUser(jwt)
-    if (error || !user) {
-      throw new UserError('Invalid JWT token or user not found')
+
+    const auth = process.env.API_KEY
+
+    if (authHeader.substring(7) !== auth) {
+      throw new UserError('Invalid token')
     }
 
     const { query } = requestData
@@ -55,24 +53,9 @@ export default async function handler(req: NextRequest) {
       throw new UserError('请输入查询内容')
     }
 
-    // Moderate the content to comply with OpenAI T&C
-    const sanitizedQuery = query.trim()
-    const moderationResponse = await fetch('https://' + openAiBaseUrl + '/v1/moderations', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${openAiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        input: sanitizedQuery,
-      }),
-    }).then((res) => res.json())
-    const [results] = moderationResponse.results
-
     if (/\bdeveloper mode\b/i.test(query)) {
       throw new UserError('Flagged content', {
         flagged: true,
-        categories: results.categories,
       })
     }
 
@@ -80,7 +63,6 @@ export default async function handler(req: NextRequest) {
       if (query.includes(politicalWords[i])) {
         throw new UserError('Flagged content politics', {
           flagged: true,
-          categories: results.categories,
         })
       }
     }
@@ -89,17 +71,10 @@ export default async function handler(req: NextRequest) {
       if (query.includes(pornWords[i])) {
         throw new UserError('Flagged content', {
           flagged: true,
-          categories: results.categories,
         })
       }
     }
 
-    if (results.flagged) {
-      throw new UserError('Flagged content', {
-        flagged: true,
-        categories: results.categories,
-      })
-    }
 
     let embeddingResponse
 
@@ -112,11 +87,10 @@ export default async function handler(req: NextRequest) {
         },
         body: JSON.stringify({
           model: 'text-embedding-ada-002',
-          input: sanitizedQuery.replaceAll('\n', ' '),
+          input: query.replaceAll('\n', ' '),
         }),
       })
 
-      console.log('embeddings response: ', embeddingResponse)
 
       if (embeddingResponse.status !== 200) {
         if (embeddingResponse.status === 401) {
@@ -136,9 +110,9 @@ export default async function handler(req: NextRequest) {
     const MainSchoolKeywords = ['本部']
     let department = null
     // Determine department based on keywords in sanitized query
-    if (DaltonKeywords.some((keyword) => sanitizedQuery.includes(keyword))) {
+    if (DaltonKeywords.some((keyword) => query.includes(keyword))) {
       department = 'Dalton'
-    } else if (MainSchoolKeywords.some((keyword) => sanitizedQuery.includes(keyword))) {
+    } else if (MainSchoolKeywords.some((keyword) => query.includes(keyword))) {
       department = 'MainSchool'
     }
 
@@ -186,7 +160,7 @@ export default async function handler(req: NextRequest) {
       ${contextText}
 
       Question: """
-      ${sanitizedQuery}
+      ${query}
       """
 
       Answer:
@@ -200,26 +174,11 @@ export default async function handler(req: NextRequest) {
       stream: true,
     }
 
-    try {
-      const { error } = await supabaseClient.from('embeddings_log').insert({
-        email: user.email,
-        question: query,
-        page_section: pageSections,
-        token_count: tokenCount,
-        context: contextText,
-        department,
-        timestamp: new Date().toISOString(),
-      })
-    } catch (error) {
-      console.log('error inserting:', error)
-    }
-
     const response = await fetch('https://' + openAiBaseUrl + '/v1/chat/completions', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${openAiKey}`,
         'Content-Type': 'application/json',
-        'X-Api-Key': `Bearer ${process.env.LLM_REPORT_API_KEY}`,
       },
       body: JSON.stringify(completionOptions),
     })

@@ -2,7 +2,6 @@ import type { NextRequest } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { codeBlock, oneLine } from 'common-tags'
 import GPT3Tokenizer from 'gpt3-tokenizer'
-import { CreateChatCompletionRequest } from 'openai'
 import { ApplicationError, UserError } from '@/lib/errors'
 import { politicalWords, pornWords } from '@/pages/api/sensitiveWords'
 // OpenAIApi does currently not work in Vercel Edge Functions as it uses Axios under the hood.
@@ -49,7 +48,7 @@ export default async function handler(req: NextRequest) {
 
     const email = user?.email;
 
-    if (email?.split('@')[1] !== 'i.pkuschool.edu.cn') {
+    if (email?.split('@')[1] !== 'i.pkuschool.edu.cn' && process.env.NODE_ENV === 'production')  {
         throw new UserError("Guest access has been disabled. Please sign in with your" +
             " PKUSchool email address to continue.")
     }
@@ -215,7 +214,7 @@ export default async function handler(req: NextRequest) {
     messages.push({ role: 'user', content: prompt })
     console.log('Updated Messages:', messages)
 
-    const completionOptions: CreateChatCompletionRequest = {
+    const completionOptions = {
       model: 'gpt-3.5-turbo',
       messages: messages,
       max_tokens: 1024,
@@ -251,6 +250,7 @@ export default async function handler(req: NextRequest) {
       const error = await response.json()
       throw new ApplicationError('Failed to generate completion', error)
     }
+
 
     // Proxy the streamed SSE response from OpenAI
     return new Response(response.body, {
