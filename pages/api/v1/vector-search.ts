@@ -45,7 +45,7 @@ export default async function handler(req: NextRequest) {
 
     const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
 
-    const { query } = requestData
+    const { query, stream = false } = requestData
     if (!query) {
       throw new UserError('请输入查询内容')
     }
@@ -168,7 +168,7 @@ export default async function handler(req: NextRequest) {
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 1024,
       temperature: 0,
-      stream: true,
+      stream,
     }
 
     const response = await fetch('https://' + openAiBaseUrl + '/v1/chat/completions', {
@@ -185,10 +185,11 @@ export default async function handler(req: NextRequest) {
       throw new ApplicationError('Failed to generate completion', error)
     }
 
+
     // Proxy the streamed SSE response from OpenAI
     return new Response(response.body, {
       headers: {
-        'Content-Type': 'text/event-stream',
+        'Content-Type': stream ? 'text/event-stream' : 'application/json',
       },
     })
   } catch (err: unknown) {
